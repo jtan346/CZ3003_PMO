@@ -1,0 +1,19 @@
+version: "3"
+services:
+  db:
+    build: ./mysql
+    ports:
+    - "3306:3306"
+    volumes:
+    - ./mysql/tmp:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: cmodb
+      MYSQL_DATABASE: cmodb
+      MYSQL_USER: devuser
+      MYSQL_PASSWORD: devpassword
+  cmo:
+    build: ./
+    links:
+    - db
+    ports:
+    - "80:80"
