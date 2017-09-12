@@ -1,4 +1,4 @@
-# Crisis Management Office
+# Prime Minister Office Management Office
 
 Project for CZ3003 Software System Analysis and Design, group SSP3.
 
@@ -26,8 +26,8 @@ environment.
 
 ```shell
 $ sudo python -m pip install virtualenv
-$ virtualenv cmoenv
-$ source cmoenv/bin/activate
+$ virtualenv pmoenv
+$ source pmoenv/bin/activate
 ```
 
 Next, we will install all requirements/dependencies for this project using `pip`.
@@ -78,26 +78,26 @@ First, we need to install Docker from https://www.docker.com/. Then, run the fol
 $ docker-compose up
 
 # Create Table in MySQL server
-$ docker exec -it cz3003ssp3cmo_cmo_1 python manage.py migrate --settings cmo.prod_settings
+$ docker exec -it cz3003ssp3pmo_pmo_1 python manage.py migrate --settings pmo.prod_settings
 
 # Create admin user
-$ docker exec -it cz3003ssp3cmo_cmo_1 python manage.py createsuperuser --settings cmo.prod_settings
+$ docker exec -it cz3003ssp3pmo_pmo_1 python manage.py createsuperuser --settings pmo.prod_settings
 ```
 
 Both the server for this project and the MySQL server will be runned. All data in MySQL server will
 be stored at `./mysql/tmp/` folder. Few useful commands to work with the MySQL server using Docker:
 
 ```shell
-# Get the name of the CMO DB by running docker command, and set the name to a variable
+# Get the name of the PMO DB by running docker command, and set the name to a variable
 $ docker ps
-$ DOCKER_CMO_DB_NAME=cz3003ssp3cmo_db_1
-$ DOCKER_CMO_NAME=cz3003ssp3cmo_cmo_1
+$ DOCKER_PMO_DB_NAME=cz3003ssp3pmo_db_1
+$ DOCKER_PMO_NAME=cz3003ssp3pmo_pmo_1
 
 # Execute some sql commands in the mysql server
-$ docker exec -i $DOCKER_CMO_DB_NAME mysql -uroot -pcmodb  <<< "use cmodb; select database();"
+$ docker exec -i $DOCKER_PMO_DB_NAME mysql -uroot -ppmodb  <<< "use pmodb; select database();"
 
 # Dump all databases to command line outputs
-$ docker exec cz3003ssp3cmo_db_1 sh -c 'exec mysqldump --all-databases -uroot -p"cmodb"'
+$ docker exec cz3003ssp3pmo_db_1 sh -c 'exec mysqldump --all-databases -uroot -p"pmodb"'
 ```
 
 ## Linter and Formatter
