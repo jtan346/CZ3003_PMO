@@ -1,4 +1,4 @@
-# Prime Minister Office Management Office
+# Prime Minister Office
 
 Project for CZ3003 Software System Analysis and Design, group SSP3.
 
