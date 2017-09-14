@@ -1,5 +1,5 @@
 # Virtual environment for this project
-cmoenv/
+pmoenv/
 
 # MySQL tmp folder
 mysql/tmp/

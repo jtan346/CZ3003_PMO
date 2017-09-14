@@ -1,6 +1,6 @@
 """Production Django settings.
 """
-from cmo.common_settings import *  # pylint: disable=wildcard-import,unused-wildcard-import
+from pmo.common_settings import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
 DATABASES = {
     'default': {

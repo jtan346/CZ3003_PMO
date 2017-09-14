@@ -1,7 +1,7 @@
 """Common Django settings for dev and prod.
 """
 
-# Django settings for cmo project.
+# Django settings for pmo project.
 import os.path
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -94,10 +94,10 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'cmo.urls'
+ROOT_URLCONF = 'pmo.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'cmo.wsgi.application'
+WSGI_APPLICATION = 'pmo.wsgi.application'
 
 TEMPLATES = [
     {
