@@ -5,9 +5,9 @@ from pmo.common_settings import *  # pylint: disable=wildcard-import,unused-wild
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'cmodb',
+        'NAME': 'pmodb',
         'USER': 'root',
-        'PASSWORD': 'cmodb',
+        'PASSWORD': 'pmodb',
         'HOST': 'db',
         'PORT': '3306',
     }

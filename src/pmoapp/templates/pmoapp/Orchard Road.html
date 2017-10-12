@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>PMOSIMS</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link href="vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/sb-admin.css" rel="stylesheet">
+
+  </head>
+
+  <body class="fixed-nav sticky-footer bg-dark" id="page-top">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+      <a class="navbar-brand" href="#">PMOSIMS</a>
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Curent Crisis">
+            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseComponents" data-parent="#exampleAccordion">
+              <i class="fa fa-fw fa-tv"></i>
+              <span class="nav-link-text">
+                Current Crisis</span>
+            </a>
+			<ul class="sidenav-second-level collapse" id="collapseComponents">
+              <li>
+                <a href="Current Crisis.html">
+					<i class="fa fa-file-text"></i>
+					Current Crisis Reports
+				</a>
+              </li>
+			  <li class="currentCrisisItem">
+                <a href="Changi T3.html">
+					⦁ Changi T3
+				</a>
+              </li>
+              <li class="currentCrisisItem">
+                <a href="#">
+					⦁ Jurong Island
+				</a>
+              </li>
+            </ul>
+          </li>
+	
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Past Reports">
+            <a class="nav-link" href="Past Reports.html">
+              <i class="fa fa-fw fa-history"></i>
+              <span class="nav-link-text">
+                Past Reports</span>
+            </a>
+          </li>
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live News Feed">
+            <a class="nav-link" href="Live News Feed.html">
+              <i class="fa fa-fw fa-feed"></i>
+              <span class="nav-link-text">
+                Live News Feed</span>
+            </a>
+          </li>
+
+        </ul>
+        <ul class="navbar-nav sidenav-toggler">
+          <li class="nav-item">
+            <a class="nav-link text-center" id="sidenavToggler">
+              <i class="fa fa-fw fa-angle-left"></i>
+            </a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+			<li class="nav-item dropdown" id="alertBellNotification">
+					<a class="nav-link dropdown-toggle mr-lg-2" href="#" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					  <i class="fa fa-fw fa-bell"></i>
+					  <span class="d-lg-none">Alerts
+						<span class="badge badge-pill badge-warning">3 New</span>
+					  </span>
+					  <span class="new-indicator text-warning d-none d-lg-block">
+						<i class="fa fa-fw fa-circle"></i>
+						<span class="number">3</span>
+					  </span>
+					</a>
+					<div class="dropdown-menu" aria-labelledby="alertsDropdown">
+					  <h6 class="dropdown-header">New Alerts:</h6>
+					  <div class="dropdown-divider"></div>
+					  <a class="dropdown-item" href="Changi T3.html">
+						<span class="text-danger">
+						  <strong>Report for Vetting</strong>
+						</span>
+						<span class="small float-right text-muted">11:21 AM</span>
+						<div class="dropdown-message small">Crisis: Bombing Incident at Changi Airport Terminal 3</div>
+					  </a>
+					  <div class="dropdown-divider"></div>
+					  <a class="dropdown-item" href="#">
+						<span class="text-danger">
+						  <strong>Report for Vetting</strong>
+						</span>
+						<span class="small float-right text-muted">11:21 AM</span>
+						<div class="dropdown-message small">Crisis: Bombing at Jurong Island</div>
+					  </a>
+					  <div class="dropdown-divider"></div>
+					  <a class="dropdown-item" href="Orchard Road.html">
+						<span class="text-success">
+						  <strong>Crisis Over</strong>
+						</span>
+						<span class="small float-right text-muted">11:21 AM</span>
+						<div class="dropdown-message small">Resolved: Bombing Incident at Orchard Road</div>
+					  </a>
+					  <div class="dropdown-divider"></div>
+					  <a class="dropdown-item small" href="#">
+						View all alerts
+					  </a>
+					</div>
+			</li>
+     
+          <li class="nav-item" id="logoutBtn">
+            <a class="nav-link" data-toggle="modal" data-target="#exampleModal">
+              <i class="fa fa-fw fa-sign-out"></i>
+              Logout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="content-wrapper">
+
+      <div class="container-fluid">
+
+        <!-- Breadcrumbs -->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="#">Past Reports</a>
+          </li>
+          <li class="breadcrumb-item active">Bombing Incident at Orchard Road</li>
+        </ol>
+
+
+        <!-- Example Tables Card -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fa fa-tv"></i>
+            	Bombing Incident at Orchard Road
+			<i id="statusLabel">Status:
+				<i id="statusText">Resolved</i>
+			</i>
+          </div>
+		  
+		  <div class="tab_container">
+			<input id="tab1" type="radio" name="tabs" checked>
+			<label class= "tab" for="tab1"><span>Report</span></label>
+
+			<input id="tab2" type="radio" name="tabs">
+			<label class= "tab" for="tab2"><span>Dashboard</span></label>
+
+			<input id="tab3" type="radio" name="tabs">
+			<label class= "tab" for="tab3"><span>CMO Chat</span></label>
+
+			<section id="content1" class="tab-content">
+			<form>
+			  <div class="form-row">
+				<label for="ReportIDtxt" class="col-form-label">Report ID:</label>
+				<div class="form-group col-md-2">  
+				  <input type="text" class="form-control" id="ReportIDtxt" value="001" readonly>
+				</div>
+				<label for="ReportDateTimetxt" class="col-form-label">Report Date/Time:</label>
+				<div class="form-group col-md-3">
+				  <input type="text" class="form-control" id="ReportDateTimetxt" value="25th December 2016, 1949H" readonly>
+				</div>
+			  </div>
+			  
+			   <div class="form-group">
+				<label for="ReportDescriptiontxt">Report Description:</label>
+				<textarea class="form-control" id="ReportDescriptiontxt" rows="5" readonly>A bomb has been detonated at Orchard Road at around 1949H, casualties are currently being reported and First-Responder teams have been dispatched. No suspects have been identified, link to Terror Organization unconfirmed. Changi Airport is classified as a Key Installation and threat level is at code: Red.
+				</textarea>
+			  </div>
+			  
+			<h4 class="reportHeader"> Current Updates </h4>  
+			<div class="form-row">
+				<label for="EstimatedCasualtiestxt" class="col-form-label col-md-2 text-left" id="estimatedCasualtiesLabel">Estimated Casualties:</label>
+				<div class="form-group col-md-2">  
+				  <input type="text" class="form-control" id="EstimatedCasualtiestxt" value="150%" readonly>
+				</div>
+				<label for="EstimatedResolutiontxt" class="col-form-label col-md-2 text-left" id="estimatedResolutionLabel">Estimated Resolution:</label>
+				<div class="form-group col-md-4">
+				  <input type="text" class="form-control" id="EstimatedResolutiontxt" value="10/12/2017 08:30 PM" readonly>
+				</div>
+			</div>
+				
+			<div class="form-row">
+				<label for="EstimatedInjuriestxt" class="col-form-label col-md-2 text-left" id="estimatedInjuriesLabel">Estimated Injuries:</label>
+				<div class="form-group col-md-2">  
+				  <input type="text" class="form-control" id="EstimatedInjuriestxt" value="100%" readonly> 
+				</div>
+				<label for="EstimatedEFUtilizationtxt" class="col-form-label col-md-2 text-left" id="estimatedEFUtilizationLabel">Estimated EF Utilization:</label>
+				<div class="form-group col-md-4">
+					<input type="text" class="form-control" id="EstimatedEFUtilizationtxt" value="20.5%" readonly>
+				</div>
+			</div>
+			
+			<div class="form-row">
+				
+				<label for="AffectedRadiustxt" class="col-form-label col-md-2 text-left" id="affectedRadiusLabel">Affected Radius:</label>
+				<div class="form-group col-md-2">  
+				  
+				  <input type="text" class="form-control" id="AffectedRadiustxt" value="3750 m" readonly>
+				</div>
+				<label for="AddressOfIncidenttxt" class="col-form-label col-md-2 text-left" id="addressOfIncidentLabel">Address of Incident:</label>
+				<div class="form-group col-md-4">
+					<input type="text" class="form-control" id="AddressOfIncidenttxt" value="2 Orchard Turn, 238801" readonly>
+				</div>
+			</div>
+			<div class="form-row">
+				<label for="threatLeveltxt" class="col-form-label col-md-2 text-left" id="threatLevelLabel">Threat Level:</label>
+				<div class="form-group col-md-2">	
+					<input type="text" class="form-control" id="threatLeveltxt" value="Red" readonly>
+				</div>
+			</div>	
+			
+			<h4 class="reportHeader"> Crisis Resolution Plan </h4>
+			
+			 <div class="form-row">
+				<label for="PlanIDtxt" class="col-form-label">Plan ID:</label>
+				<div class="form-group col-md-2">  
+				  <input type="text" class="form-control" id="PlanIDtxt" value="00000001" readonly>
+				</div>
+			  </div>
+			  
+			   <div class="form-group">
+				<label for="PlanDescriptiontxt">Plan Description:</label>
+				<textarea class="form-control" id="PlanDescriptiontxt" rows="5" readonly>A bomb has been detonated at Changi Airport Terminal 3 at around 1930H, casualties are currently being reported and First-Responder teams have been dispatched. No suspects have been identified, link to Terror Organization unconfirmed. Changi Airport is classified as a Key Installation and threat level is at code: Red.
+				</textarea>
+			  </div>
+			  
+			<div class="form-row">
+				<label for="ProjectedCrisisRadiustxt" class="col-form-label" id="ProjectedCrisisRadiusLabel">Projected Crisis Radius:</label>
+				<div class="form-group col-md-1">  
+				  <input type="text" class="form-control" id="ProjectedCrisisRadiustxt" value="3000 m" readonly>
+				</div>
+				<label for="ProjectedCasualtiestxt" class="col-form-label col-md-3 text-right" id="ProjectedCasualtiesLabel">Projected Casualties:</label>
+				<div class="form-group col-md-1">
+				  <input type="text" class="form-control" id="ProjectedCasualtiestxt" value="5.5%" readonly>
+				</div>
+				<label for="ProjectedCrisisResolutiontxt" class="col-form-label col-md-3 text-right" id="ProjectedCrisisResolutionLabel">Projected Crisis Resolution:</label>
+				<div class="form-group col-md-1">
+				  <input type="text" class="form-control" id="ProjectedCrisisResolutiontxt" value="100 hr" readonly>
+				</div>
+			</div>
+			
+			<h5 class="reportSubheader"> EF Deployment Details </h5>
+			<div class="form-row">
+				<label for="RecommendedSAFDeploymenttxt" class="col-form-label col-md-3 text-left" id="RecommendedSAFDeploymentLabel">Recommended SAF Deployment:</label>
+				<div class="form-group col-md-1">  
+				  <input type="text" class="form-control" id="RecommendedSAFDeploymenttxt" value="40%" readonly>
+				</div>
+				<label for="MaximumSAFDeploymenttxt" class="col-form-label col-md-3 text-left" id="MaximumSAFDeploymentLabel">Maximum SAF Deployment:</label>
+				<div class="form-group col-md-1">
+				  <input type="text" class="form-control" id="MaximumSAFDeploymenttxt" value="60%" readonly>
+				</div>
+			</div>
+			
+			<div class="form-row">
+				<label for="RecommendedSCDFDeploymenttxt" class="col-form-label col-md-3 text-left" id="RecommendedSCDFDeploymentLabel">Recommended SCDF Deployment:</label>
+				<div class="form-group col-md-1">  
+				  <input type="text" class="form-control" id="RecommendedSCDFDeploymenttxt" value="35%" readonly>
+				</div>
+				<label for="MaximumSCDFDeploymenttxt" class="col-form-label col-md-3 text-left" id="MaximumSCDFDeploymentLabel">Maximum SCDF Deployment:</label>
+				<div class="form-group col-md-1">
+				  <input type="text" class="form-control" id="MaximumSCDFDeploymenttxt" value="60%" readonly>
+				</div>
+			</div>
+			
+			<div class="form-row">
+				<label for="RecommendedCDDeploymenttxt" class="col-form-label col-md-3 text-left" id="RecommendedCDDeploymentLabel">Recommended CD Deployment:</label>
+				<div class="form-group col-md-1">  
+				  <input type="text" class="form-control" id="RecommendedCDDeploymenttxt" value="35%" readonly>
+				</div>
+				<label for="MaximumCDDeploymenttxt" class="col-form-label col-md-3 text-left" id="MaximumCDDeploymentLabel">Maximum CD Deployment:</label>
+				<div class="form-group col-md-1">
+				  <input type="text" class="form-control" id="MaximumCDDeploymenttxt" value="60%" readonly>
+				</div>
+			</div>
+			
+		
+			<h4 class="reportHeader"> Review of Crisis Report </h4>
+			
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<div class="card-header" id="reportPanel1" data-toggle="collapse" href="#filterPanel1" data-parent="#exampleAccordion">						
+							<i class="fa fa-check-square" id="tickCross1"></i>
+							Deputy Prime Minister 
+						<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel1">
+							<i class="fa fa-chevron-right" id="panelArrow1"></i>
+						</span>
+					</div>
+				</div>
+				<div class="card-body" id="reportPanelBody1">
+					<div id="filterPanel1" class="panel-collapse panel-collapse collapse">
+						<div class="panel-body">
+							<div class="reportReview">
+								<textarea class="form-control" id="DeputyPMtxt" rows="5" readonly>DPM comments</textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<div class="card-header" id="reportPanel2" data-toggle="collapse" href="#filterPanel2" data-parent="#exampleAccordion">						
+							<i class="fa fa-check-square" id="tickCross2"></i>
+							Minister of Foreign Affairs 
+						<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel2">
+							<i class="fa fa-chevron-right" id="panelArrow2"></i>
+						</span>
+					</div>
+				</div>
+				<div class="card-body" id="reportPanelBody2">
+					<div id="filterPanel2" class="panel-collapse panel-collapse collapse">
+						<div class="panel-body">
+							<div class="reportReview">
+								<textarea class="form-control" id="MOFAtxt" rows="5" readonly>MOFA comments</textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<div class="card-header" id="reportPanel3" data-toggle="collapse" href="#filterPanel3" data-parent="#exampleAccordion">						
+							<i class="fa fa-check-square" id="tickCross3"></i>
+							Minister of Home Affairs
+						<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel3">
+							<i class="fa fa-chevron-right" id="panelArrow3"></i>
+						</span>
+					</div>
+				</div>
+				<div class="card-body" id="reportPanelBody3">
+					<div id="filterPanel3" class="panel-collapse panel-collapse collapse">
+						<div class="panel-body">
+							<div class="reportReview">
+								<textarea class="form-control" id="MOHAtxt" rows="5" readonly>MOHA comments</textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<div class="card-header" id="reportPanel4" data-toggle="collapse" href="#filterPanel4" data-parent="#exampleAccordion">						
+							<i class="fa fa-check-square" id="tickCross4"></i>
+							Minister of Defence
+						<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel4">
+							<i class="fa fa-chevron-right" id="panelArrow4"></i>
+						</span>
+					</div>
+				</div>
+				<div class="card-body" id="reportPanelBody4">
+					<div id="filterPanel4" class="panel-collapse panel-collapse collapse">
+						<div class="panel-body">
+							<div class="reportReview">
+								<textarea class="form-control" id="MINDEFtxt" rows="5" readonly>MINDEF comments</textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<div class="card-header" id="reportPanel5" data-toggle="collapse" href="#filterPanel5" data-parent="#exampleAccordion">						
+							<i class="fa fa-check-square" id="tickCross5"></i>
+							Prime Minister
+						<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel5">
+							<i class="fa fa-chevron-right" id="panelArrow5"></i>
+						</span>
+					</div>
+				</div>
+				<div class="card-body" id="reportPanelBody5">
+					<div id="filterPanel5" class="panel-collapse panel-collapse collapse">
+						<div class="panel-body">
+							<div class="reportReview">
+								<textarea class="form-control" id="PMtxt" rows="5" readonly>PM comments</textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			  
+			  <button type="submit" class="btn btn-primary" id="SubmitCounterProposal">Submit Report with Counter-Proposals</button>
+			</form>
+			</section>
+
+			<section id="content2" class="tab-content">
+				<!-- Area Chart Example -->
+				<div class="card mb-3">
+				  <div class="card-header">
+					<i class="fa fa-area-chart"></i>
+					Casualty and Injury Rate
+				  </div>
+				  <div class="card-body">
+					<canvas id="myAreaChart" width="100%" height="30"></canvas>
+				  </div>
+				</div> 
+			</section>
+			
+			<section id="content3" class="tab-content">
+			<!-- CMO Chat -->
+				<div class="card mb-3">
+				  <div class="card-header">
+					<i class="fa fa-comments-o"></i>
+					Instant Messenger – Crisis Management Office
+				  </div>
+				  <div class="card-body">
+					<textarea class="form-control" id="chatWindow" rows="15" readonly></textarea>
+					<div class="form-row">
+						<div class="form-group col-md-11">	
+							<input type="text" class="form-control" id="chatEntry" rows="14" placeholder="Type your message here"></textarea>
+						</div>
+						<div class="form-group col-md-1">	
+							<button type="submit" class="btn btn-primary" id="sendBtn">Send</button>
+						</div>
+					</div>
+				  </div>
+				</div> 
+			</section>
+		</div>
+     
+        </div>
+
+      </div>
+      <!-- /.container-fluid -->
+
+    </div>
+    <!-- /.content-wrapper -->
+
+    <footer class="sticky-footer">
+      <div class="container">
+        <div class="text-center">
+          <small>PMOSIMS 2017</small>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fa fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Select "Logout" below if you are ready to end your current session.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <a class="btn btn-primary" href="login.html">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/popper/popper.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="vendor/chart.js/Chart.min.js"></script>
+    <script src="vendor/datatables/jquery.dataTables.js"></script>
+    <script src="vendor/datatables/dataTables.bootstrap4.js"></script>
+
+    <!-- Custom scripts for this template -->
+    <script src="js/sb-admin.min.js"></script>
+	<script src="js/report-panel.js"></script>
+
+  </body>
+
+</html>

@@ -56,7 +56,7 @@ We don't install these dependecies everytime when we want to develop for this pr
 workflow would be:
 
 ```shell
-$ source cmoenv/bin/activate
+$ source pmoenv/bin/activate
 
 $ cd src/
 $ python manage.py runserver

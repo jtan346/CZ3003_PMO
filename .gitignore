@@ -1,6 +1,9 @@
 # Virtual environment for this project
 pmoenv/
 
+# Pycharm
+.idea/
+
 # MySQL tmp folder
 mysql/tmp/
 db.sqlite3
