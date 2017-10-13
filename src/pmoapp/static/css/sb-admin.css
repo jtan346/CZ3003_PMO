@@ -404,6 +404,7 @@ input {
 #tab3:checked ~ #content3 {
   display: block;
   border-bottom: 2px solid #f0f0f0;
+  padding-right:1%;
 }
 
 .tab_container .tab-content p,

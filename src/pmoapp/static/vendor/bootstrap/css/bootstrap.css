@@ -3655,6 +3655,8 @@ tbody.collapse.show {
   -ms-flex-direction: column;
       flex-direction: column;
   min-width: 0;
+  /*min-height:70vh;
+  max-height:76vh;*/
   word-wrap: break-word;
   background-color: #fff;
   background-clip: border-box;

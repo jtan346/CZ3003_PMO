@@ -2,6 +2,7 @@
 """
 from django.shortcuts import render
 from django.http import HttpResponse
+from .models import *
 
 def login(request):
     return render(request, 'pmoapp/login.html', {})
@@ -22,3 +23,8 @@ def newsfeed(request):
 
 def history(request):
     return render(request, 'pmoapp/history.html', {})
+
+def testinginsertdb(Request):
+    newAccount = Account(username="benji", password="12345", emailAddress="benjamintanjb@gmail.com", user_type="PM")
+    newAccount.save()
+    return HttpResponse("IT SAVED " + str(newAccount.username))
