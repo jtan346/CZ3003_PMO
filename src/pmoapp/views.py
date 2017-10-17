@@ -3,6 +3,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
+from django.views.generic.list import ListView
 from .models import *
 from datetime import datetime
 import json
@@ -85,6 +86,15 @@ def report(request, plan_id):
         'curUser': curUser
     }
     return HttpResponse(template.render(context, request))
+
+class crisisUpdates(ListView):
+    template_name = 'pmoapp/crisisUpdates.html'
+    def get_queryset(self):
+        plan_id = '00040003'
+        planItem = Plan.objects.filter(plan_ID=plan_id).get()
+        crisisItem = planItem.plan_crisisID
+        updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=crisisItem.crisis_ID).latest('updates_datetime')
+        return updateItem
 
 def newsfeed(request):
     return render(request, 'pmoapp/newsfeed.html', {})

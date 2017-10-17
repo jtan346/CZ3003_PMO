@@ -30,28 +30,8 @@
 		var sender = {{ curName|safe }};
 	</script>
 	  <script>
-		  function pasteData() {
-            $.ajax({
-
-                type: 'GET', //GET or POST or PUT or DELETE verb
-
-                url: '/updateModel/', // Location of the service
-
-                data: {
-                    'findID' : 1,
-                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
-                }, //Data sent to server
-
-                success: function (msg) {
-
-                    //On Successful service call
-                    alert("done!");
-                }
-            });
-        }
-
         setInterval(function(){
-        $('#crisisUpdates').load("/report/");
+        $('#crisisUpdates').load("/crisisUpdates/{{crisisItem.crisis_ID");
         },6000);
 	  </script>
 	<script src="/static/js/app.js"></script>
@@ -231,8 +211,8 @@
 			<input id="tab2" type="radio" name="tabs">
 			<label class= "tab" for="tab2"><span>Dashboard</span></label>
 
-			<!--<input id="tab3" type="radio" name="tabs">
-			<label class= "tab" for="tab3"><span>CMO Chat</span></label>-->
+			<input id="tab3" type="radio" name="tabs">
+			<label class= "tab" for="tab3"><span>Test</span></label>
 
 			<section id="content1" class="tab-content">
 			<form>
@@ -272,7 +252,7 @@
 			  
 			   <div class="form-group">
 				<label for="txtCrisisDescription">Crisis Description:</label>
-				<textarea class="form-control" id="txtCrisisDescription" rows="5" readonly>{{ crisisItem.crisis_description }}
+				<textarea class="form-control col-md-11" id="txtCrisisDescription" rows="5" readonly>{{ crisisItem.crisis_description }}
 				</textarea>
 			  </div>
 			  
@@ -287,7 +267,7 @@
 					<div class="form-group col-md-2">
 					  <input type="text" class="form-control" id="txtReportedDeaths" value="{{ updateItem.updates_curDeaths }}" readonly>
 					</div>
-					<label for="txtCurSAF" class="col-form-label col-md-2 offset-1 text-left" id="lblCurSAF">Current SAF Utilization:</label>
+					<label for="txtCurSAF" class="col-form-label col-md-3 offset-1 text-left" id="lblCurSAF">Current SAF Utilization:</label>
 					<div class="form-group col-md-2">
 					  <input type="text" class="form-control" id="txtCurSAF" value="{{ updateItem.updates_curSAF }} %" readonly>
 					</div>
@@ -298,7 +278,7 @@
 					<div class="form-group col-md-2">
 					  <input type="text" class="form-control" id="txtReportedInjuries" value="{{ updateItem.updates_curInjuries }}" readonly>
 					</div>
-					<label for="txtCurCD" class="col-form-label col-md-2 offset-1 text-left" id="lblCurCD">Current CD Utilization:</label>
+					<label for="txtCurCD" class="col-form-label col-md-3 offset-1 text-left" id="lblCurCD">Current CD Utilization:</label>
 					<div class="form-group col-md-2">
 						<input type="text" class="form-control" id="txtCurCD" value="{{ updateItem.updates_curCD }} %" readonly>
 					</div>
@@ -311,7 +291,7 @@
 
 					  <input type="text" class="form-control" id="txtAffectedRadius" value="{{ updateItem.updates_curRadius }} m" readonly>
 					</div>
-					<label for="txtCurSCDF" class="col-form-label col-md-2 offset-1 text-left" id="lblCurSCDF">Address of Incident:</label>
+					<label for="txtCurSCDF" class="col-form-label col-md-3 offset-1 text-left" id="lblCurSCDF">Current SCDF Utilization:</label>
 					<div class="form-group col-md-2">
 						<input type="text" class="form-control" id="txtCurSCDF" value="{{ updateItem.updates_curSCDF}} %" readonly>
 					</div>
@@ -328,26 +308,26 @@
 			
 			 <div class="form-row">
 				<label for="txtPlanID" class="col-form-label col-md-2">Plan ID/Status:</label>
-				<div class="form-group col-md-2">  
+				<div class="form-group col-md-3">
 				  <input type="text" class="form-control" id="txtPlanID" value="{{ planItem.plan_ID }}: {{ planItem.plan_status }}" readonly>
 				</div>
 				 <label for="txtPlanReceipt" class="col-form-label col-md-2 offset-1 text-left">Plan Receipt:</label>
-				<div class="form-group col-md-2">
+				<div class="form-group col-md-3">
 				  <input type="text" class="form-control" id="txtPlanReceipt" value="{{ planItem.plan_dateTime }}" readonly>
 				</div>
 			  </div>
 			  
 			   <div class="form-group">
 				<label for="txtPlanDescription">Plan Description:</label>
-				<textarea class="form-control" id="txtPlanDescription" rows="5" readonly>{{ planItem.plan_description }}</textarea>
+				<textarea class="form-control col-md-11" id="txtPlanDescription" rows="5" readonly>{{ planItem.plan_description }}</textarea>
 			  </div>
 			  
 			<div class="form-row">
 				<label for="txtProjectedCrisisRadius" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisRadius">Projected Crisis Radius:</label>
-				<div class="form-group col-md-2">
+				<div class="form-group col-md-3">
 				  <input type="text" class="form-control" id="txtProjectedCrisisRadius" value="{{ planItem.plan_projRadius }} m" readonly>
 				</div>
-				<label for="txtProjectedCasualties" class="col-form-label col-md-2 offset-1 text-right" id="lblProjectedCasualties">Projected Casualties:</label>
+				<label for="txtProjectedCasualties" class="col-form-label col-md-2 offset-1 text-left" id="lblProjectedCasualties">Projected Casualties:</label>
 				<div class="form-group col-md-2">
 				  <input type="text" class="form-control" id="txtProjectedCasualties" value="{{ planItem.plan_projCasualtyRate }} %" readonly>
 				</div>
@@ -527,7 +507,7 @@
 
 			<section id="content3">
 				<div id="testing">
-
+					<p>testing</p>
 				</div>
 			</section>
 

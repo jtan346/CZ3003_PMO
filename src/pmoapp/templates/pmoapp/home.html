@@ -49,20 +49,26 @@
             </a>
 			<ul class="sidenav-second-level collapse" id="collapseComponents">
 			<!--<ul class="sidenav-second-level show" id="collapseComponents">-->
-
+                {% if toDisplay %}
+                    {% for plan in toDisplay %}
+                        <li style="overflow:hidden; text-overflow: ellipsis; white-space:nowrap; max-width:100%;">
+                            <a href="../report/{{ plan.plan_ID }}">{{ plan.plan_crisisID.crisis_ID }}: {{ plan.plan_ID }}<br>({{ plan.plan_status }})</a>
+                        </li>
+                    {% endfor %}
+                {% endif %}
 			  <!--<li class="currentCrisisItem active">-->
-			  <li>
+			  <!--<li>
                 <a href="../report/00030001">
 					⦁ Changi T3
 				</a>
               </li>
 
-              <!--<li class="currentCrisisItem">-->
+              &lt;!&ndash;<li class="currentCrisisItem">&ndash;&gt;
               <li>
                 <a href="../report/00040001">
 					⦁ Jurong Island
 				</a>
-              </li>
+              </li>-->
             </ul>
           </li>
 
