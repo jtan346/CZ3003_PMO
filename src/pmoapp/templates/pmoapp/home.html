@@ -22,7 +22,6 @@
 
     <!-- Custom styles for this template -->
     <link href="/static/css/sb-admin.css" rel="stylesheet">
-
   </head>
 
   <body class="fixed-nav sticky-footer bg-dark" id="page-top">
@@ -79,6 +78,13 @@
               <i class="fa fa-fw fa-feed"></i>
               <span class="nav-link-text">
                 Live News Feed</span>
+            </a>
+          </li>
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live News Feed">
+            <a class="nav-link" href="#">
+              <i class="fa fa-fw fa-feed"></i>
+              <span class="nav-link-text">
+                CMO Public Broadcast</span>
             </a>
           </li>
 
@@ -163,7 +169,7 @@
         <!-- Example Tables Card -->
         <div class="card mb-3">
           <div class="card-header">
-            <i class="fa fa-tv"></i>
+            <!--<i class="fa fa-tv"></i>-->
             Current Crisis Reports
           </div>
           <div class="card-body">
@@ -177,37 +183,37 @@
                     <th>Report ID</th>
                     <th>Report Receipt</th>
 					<th>Report Status</th>
+                    <!--<th>Plan ID</th>
+                    <th>Plan Receipt</th>
+					<th>Plan Status</th>-->
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>0003</td>
-                    <td><a href="../report/00030004">Explosion at Changi Airport Terminal 3</a></td>
-                    <td>25th December 2017, 1949H</td>
-                    <td>0001</td>
-                    <td>25th December 2017, 1953H</td>
-					<td>Pending: PMO</td>
-                  </tr>
-                  <tr>
-                    <td>0004</td>
-                    <td><a href="../report/00040003">Fire at Jurong Island</a></td>
-                    <td>25th December 2017, 1953H</td>
-                    <td>0003</td>
-                    <td>25th December 2017, 2001H</td>
-					<td>Pending: CMO</td>
-                  </tr>
+                {% if toDisplay %}
+                    {% for plan in toDisplay %}
+                        <tr>
+                            <td>{{ plan.plan_crisisID.crisis_ID }}</td>
+                            <td><a href="/report/{{ plan.plan_ID }}">{{ plan.plan_crisisID.crisis_name }}</a></td>
+                            <td>{{ plan.plan_crisisID.crisis_dateTime }}</td>
+                            <td>{{ plan.plan_ID }}</td>
+                            <td>{{ plan.plan_dateTime }}</td>
+                            <td>{{ plan.plan_status }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td>Singapore is safe!</td></tr>
+                {% endif %}
                 </tbody>
               </table>
             </div>
           </div>
           <div class="card-footer small text-muted">
-            Updated yesterday at 11:59 PM
+            Updated: {{ updateTime }}
           </div>
         </div>
 
       </div>
       <!-- /.container-fluid -->
-
     </div>
     <!-- /.content-wrapper -->
 

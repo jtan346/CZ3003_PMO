@@ -6,7 +6,6 @@ pmoenv/
 
 # MySQL tmp folder
 mysql/tmp/
-db.sqlite3
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

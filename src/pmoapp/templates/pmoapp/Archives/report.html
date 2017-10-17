@@ -29,31 +29,6 @@
 		var crisis = {{ crisisID|safe }};
 		var sender = {{ curName|safe }};
 	</script>
-	  <script>
-		  function pasteData() {
-            $.ajax({
-
-                type: 'GET', //GET or POST or PUT or DELETE verb
-
-                url: '/updateModel/', // Location of the service
-
-                data: {
-                    'findID' : 1,
-                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
-                }, //Data sent to server
-
-                success: function (msg) {
-
-                    //On Successful service call
-                    alert("done!");
-                }
-            });
-        }
-
-        setInterval(function(){
-        $('#crisisUpdates').load("/report/");
-        },6000);
-	  </script>
 	<script src="/static/js/app.js"></script>
     <script src="https://cdn.firebase.com/libs/angularfire/2.2.0/angularfire.min.js"></script>
 
@@ -214,8 +189,7 @@
 
 
         <!-- Example Tables Card -->
-		  <div class="form-row">
-        <div class="card mb-3 col-md-9" style="padding-right:0px;padding-left:0px;">
+        <div class="card mb-3">
           <div class="card-header">
             <!--<i class="fa fa-tv"></i>-->
             Explosion at Changi Airport Terminal 3
@@ -231,41 +205,35 @@
 			<input id="tab2" type="radio" name="tabs">
 			<label class= "tab" for="tab2"><span>Dashboard</span></label>
 
-			<!--<input id="tab3" type="radio" name="tabs">
-			<label class= "tab" for="tab3"><span>CMO Chat</span></label>-->
+			<input id="tab3" type="radio" name="tabs">
+			<label class= "tab" for="tab3"><span>CMO Chat</span></label>
 
 			<section id="content1" class="tab-content">
 			<form>
                 <h4 class="reportHeader"> Crisis Details </h4>
 
 				<div class="form-row">
-				<label for="txtCrisisID" class="col-form-label col-md-2 text-left">Crisis ID:</label>
-				<div class="form-group col-md-3">
+				<label for="txtCrisisID" class="col-form-label col-md-1 text-left">Crisis ID:</label>
+				<div class="form-group col-md-1">
 				  <input type="text" class="form-control" id="txtCrisisID" value='{{ crisisItem.crisis_ID }}' readonly>
 				</div>
-				<label for="txtCurPlanID" class="col-form-label col-md-2 offset-1 text-left">Crisis ID/Status:</label>
-				<div class="form-group col-md-3">
-				  <input type="text" class="form-control" id="txtCurPlanID" value="{{ crisisItem.crisis_ID }} : {{ crisisItem.crisis_status }}" readonly>
+				<label for="txtCurPlanID" class="col-form-label col-md-1 text-left">Current Status:</label>
+				<div class="form-group col-md-1">
+				  <input type="text" class="form-control" id="txtCurPlanID" value="{{ crisisItem.crisis_status }}" readonly>
 				</div>
-              </div>
-			<div class="form-row">
-				<label for="txtCrisisAddr" class="col-form-label col-md-2 text-left">Latest Plan ID:</label>
-				<div class="form-group col-md-3">
-				  <input type="text" class="form-control" id="txtLatestPlanID" value='{{ planItem.plan_ID }}' readonly>
-				</div>
-				<div class="offset-1 col-md-2"><label for="txtCrisisDateTime" class="col-form-label text-left">Plan ID/Status:</label></div>
-				<div class="form-group col-md-3">
-				  <input type="text" class="form-control" id="txtPlanStatus" value="{{ planItem.plan_ID }} : {{ planItem.plan_status }}" readonly>
+                  <label for="txtReportStatus" class="col-form-label col-md-2 text-left">Current Plan ID/Status:</label>
+				<div class="form-group col-md-2">
+				  <input type="text" class="form-control" id="txtReportStatus" value="{{ planItem.plan_ID }}: {{ planItem.plan_status }}" readonly>
 				</div>
               </div>
 
 				<div class="form-row">
-				<label for="txtCrisisAddr" class="col-form-label col-md-2 text-left">Crisis Address:</label>
+				<label for="txtCrisisAddr" class="col-form-label col-md-1 text-left">Crisis Address:</label>
 				<div class="form-group col-md-3">
 				  <input type="text" class="form-control" id="txtCrisisAddr" value='{{ crisisItem.crisis_address }}' readonly>
 				</div>
-				<div class="offset-1 col-md-2"><label for="txtCrisisDateTime" class="col-form-label text-left">Crisis Reported Date/Time:</label></div>
-				<div class="form-group col-md-3">
+				<label for="txtCrisisDateTime" class="col-form-label col-md-2 text-left">Crisis Reported Date/Time:</label>
+				<div class="form-group col-md-2">
 				  <input type="text" class="form-control" id="txtCrisisDateTime" value="{{ crisisItem.crisis_dateTime }}" readonly>
 				</div>
               </div>
@@ -276,53 +244,52 @@
 				</textarea>
 			  </div>
 			  
-			<h4 class="reportHeader"> Current Crisis Updates</h4>
-			<div id="crisisUpdates">
-				<div class="form-row">
-					<h6 class="col-form-label text-left bottom-buffer bold italic">Last Updated: {{updateItem.updates_datetime}}</h6>
+			<h4 class="reportHeader"> Current Updates</h4>
+			<div class="form-row">
+				<h6 class="col-form-label col-md-5 text-left bottom-buffer bold italic">Last Updated: {{updateItem.updates_datetime}}</h6>
+			</div>
+
+			<div class="form-row">
+				<label for="txtReportedDeaths" class="col-form-label col-md-2 text-left" id="lblReportedDeaths">Reported Deaths:</label>
+				<div class="form-group col-md-2">  
+				  <input type="text" class="form-control" id="txtReportedDeaths" value="{{ updateItem.updates_curDeaths }}" readonly>
 				</div>
-
-				<div class="form-row">
-					<label for="txtReportedDeaths" class="col-form-label col-md-2 text-left" id="lblReportedDeaths">Reported Deaths:</label>
-					<div class="form-group col-md-2">
-					  <input type="text" class="form-control" id="txtReportedDeaths" value="{{ updateItem.updates_curDeaths }}" readonly>
-					</div>
-					<label for="txtCurSAF" class="col-form-label col-md-2 offset-1 text-left" id="lblCurSAF">Current SAF Utilization:</label>
-					<div class="form-group col-md-2">
-					  <input type="text" class="form-control" id="txtCurSAF" value="{{ updateItem.updates_curSAF }} %" readonly>
-					</div>
-				</div>
-
-				<div class="form-row">
-					<label for="txtReportedInjuries" class="col-form-label col-md-2 text-left" id="lblReportedInjuries">Reported Injuries:</label>
-					<div class="form-group col-md-2">
-					  <input type="text" class="form-control" id="txtReportedInjuries" value="{{ updateItem.updates_curInjuries }}" readonly>
-					</div>
-					<label for="txtCurCD" class="col-form-label col-md-2 offset-1 text-left" id="lblCurCD">Current CD Utilization:</label>
-					<div class="form-group col-md-2">
-						<input type="text" class="form-control" id="txtCurCD" value="{{ updateItem.updates_curCD }} %" readonly>
-					</div>
-				</div>
-
-				<div class="form-row">
-
-					<label for="txtAffectedRadius" class="col-form-label col-md-2 text-left" id="lblAffectedRadius">Affected Radius:</label>
-					<div class="form-group col-md-2">
-
-					  <input type="text" class="form-control" id="txtAffectedRadius" value="{{ updateItem.updates_curRadius }} m" readonly>
-					</div>
-					<label for="txtCurSCDF" class="col-form-label col-md-2 offset-1 text-left" id="lblCurSCDF">Address of Incident:</label>
-					<div class="form-group col-md-2">
-						<input type="text" class="form-control" id="txtCurSCDF" value="{{ updateItem.updates_curSCDF}} %" readonly>
-					</div>
-				</div>
-				<div class="form-row">
-					<label for="txtThreatLevel" class="col-form-label col-md-2 text-left" id="lblThreatLevel">Threat Level:</label>
-					<div class="form-group col-md-2">
-						<input type="text" class="form-control" id="txtThreatLevel" value="{{ updateItem.updates_curThreatLevel }}" readonly>
-					</div>
+				<label for="txtCurSAF" class="col-form-label col-md-2 text-left" id="lblCurSAF">Current SAF Utilization:</label>
+				<div class="form-group col-md-2">
+				  <input type="text" class="form-control" id="txtCurSAF" value="{{ updateItem.updates_curSAF }} %" readonly>
 				</div>
 			</div>
+				
+			<div class="form-row">
+				<label for="txtReportedInjuries" class="col-form-label col-md-2 text-left" id="lblReportedInjuries">Reported Injuries:</label>
+				<div class="form-group col-md-2">  
+				  <input type="text" class="form-control" id="txtReportedInjuries" value="{{ updateItem.updates_curInjuries }}" readonly>
+				</div>
+				<label for="txtCurCD" class="col-form-label col-md-2 text-left" id="lblCurCD">Current CD Utilization:</label>
+				<div class="form-group col-md-2">
+					<input type="text" class="form-control" id="txtCurCD" value="{{ updateItem.updates_curCD }} %" readonly>
+				</div>
+			</div>
+			
+			<div class="form-row">
+				
+				<label for="txtAffectedRadius" class="col-form-label col-md-2 text-left" id="lblAffectedRadius">Current Affected Radius:</label>
+				<div class="form-group col-md-2">  
+				  
+				  <input type="text" class="form-control" id="txtAffectedRadius" value="{{ updateItem.updates_curRadius }} m" readonly>
+				</div>
+				<label for="txtCurSCDF" class="col-form-label col-md-2 text-left" id="lblCurSCDF">Address of Incident:</label>
+				<div class="form-group col-md-2">
+					<input type="text" class="form-control" id="txtCurSCDF" value="{{ updateItem.updates_curSCDF}} %" readonly>
+				</div>
+			</div>
+			<div class="form-row">
+				<label for="txtThreatLevel" class="col-form-label col-md-2 text-left" id="lblThreatLevel">Threat Level:</label>
+				<div class="form-group col-md-2">	
+					<input type="text" class="form-control" id="txtThreatLevel" value="{{ updateItem.updates_curThreatLevel }}" readonly>
+				</div>
+			</div>
+
 			
 			<h4 class="reportHeader"> Crisis Resolution Plan </h4>
 			
@@ -331,7 +298,7 @@
 				<div class="form-group col-md-2">  
 				  <input type="text" class="form-control" id="txtPlanID" value="{{ planItem.plan_ID }}: {{ planItem.plan_status }}" readonly>
 				</div>
-				 <label for="txtPlanReceipt" class="col-form-label col-md-2 offset-1 text-left">Plan Receipt:</label>
+				 <label for="txtPlanReceipt" class="col-form-label col-md-2 text-left">Plan Receipt:</label>
 				<div class="form-group col-md-2">
 				  <input type="text" class="form-control" id="txtPlanReceipt" value="{{ planItem.plan_dateTime }}" readonly>
 				</div>
@@ -343,31 +310,29 @@
 			  </div>
 			  
 			<div class="form-row">
-				<label for="txtProjectedCrisisRadius" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisRadius">Projected Crisis Radius:</label>
-				<div class="form-group col-md-2">
+				<label for="txtProjectedCrisisRadius" class="col-form-label" id="lblProjectedCrisisRadius">Projected Crisis Radius:</label>
+				<div class="form-group col-md-1">  
 				  <input type="text" class="form-control" id="txtProjectedCrisisRadius" value="{{ planItem.plan_projRadius }} m" readonly>
 				</div>
-				<label for="txtProjectedCasualties" class="col-form-label col-md-2 offset-1 text-right" id="lblProjectedCasualties">Projected Casualties:</label>
-				<div class="form-group col-md-2">
+				<label for="txtProjectedCasualties" class="col-form-label col-md-2 text-right" id="lblProjectedCasualties">Projected Casualties:</label>
+				<div class="form-group col-md-1">
 				  <input type="text" class="form-control" id="txtProjectedCasualties" value="{{ planItem.plan_projCasualtyRate }} %" readonly>
 				</div>
-			</div>
-			<div class="form-row">
-				<label for="txtProjectedCrisisResolution" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisResolution">Est. Resolution Time:</label>
-				<div class="form-group col-md-3">
+				<label for="txtProjectedCrisisResolution" class="col-form-label col-md-2 text-right" id="lblProjectedCrisisResolution">Projected Crisis Resolution:</label>
+				<div class="form-group col-md-2">
 				  <input type="text" class="form-control" id="txtProjectedCrisisResolution" value="{{ planItem.plan_projResolutionTime }}" readonly>
 				</div>
 			</div>
 			
 			<h5 class="reportSubheader"> EF Deployment Details </h5>
 			<div class="form-row">
-                <div class="col-form-label col-md-3">
+                <div class="col-form-label col-md-2">
 				    <label for="txtRecommendedSAFDeployment" class="text-left" id="lblRecommendedSAFDeployment">Recommended SAF Deployment:</label>
                 </div>
 				<div class="form-group col-md-1">
 				  <input type="text" class="form-control" id="txtRecommendedSAFDeployment" value="{{ planItem.plan_SAFRecommended }} %" readonly>
 				</div>
-                <div class="col-form-label col-md-3 offset-1">
+                <div class="col-form-label col-md-2 col-md-offset-2">
                     <label for="txtMaximumSAFDeployment" class="text-left" id="lblMaximumSAFDeployment">Maximum SAF Deployment:</label>
                 </div>
                 <div class="form-group col-md-1">
@@ -377,22 +342,22 @@
 			</div>
 			
 			<div class="form-row">
-				<label for="txtRecommendedSCDFDeployment" class="col-form-label col-md-3 text-left" id="lblRecommendedSCDFDeployment">Recommended SCDF Deployment:</label>
+				<label for="txtRecommendedSCDFDeployment" class="col-form-label col-md-2 text-left" id="lblRecommendedSCDFDeployment">Recommended SCDF Deployment:</label>
 				<div class="form-group col-md-1">  
 				  <input type="text" class="form-control" id="txtRecommendedSCDFDeployment" value="{{ planItem.plan_SCDFRecommended }} %" readonly>
 				</div>
-				<label for="txtMaximumSCDFDeployment" class="col-form-label col-md-3 offset-1 text-left" id="lblMaximumSCDFDeployment">Maximum SCDF Deployment:</label>
+				<label for="txtMaximumSCDFDeployment" class="col-form-label col-md-2 text-left" id="lblMaximumSCDFDeployment">Maximum SCDF Deployment:</label>
 				<div class="form-group col-md-1">
 				  <input type="text" class="form-control" id="txtMaximumSCDFDeployment" value="{{ planItem.plan_SCDFMaximum }} %" readonly>
 				</div>
 			</div>
 			
 			<div class="form-row">
-				<label for="txtRecommendedCDDeployment" class="col-form-label col-md-3 text-left" id="lblRecommendedCDDeployment">Recommended CD Deployment:</label>
+				<label for="txtRecommendedCDDeployment" class="col-form-label col-md-2 text-left" id="lblRecommendedCDDeployment">Recommended CD Deployment:</label>
 				<div class="form-group col-md-1">  
 				  <input type="text" class="form-control" id="txtRecommendedCDDeployment" value="{{ planItem.plan_CDRecommended }} %" readonly>
 				</div>
-				<label for="txtMaximumCDDeployment" class="col-form-label col-md-3 offset-1 text-left" id="lblMaximumCDDeployment">Maximum CD Deployment:</label>
+				<label for="txtMaximumCDDeployment" class="col-form-label col-md-2 text-left" id="lblMaximumCDDeployment">Maximum CD Deployment:</label>
 				<div class="form-group col-md-1">
 				  <input type="text" class="form-control" id="txtMaximumCDDeployment" value="{{ planItem.plan_CDMaximum }} %" readonly>
 				</div>
@@ -522,65 +487,38 @@
 					  <canvas id="myAreaChart" width="100%" height="30"></canvas>
 				  </div>
 			  </div>
-
-			</section>
-
-			<section id="content3">
-				<div id="testing">
-
-				</div>
 			</section>
 
             <!-- CMO Chat -->
-			<!--<section id="content3" class="tab-content">
+			<section id="content3" class="tab-content">
 				<div class="card mb-3">
 				  <div class="card-header">
 					<i class="fa fa-comments-o"></i>
 					Instant Chat Messenger – Crisis Management Office
 				  </div>
 				  <div class="card-body" ng-controller="ChatController">
-					<p ng-repeat="m in messages">{{ m.messages }}- </p>
+					<!--<p ng-repeat="m in messages">{{ m.messages }}- </p>-->
 					<p ng-repeat="m in fbmessages"> {% verbatim %}{{m.date | date:'short'}} - {{m.sender}}: {{m.message}}{% endverbatim %}
-					{% for item in m %}{{ item }}{% endfor %}
+					<!--{% for item in m %}{{ item }}{% endfor %}-->
 					</p>
 					<div class="form-row">
-						<div class="form-group col-md-11">
+						<div class="form-group col-md-11">	
 							<input type="text" id = "txtFBMsgs" class="form-control" placeholder="Message here..." ng-model="messageText" onkeydown = "if (event.keyCode == 13) document.getElementById('sendBtn').click()">
 						</div>
-						<div class="form-group col-md-1">
+						<div class="form-group col-md-1">	
 							<button type="submit" class="btn btn-primary btn-block" id="sendBtn" ng-click="send()">Send</button>
 						</div>
 					</div>
 				  </div>
 				</div>
-			</section>-->
+			</section>
 		</div>
-
+     
         </div>
-			<div class="card mb-3 col-md-3" ng-controller="ChatController" style="padding-left:0px; padding-right:0px; margin-left:5px; -ms-flex:0 0 25%;flex:0 0 25%;max-width:calc(25% - 5px);">
-				  <div class="card-header">
-					<!--<i class="fa fa-comments-o"></i>-->
-					CMO Messenger - Crisis ID: {{crisisItem.crisis_ID}}
-				  </div>
-				  <div class="card-body"  style="overflow-x: hidden; overflow-y:scroll; min-height:60vh; max-height:64vh;">
-					<!--<p ng-repeat="m in messages">{{ m.messages }}- </p>-->
-					  <div>
-					  <p ng-repeat="m in fbmessages"> {% verbatim %}{{m.date | date:'short'}} - {{m.sender}}: <br> {{m.message}}{% endverbatim %}</p>
-					<!--{% for item in m %}{{ item }}{% endfor %}-->
-					</div>
-				  </div>
-				<div class="form-row">
-						<div class="form-group col-md-9" style="margin-left:5px; max-width:calc(75% - 5px); padding-top:5px;">
-							<input type="text" id = "txtFBMsgs" class="form-control" placeholder="Message here..." ng-model="messageText" onkeydown = "if (event.keyCode == 13) document.getElementById('sendBtn').click()">
-						</div>
-						<div class="form-group col-md-3" style="max-width:calc(25% - 5px);" >
-							<button type="submit" class="btn btn-primary btn-block" id="sendBtn" ng-click="send()">Send</button>
-						</div>
-					</div>
-				</div>
+
       </div>
       <!-- /.container-fluid -->
-</div>
+
     </div>
     <!-- /.content-wrapper -->
 

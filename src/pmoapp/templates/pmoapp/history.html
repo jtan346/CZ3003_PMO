@@ -81,6 +81,13 @@
                 Live News Feed</span>
             </a>
           </li>
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live News Feed">
+            <a class="nav-link" href="#">
+              <i class="fa fa-fw fa-feed"></i>
+              <span class="nav-link-text">
+                CMO Public Broadcast</span>
+            </a>
+          </li>
 
         </ul>
         <ul class="navbar-nav sidenav-toggler">
@@ -163,7 +170,7 @@
         <!-- Example Tables Card -->
         <div class="card mb-3">
           <div class="card-header">
-            <i class="fa fa-tv"></i>
+            <!--<i class="fa fa-tv"></i>-->
             Past Crisis Reports
           </div>
           <div class="card-body">
@@ -180,102 +187,27 @@
                   </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>0002</td>
-                    <td><a href="../report/00030004">Fire at Jurong Island Oil Refinery</a></td>
-                    <td>09th August 2016, 1402H</td>
-                    <td>0004</td>
-                    <td>09th August 2016, 1514H</td>
-					<td>Crisis Resolved</td>
-                  </tr>
-                <tr>
-                    <td>0002</td>
-                    <td><a href="../report/00030004">Fire at Jurong Island Oil Refinery</a></td>
-                    <td>09th August 2016, 1402H</td>
-                    <td>0003</td>
-                    <td>09th August 2016, 1417H</td>
-					<td>Approved</td>
-                  </tr>
-                <tr>
-                    <td>0002</td>
-                    <td><a href="../report/00030004">Fire at Jurong Island Oil Refinery</a></td>
-                    <td>09th August 2016, 1402H</td>
-                    <td>0002</td>
-                    <td>09th August 2016, 1411H</td>
-					<td>CMO to Ammend</td>
-                  </tr>
-                <tr>
-                    <td>0002</td>
-                    <td><a href="../report/00030004">Fire at Jurong Island Oil Refinery</a></td>
-                    <td>09th August 2016, 1402H</td>
-                    <td>0001</td>
-                    <td>09th August 2016, 1406H</td>
-					<td>CMO to Ammend</td>
-                  </tr>
-
-                    <tr>
-                    <td>0001</td>
-                    <td><a href="../report/00030004">Explosion at Tuas Causeway</a></td>
-                    <td>25th December 2016, 1949H</td>
-                    <td>0007</td>
-                    <td>25th December 2016, 2132H</td>
-					<td>Crisis Resolved</td>
-                  </tr>
-                  <tr>
-                    <td>0001</td>
-                    <td><a href="../report/00030004">Explosion at Tuas Causeway</a></td>
-                    <td>25th December 2016, 1949H</td>
-                    <td>0006</td>
-                    <td>25th December 2016, 2017H</td>
-					<td>Approved</td>
-                  </tr>
-                 <tr>
-                    <td>0001</td>
-                    <td><a href="../report/00030004">Explosion at Tuas Causeway</a></td>
-                    <td>25th December 2016, 1949H</td>
-                    <td>0005</td>
-                    <td>25th December 2016, 2012H</td>
-					<td>CMO to Ammend</td>
-                  </tr>
-                <tr>
-                    <td>0001</td>
-                    <td><a href="../report/00030004">Explosion at Tuas Causeway</a></td>
-                    <td>25th December 2016, 1949H</td>
-                    <td>0004</td>
-                    <td>25th December 2016, 2007H</td>
-					<td>CMO to Ammend</td>
-                  </tr>
-                  <tr>
-                    <td>0001</td>
-                    <td><a href="../report/00030004">Explosion at Tuas Causeway</a></td>
-                    <td>25th December 2016, 1949H</td>
-                    <td>0003</td>
-                    <td>25th December 2016, 2002H</td>
-					<td>CMO to Ammend</td>
-                  </tr>
-                <tr>
-                    <td>0001</td>
-                    <td><a href="../report/00030004">Explosion at Tuas Causeway</a></td>
-                    <td>25th December 2016, 1949H</td>
-                    <td>0002</td>
-                    <td>25th December 2016, 1957H</td>
-					<td>CMO to Ammend</td>
-                  </tr>
-                <tr>
-                    <td>0001</td>
-                    <td><a href="../report/00030004">Explosion at Tuas Causeway</a></td>
-                    <td>25th December 2016, 1949H</td>
-                    <td>0001</td>
-                    <td>25th December 2016, 1953H</td>
-					<td>CMO to Ammend</td>
-                  </tr>
-
+                {% if toDisplay %}
+                    {% for plan in toDisplay %}
+                        <tr>
+                            <!--<td>{{ plan.crisis_ID }}</td>-->
+                            <td>{{ plan.plan_crisisID.crisis_ID }}</td>
+                            <td><a href="/report/{{ plan.plan_ID }}">{{ plan.plan_crisisID.crisis_name }}</a></td>
+                            <td>{{ plan.plan_crisisID.crisis_dateTime }}</td>
+                            <td>{{ plan.plan_ID }}</td>
+                            <td>{{ plan.plan_dateTime }}</td>
+                            <td>{{ plan.plan_status }}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td>Singapore is safe!</td></tr>
+                {% endif %}
                 </tbody>
               </table>
             </div>
           </div>
           <div class="card-footer small text-muted">
-            Updated yesterday at 11:59 PM
+            Updated: {{ updateTime }}
           </div>
         </div>
 

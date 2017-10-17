@@ -6,6 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
     <meta name="description" content="">
     <meta name="author" content="">
     <title>PMOSIMS</title>
@@ -28,63 +29,50 @@
 
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
-      <a class="navbar-brand" href="../home">PMOSIMS</a>
+      <a class="navbar-brand" href="#">PMOSIMS</a>
       <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-             <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Home">
-            <a class="nav-link" href="../home">
-              <i class="fa fa-fw fa-home"></i>
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Curent Crisis">
+            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseComponents" data-parent="#exampleAccordion">
+              <i class="fa fa-fw fa-tv"></i>
               <span class="nav-link-text">
-                Home</span>
+                Current Crisis</span>
             </a>
-          </li>
-          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Current Crisis">
-            <a class="nav-link nav-link-collapse" data-toggle="collapse" href="#collapseComponents" data-parent="#exampleAccordion">
-              <i class="fa fa-fw fa-list"></i>
-              <span class="nav-link-text">
-                Current Crisis Reports</span>
-            </a>
-			<!--<ul class="sidenav-second-level collapse" id="collapseComponents">-->
 			<ul class="sidenav-second-level collapse" id="collapseComponents">
-
-			  <!--<li class="currentCrisisItem active">-->
-			  <li>
-                <a href="../report/00030001">
+              <li>
+                <a href="Current Crisis.html">
+					<i class="fa fa-file-text"></i>
+					Current Crisis Reports
+				</a>
+              </li>
+			  <li class="currentCrisisItem">
+                <a href="Changi T3.html">
 					⦁ Changi T3
 				</a>
               </li>
-
-              <!--<li class="currentCrisisItem">-->
-              <li>
-                <a href="../report/00040001">
+              <li class="currentCrisisItem">
+                <a href="#">
 					⦁ Jurong Island
 				</a>
               </li>
             </ul>
           </li>
-
+	
           <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Past Reports">
-            <a class="nav-link" href="../history">
+            <a class="nav-link" href="Past Reports.html">
               <i class="fa fa-fw fa-history"></i>
               <span class="nav-link-text">
                 Past Reports</span>
             </a>
           </li>
-          <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Live News Feed">
-            <a class="nav-link" href="../newsfeed">
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live News Feed">
+            <a class="nav-link" href="Live News Feed.html">
               <i class="fa fa-fw fa-feed"></i>
               <span class="nav-link-text">
                 Live News Feed</span>
-            </a>
-          </li>
-          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live News Feed">
-            <a class="nav-link" href="#">
-              <i class="fa fa-fw fa-feed"></i>
-              <span class="nav-link-text">
-                CMO Public Broadcast</span>
             </a>
           </li>
 
@@ -96,9 +84,6 @@
             </a>
           </li>
         </ul>
-
-        <!-- End of Sidebar -->
-
         <ul class="navbar-nav ml-auto">
 			<li class="nav-item dropdown" id="alertBellNotification">
 				<a class="nav-link dropdown-toggle mr-lg-2" href="#" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -142,7 +127,8 @@
 					View all alerts
 				  </a>
 				</div>
-			  </li>
+			</li>
+     
           <li class="nav-item" id="logoutBtn">
             <a class="nav-link" data-toggle="modal" data-target="#exampleModal">
               <i class="fa fa-fw fa-sign-out"></i>
@@ -159,46 +145,52 @@
         <!-- Breadcrumbs -->
         <ol class="breadcrumb">
           <li class="breadcrumb-item">
-            <a href="../home">Home</a>
+            <a href="#">Past Reports</a>
           </li>
-          <li class="breadcrumb-item active">Live News Feed</li>
+          <li class="breadcrumb-item active">Past Reports</li>
         </ol>
-		
-		<div class="row">
 
-          <div class="col-lg-8">
 
-            <!-- Live News Feed -->
-            <div class="card mb-3">
-              <div class="card-header">
-                <!--<i class="fa fa-newspaper-o"></i>-->
-                Live News Feed
-              </div>
-              <div class="card-body">
-                <div class="row">
-                  <div class="col-sm-8 my-auto">
-                    
-					<div class="embed-responsive embed-responsive-16by9" >
-						<iframe width="1903" height="764" src="https://www.youtube.com/embed/B50QaZqVu08" frameborder="0" allowfullscreen></iframe>
-						<!--<iframe class="embed-responsive-item"  id="liveNews" src="https://youtube.com/embed/PfZ46V3ucDE?autoplay=1" frameborder="0" allowfullscreen></iframe>-->
-					</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- /Card Columns -->
-
+        <!-- Example Tables Card -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fa fa-fw fa-history"></i>
+            Past Reports
           </div>
-		<div class="col-lg-4" >
-			<div class="card mb-3">
-				<div class="card-header">
-                <i class="fa fa-fw fa-feed"></i>
-                RSS Feed
-              </div>
-				<!-- start feedwind code --> <script type="text/javascript" src="https://feed.mikle.com/js/fw-loader.js" data-fw-param="49348/"></script> <!-- end feedwind code -->
-			</div>
-		</div>
-     
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" width="100%" id="dataTable" cellspacing="0">
+                <thead>
+                  <tr>
+					<th>Report ID</th>
+                    <th>Crisis</th>
+                    <th>Report Receipt</th>
+                    <th>Report Reviewed</th>
+					<th>Report Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>001</td>
+                    <td><a href="Orchard Road.html">Bombing Incident at Orchard Road</a></td>
+                    <td>25th December 2016, 1949H</td>
+                    <td>25th December 2016, 1953H</td>
+					<td>Resolved</td>
+                  </tr>
+                  <tr>
+                    <td>002</td>
+                    <td><a href="#">Bombing at Changi Airport Terminal 1</a></td>
+                    <td>25th December 2016, 1953H</td>
+                    <td>25th December 2016, 2001H</td>
+					<td>Resolved</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer small text-muted">
+            Updated yesterday at 11:59 PM
+          </div>
         </div>
 
       </div>
@@ -240,7 +232,6 @@
         </div>
       </div>
     </div>
-	
 
     <!-- Bootstrap core JavaScript -->
     <script src="/static/vendor/jquery/jquery.min.js"></script>
@@ -254,15 +245,8 @@
     <script src="/static/vendor/datatables/dataTables.bootstrap4.js"></script>
 
     <!-- Custom scripts for this template -->
-    <script src="/static/js/sb-admin.min.js"></script>
+    <script src="js/sb-admin.min.js"></script>
 
   </body>
 
-
 </html>
-
-
-
-
-
-

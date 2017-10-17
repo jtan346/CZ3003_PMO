@@ -1,0 +1,22 @@
+<!--{% if crisisList %}
+    <ul>
+    {% for crisis in crisisList %}
+        <li><a href="/report/000{{ crisis.crisis_ID}}0001">{{ crisis.crisis_name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No crisis available.</p>
+{% endif %}-->
+
+{% if planItem %}
+    <ul>
+        <li>{{ planItem.plan_ID }}</a></li>
+        <li>{{ planItem.plan_description }}</a></li>
+        <li>{{ planItem.plan_crisisID.crisis_ID }}</a></li>
+        <li>{{ crisisItem.crisis_ID }}</a></li>
+        <li>{{ crisisItem2 }}</a></li>
+        <li>{{ updateItem.updates_ID }}</a></li>
+    </ul>
+{% else %}
+    <p>No plan available.</p>
+{% endif %}
