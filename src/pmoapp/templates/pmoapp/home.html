@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="chatApp">
 
   <head>
 
@@ -11,6 +11,28 @@
     <meta name="author" content="">
     <title>PMOSIMS</title>
 
+      <!-- Chat Function -->
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.0/angular.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.4/firebase.js"></script>
+    <script>
+		// This will be generated in the firebase console
+		var config = {
+			apiKey: "AIzaSyCGfibas_wVxOWSR-uqewBTLtYdcbwW37k",
+			authDomain: "testapp-f3e73.firebaseapp.com",
+			databaseURL: "https://testapp-f3e73.firebaseio.com",
+			projectId: "testapp-f3e73",
+			storageBucket: "testapp-f3e73.appspot.com",
+			messagingSenderId: "300550730836"
+	  	};
+    	firebase.initializeApp(config);
+    </script>
+    <script text="text/javascript">
+		var channel = "GeneralChat";
+		var sender = {{ curName|safe }};
+	</script>
+    <script src="/static/js/app.js"></script>
+
+    <script src="https://cdn.firebase.com/libs/angularfire/2.2.0/angularfire.min.js"></script>
     <!-- Bootstrap core CSS -->
     <link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
@@ -51,24 +73,11 @@
 			<!--<ul class="sidenav-second-level show" id="collapseComponents">-->
                 {% if toDisplay %}
                     {% for plan in toDisplay %}
-                        <li style="overflow:hidden; text-overflow: ellipsis; white-space:nowrap; max-width:100%;">
-                            <a href="../report/{{ plan.plan_ID }}">{{ plan.plan_crisisID.crisis_ID }}: {{ plan.plan_ID }}<br>({{ plan.plan_status }})</a>
+                        <li>
+                            <a href="../report/{{ plan.plan_ID }}">{{ plan.plan_crisisID.crisis_ID }}: {{ plan.plan_crisisID.crisis_name|truncatechars:20 }}</a>
                         </li>
                     {% endfor %}
                 {% endif %}
-			  <!--<li class="currentCrisisItem active">-->
-			  <!--<li>
-                <a href="../report/00030001">
-					⦁ Changi T3
-				</a>
-              </li>
-
-              &lt;!&ndash;<li class="currentCrisisItem">&ndash;&gt;
-              <li>
-                <a href="../report/00040001">
-					⦁ Jurong Island
-				</a>
-              </li>-->
             </ul>
           </li>
 
@@ -171,24 +180,24 @@
           <li class="breadcrumb-item active">Home</li>
         </ol>
 
-
+        <div class="form-row" style="min-height:100%">
         <!-- Example Tables Card -->
-        <div class="card mb-3">
+        <div class="card mb-2 col-md-9" style="padding-right:0px;padding-left:0px;">
           <div class="card-header">
             <!--<i class="fa fa-tv"></i>-->
             Current Crisis Reports
           </div>
-          <div class="card-body">
+          <div class="card-body col-md-12">
             <div class="table-responsive">
               <table class="table table-bordered" width="100%" id="dataTable" cellspacing="0">
                 <thead>
                   <tr>
-					<th>Crisis ID</th>
+					<th>Crisis - Plan ID</th>
                     <th>Crisis Title</th>
                     <th>Crisis Start Date/Time</th>
-                    <th>Report ID</th>
-                    <th>Report Receipt</th>
-					<th>Report Status</th>
+                    <!--<th>Report ID</th>-->
+                    <th>Plan Receipt</th>
+					<th>Plan Status</th>
                     <!--<th>Plan ID</th>
                     <th>Plan Receipt</th>
 					<th>Plan Status</th>-->
@@ -198,10 +207,10 @@
                 {% if toDisplay %}
                     {% for plan in toDisplay %}
                         <tr>
-                            <td>{{ plan.plan_crisisID.crisis_ID }}</td>
+                            <td>{{ plan.plan_crisisID.crisis_ID }} - {{ plan.plan_ID }}</td>
                             <td><a href="/report/{{ plan.plan_ID }}">{{ plan.plan_crisisID.crisis_name }}</a></td>
                             <td>{{ plan.plan_crisisID.crisis_dateTime }}</td>
-                            <td>{{ plan.plan_ID }}</td>
+                            <!--<td>{{ plan.plan_ID }}</td>-->
                             <td>{{ plan.plan_dateTime }}</td>
                             <td>{{ plan.plan_status }}</td>
                         </tr>
@@ -217,9 +226,31 @@
             Updated: {{ updateTime }}
           </div>
         </div>
-
+        <div class="card mb-2 col-md-3" ng-controller="ChatController" style="padding-left:0px; padding-right:0px; margin-left:5px; -ms-flex:0 0 25%;flex:0 0 25%;max-width:calc(25% - 5px);">
+              <div class="card-header">
+                <!--<i class="fa fa-comments-o"></i>-->
+                CMO Messenger - General Chat Channel
+              </div>
+              <div class="card-body"  style="overflow-x: hidden; overflow-y:scroll; min-height:64vh; max-height:64vh;">
+                <!--<p ng-repeat="m in messages">{{ m.messages }}- </p>-->
+                  <div>
+                  <p ng-repeat="m in fbmessages"> {% verbatim %}{{m.date | date:'short'}} - {{m.sender}}: <br> {{m.message}}{% endverbatim %}</p>
+                <!--{% for item in m %}{{ item }}{% endfor %}-->
+                </div>
+              </div>
+            <div class="form-row">
+                    <div class="form-group col-md-9" style="margin-left:5px; max-width:calc(75% - 5px); padding-top:5px;">
+                        <input type="text" id = "txtFBMsgs" class="form-control" placeholder="Message here..." ng-model="messageText" onkeydown = "if (event.keyCode == 13) document.getElementById('sendBtn').click()">
+                    </div>
+                    <div class="form-group col-md-3" style="max-width:calc(25% - 5px);" >
+                        <button type="submit" class="btn btn-primary btn-block" id="sendBtn" ng-click="send()">Send</button>
+                    </div>
+                </div>
+            </div>
       </div>
+
       <!-- /.container-fluid -->
+      </div>
     </div>
     <!-- /.content-wrapper -->
 

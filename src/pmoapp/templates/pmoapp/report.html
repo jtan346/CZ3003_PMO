@@ -26,15 +26,18 @@
     	firebase.initializeApp(config);
     </script>
     <script text="text/javascript">
-		var crisis = {{ crisisID|safe }};
+		var channel = {{ crisisID|safe }};
 		var sender = {{ curName|safe }};
 	</script>
-	  <script>
+	  <script text="text/javascript">
         setInterval(function(){
-        $('#crisisUpdates').load("/crisisUpdates/{{crisisItem.crisis_ID");
+
+        	$('#crisisUpdates').load("/crisisUpdates/{{crisisItem.crisis_ID}}");
+        	<!--$('#crisisUpdates').load("/crisisUpdates");-->
         },6000);
 	  </script>
 	<script src="/static/js/app.js"></script>
+	  <script src="/static/js/mygraph.js"></script>
     <script src="https://cdn.firebase.com/libs/angularfire/2.2.0/angularfire.min.js"></script>
 
     <!-- Bootstrap core CSS -->
@@ -78,18 +81,19 @@
 			<ul class="sidenav-second-level show" id="collapseComponents">
 
 			  <!--<li class="currentCrisisItem active">-->
-			  <li class="active">
-                <a href="../report/00030001">
-					⦁ Changi T3
-				</a>
-              </li>
-
-              <!--<li class="currentCrisisItem">-->
-              <li>
-                <a href="../report/00040001">
-					⦁ Jurong Island
-				</a>
-              </li>
+			  {% if toDisplay %}
+                    {% for plan in toDisplay %}
+						{% if plan.plan_ID == planItem.plan_ID %}
+                        <li class="active">
+                            <a href="../report/{{ plan.plan_ID }}">{{ plan.plan_crisisID.crisis_ID }}: {{ plan.plan_crisisID.crisis_name|truncatechars:20 }}</a>
+                        </li>
+						{% else %}
+						<li>
+                            <a href="../report/{{ plan.plan_ID }}">{{ plan.plan_crisisID.crisis_ID }}: {{ plan.plan_crisisID.crisis_name|truncatechars:20 }}</a>
+                        </li>
+						{% endif %}
+                    {% endfor %}
+                {% endif %}
             </ul>
           </li>
 	
@@ -496,7 +500,7 @@
 			  <div class="card mb-3">
 				  <div class="card-header">
 					  <i class="fa fa-area-chart"></i>
-					  Casualty and Injury Rate
+					  Current Injuries/Deaths
 				  </div>
 				  <div class="card-body">
 					  <canvas id="myAreaChart" width="100%" height="30"></canvas>
@@ -507,7 +511,7 @@
 
 			<section id="content3">
 				<div id="testing">
-					<p>testing</p>
+
 				</div>
 			</section>
 

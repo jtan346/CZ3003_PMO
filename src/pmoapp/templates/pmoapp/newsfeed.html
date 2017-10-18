@@ -51,18 +51,13 @@
 			<ul class="sidenav-second-level collapse" id="collapseComponents">
 
 			  <!--<li class="currentCrisisItem active">-->
-			  <li>
-                <a href="../report/00030001">
-					⦁ Changi T3
-				</a>
-              </li>
-
-              <!--<li class="currentCrisisItem">-->
-              <li>
-                <a href="../report/00040001">
-					⦁ Jurong Island
-				</a>
-              </li>
+			 {% if toDisplay %}
+                    {% for plan in toDisplay %}
+                        <li>
+                            <a href="../report/{{ plan.plan_ID }}">{{ plan.plan_crisisID.crisis_ID }}: {{ plan.plan_crisisID.crisis_name|truncatechars:20 }}</a>
+                        </li>
+                    {% endfor %}
+                {% endif %}
             </ul>
           </li>
 

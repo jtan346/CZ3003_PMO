@@ -9,7 +9,7 @@
 
     <meta name="description" content="">
     <meta name="author" content="">
-      <title>PMOSIMS</title>
+    <title>PMOSIMS</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -29,13 +29,13 @@
 
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
-      <a class="navbar-brand" href="../home">PMOSIMS</a>
+      <a class="navbar-brand" href="#">PMOSIMS</a>
       <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-             <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Home">
+             <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Home">
             <a class="nav-link" href="../home">
               <i class="fa fa-fw fa-home"></i>
               <span class="nav-link-text">
@@ -52,17 +52,22 @@
 			<!--<ul class="sidenav-second-level show" id="collapseComponents">-->
 
 			  <!--<li class="currentCrisisItem active">-->
-			  {% if toDisplay %}
-                    {% for plan in toDisplay2 %}
-                        <li>
-                            <a href="../report/{{ plan.plan_ID }}">{{ plan.plan_crisisID.crisis_ID }}: {{ plan.plan_crisisID.crisis_name|truncatechars:20 }}</a>
-                        </li>
-                    {% endfor %}
-                {% endif %}
+			  <li>
+                <a href="../report/00030001">
+					⦁ Changi T3
+				</a>
+              </li>
+
+              <!--<li class="currentCrisisItem">-->
+              <li>
+                <a href="../report/00040001">
+					⦁ Jurong Island
+				</a>
+              </li>
             </ul>
           </li>
 
-          <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Past Reports">
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Past Reports">
             <a class="nav-link" href="../history">
               <i class="fa fa-fw fa-history"></i>
               <span class="nav-link-text">
@@ -74,13 +79,6 @@
               <i class="fa fa-fw fa-feed"></i>
               <span class="nav-link-text">
                 Live News Feed</span>
-            </a>
-          </li>
-          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live News Feed">
-            <a class="nav-link" href="#">
-              <i class="fa fa-fw fa-feed"></i>
-              <span class="nav-link-text">
-                CMO Public Broadcast</span>
             </a>
           </li>
 
@@ -139,7 +137,7 @@
 					  </a>
 					</div>
 			</li>
-
+     
           <li class="nav-item" id="logoutBtn">
             <a class="nav-link" data-toggle="modal" data-target="#exampleModal">
               <i class="fa fa-fw fa-sign-out"></i>
@@ -158,15 +156,15 @@
           <li class="breadcrumb-item">
             <a href="../home">Home</a>
           </li>
-          <li class="breadcrumb-item active">Past Crisis Reports</li>
+          <li class="breadcrumb-item active">Home</li>
         </ol>
 
 
         <!-- Example Tables Card -->
         <div class="card mb-3">
           <div class="card-header">
-            <!--<i class="fa fa-tv"></i>-->
-            Past Crisis Reports
+            <i class="fa fa-tv"></i>
+            Current Crisis Reports
           </div>
           <div class="card-body">
             <div class="table-responsive">
@@ -182,27 +180,28 @@
                   </tr>
                 </thead>
                 <tbody>
-                {% if toDisplay %}
-                    {% for plan in toDisplay %}
-                        <tr>
-                            <!--<td>{{ plan.crisis_ID }}</td>-->
-                            <td>{{ plan.plan_crisisID.crisis_ID }}</td>
-                            <td><a href="/report/{{ plan.plan_ID }}">{{ plan.plan_crisisID.crisis_name }}</a></td>
-                            <td>{{ plan.plan_crisisID.crisis_dateTime }}</td>
-                            <td>{{ plan.plan_ID }}</td>
-                            <td>{{ plan.plan_dateTime }}</td>
-                            <td>{{ plan.plan_status }}</td>
-                        </tr>
-                    {% endfor %}
-                {% else %}
-                    <tr><td>Singapore is safe!</td></tr>
-                {% endif %}
+                  <tr>
+                    <td>0003</td>
+                    <td><a href="../report/00030004">Explosion at Changi Airport Terminal 3</a></td>
+                    <td>25th December 2017, 1949H</td>
+                    <td>0001</td>
+                    <td>25th December 2017, 1953H</td>
+					<td>Pending: PMO</td>
+                  </tr>
+                  <tr>
+                    <td>0004</td>
+                    <td><a href="../report/00040003">Fire at Jurong Island</a></td>
+                    <td>25th December 2017, 1953H</td>
+                    <td>0003</td>
+                    <td>25th December 2017, 2001H</td>
+					<td>Pending: CMO</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
           </div>
           <div class="card-footer small text-muted">
-            Updated: {{ updateTime }}
+            Updated yesterday at 11:59 PM
           </div>
         </div>
 

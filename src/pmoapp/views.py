@@ -19,12 +19,15 @@ def otp(request):
 
 def home(request):
     template = loader.get_template('pmoapp/home.html')
+    updateTime = datetime.now()
+
+    curAccount = Account.objects.filter(user_type='MDEF').get()  # in session or something
+    accountType = curAccount.user_type
+    curUser = curAccount.name
 
     crisisList = Crisis.objects.filter(crisis_status='Ongoing').order_by('-crisis_ID')
     planList = Plan.objects.filter(plan_crisisID__crisis_status='Ongoing')
     toDisplay = []
-    updateTime = datetime.now()
-
     for crisis in crisisList:
         plansInCrisis = planList.filter(plan_crisisID__crisis_ID=crisis.crisis_ID)
         max = plansInCrisis[0]
@@ -34,7 +37,11 @@ def home(request):
 
     context = {
         'toDisplay': toDisplay,
-        'updateTime':updateTime
+        'updateTime':updateTime,
+        'accountType': accountType,
+        'curUser': curUser,
+        # 'crisisID': json.dumps(crisisItem.crisis_ID),
+        'curName': json.dumps(curAccount.name)
     }
     return HttpResponse(template.render(context, request))
 
@@ -47,6 +54,20 @@ def history(request):
     planResolvedList = Plan.objects.exclude(plan_crisisID__crisis_status='Ongoing')
     toDisplay = []
     updateTime = datetime.now()
+
+    crisisList = Crisis.objects.filter(crisis_status='Ongoing').order_by('-crisis_ID')
+    planList = Plan.objects.filter(plan_crisisID__crisis_status='Ongoing')
+    toDisplay2 = []
+    for crisis in crisisList:
+        plansInCrisis = planList.filter(plan_crisisID__crisis_ID=crisis.crisis_ID)
+        max = plansInCrisis[0]
+        for plan in plansInCrisis:
+            if (plan.plan_ID > max.plan_ID): max = plan
+        toDisplay2.append(max)
+
+    curAccount = Account.objects.filter(user_type='MDEF').get()  # in session or something
+    accountType = curAccount.user_type
+    curUser = curAccount.name
 
     for plan in planResolvedList:
         toDisplay.append(plan)
@@ -61,7 +82,8 @@ def history(request):
 
     context = {
         'toDisplay': toDisplay,
-        'updateTime': updateTime
+        'toDisplay2': toDisplay2,
+        'updateTime': updateTime,
     }
     return HttpResponse(template.render(context, request))
 
@@ -76,6 +98,18 @@ def report(request, plan_id):
     accountType = curAccount.user_type
     curUser = curAccount.name
 
+    crisisList = Crisis.objects.filter(crisis_status='Ongoing').order_by('-crisis_ID')
+    planList = Plan.objects.filter(plan_crisisID__crisis_status='Ongoing')
+    toDisplay = []
+    for crisis in crisisList:
+        plansInCrisis = planList.filter(plan_crisisID__crisis_ID=crisis.crisis_ID)
+        max = plansInCrisis[0]
+        for plan in plansInCrisis:
+            if (plan.plan_ID > max.plan_ID): max = plan
+        toDisplay.append(max)
+
+    graphUpdateList = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=crisisItem.crisis_ID)
+
     context = {
         'planItem': planItem,
         'crisisItem': crisisItem,
@@ -83,21 +117,44 @@ def report(request, plan_id):
         'curName': json.dumps(curAccount.name),
         'updateItem': updateItem,
         'accountType': accountType,
-        'curUser': curUser
+        'curUser': curUser,
+        'toDisplay': toDisplay
     }
     return HttpResponse(template.render(context, request))
 
 class crisisUpdates(ListView):
     template_name = 'pmoapp/crisisUpdates.html'
+    findID=""
     def get_queryset(self):
-        plan_id = '00040003'
-        planItem = Plan.objects.filter(plan_ID=plan_id).get()
-        crisisItem = planItem.plan_crisisID
-        updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=crisisItem.crisis_ID).latest('updates_datetime')
+        find_id = self.kwargs['slug']
+        updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=find_id).latest('updates_datetime')
+        return updateItem
+
+class graphUpdates(ListView):
+    template_name='pmoapp/crisisUpdates.html'
+    find_id=""
+    def get_queryset(self):
+        find_id = self.kwargs['slug']
+        updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=find_id)
         return updateItem
 
 def newsfeed(request):
-    return render(request, 'pmoapp/newsfeed.html', {})
+    template=loader.get_template('pmoapp/newsfeed.html')
+
+    crisisList = Crisis.objects.filter(crisis_status='Ongoing').order_by('-crisis_ID')
+    planList = Plan.objects.filter(plan_crisisID__crisis_status='Ongoing')
+    toDisplay = []
+    for crisis in crisisList:
+        plansInCrisis = planList.filter(plan_crisisID__crisis_ID=crisis.crisis_ID)
+        max = plansInCrisis[0]
+        for plan in plansInCrisis:
+            if (plan.plan_ID > max.plan_ID): max = plan
+        toDisplay.append(max)
+
+    context = {
+        "toDisplay": toDisplay
+    }
+    return HttpResponse(template.render(context, request))
 
 #def testinginsertdb(Request):
     #newAccount = Account(username="benji", password="12345", emailAddress="benjamintanjb@gmail.com", user_type="PM")

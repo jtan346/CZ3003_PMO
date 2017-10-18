@@ -51,6 +51,10 @@ class ApproveAgencyAdmin(admin.ModelAdmin):
     def crisis(self, obj):
         return obj.approve_crisis.crisis_ID
 
+class EvalPlanAdmin(admin.ModelAdmin):
+    Model = EvalPlan
+    list_display = ('eval_planID','eval_userID','eval_text')
+
 admin.site.register(Account, AccountAdmin)
 #admin.site.register(CurrentReport)
 admin.site.register(Crisis, CrisisAdmin)
@@ -58,3 +62,5 @@ admin.site.register(CrisisUpdates, UpdateAdmin)
 admin.site.register(Plan, PlanAdmin)
 admin.site.register(ExternalAgency, ExternalAgencyAdmin)
 admin.site.register(ApproveAgency, ApproveAgencyAdmin)
+admin.site.register(EvalPlan, EvalPlanAdmin)
+

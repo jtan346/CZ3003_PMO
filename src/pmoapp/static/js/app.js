@@ -9,7 +9,7 @@ app.controller('ChatController', function($scope, $firebaseArray) {
 
 	//Query
 	
-    var ref = firebase.database().ref().child(crisis).child('CMO-PMO');
+    var ref = firebase.database().ref().child(channel).child('CMO-PMO');
 	
     $scope.fbmessages = $firebaseArray(ref);
 

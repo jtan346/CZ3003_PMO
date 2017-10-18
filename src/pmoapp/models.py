@@ -90,7 +90,7 @@ class Crisis(models.Model):
     )
     crisis_name = models.CharField(max_length=50)
     crisis_description = models.CharField(max_length=350)
-    crisis_dateTime = models.DateTimeField()
+    crisis_datetime = models.DateTimeField()
     crisis_address = models.CharField(max_length=50)
     crisis_status = models.CharField(max_length=50)  # Enum: Ongoing, Cleaning-Up, Resolved
     crisis_extAgencies = models.ManyToManyField(ExternalAgency, through='ApproveAgency', null=True)
@@ -100,13 +100,6 @@ class Crisis(models.Model):
     #     return str(self.crisis_ID) + "     " + self.crisis_name
 
 class CrisisUpdates(models.Model):
-    """updates_ID = models.IntegerField(
-        primary_key=True,
-        validators=[
-            MaxValueValidator(9999),
-            MinValueValidator(1)
-        ]
-    )"""
     updates_ID = models.CharField(
         primary_key=True,
         max_length=4,
@@ -140,7 +133,8 @@ class Plan(models.Model):
     ) # PK
     plan_crisisID = models.ForeignKey(Crisis, on_delete=models.CASCADE)
     plan_description = models.CharField(max_length=500)
-    plan_status = models.CharField(max_length=50)  # Enum: PendingPMO, PendingCMO, Approved, CrisisResolved
+    plan_status = models.CharField(max_length=50)  # Enum: PendingPMO, PendingCMO, Approved(only when approved=True)
+    plan_approved = models.BooleanField(default=False)
     plan_dateTime = models.DateTimeField()
     plan_projRadius = models.IntegerField(
         validators=[MinValueValidator(0)]
@@ -161,6 +155,11 @@ class ApproveAgency(models.Model):
     approve_text = models.CharField(max_length=50)
     class Meta: #For naming convention in django/admin
         verbose_name_plural = "Agency Approval"
+
+class EvalPlan(models.Model): #Comments by Ministers
+    eval_planID = models.ForeignKey(Plan, on_delete=models.CASCADE)
+    eval_userID = models.ForeignKey(Account, on_delete=models.CASCADE)
+    eval_text = models.CharField(max_length=500)
 
 
 """
