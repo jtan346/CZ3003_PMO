@@ -1,12 +1,16 @@
 """All Django views for pmoapp.
 """
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from django.views.generic.list import ListView
 from .models import *
 from datetime import datetime
 import json
+from django.core import serializers
+from django.core.serializers import serialize
+from django.core.serializers.json import DjangoJSONEncoder
+
 from django.db.models import Max
 #from django.test import Client
 import operator
@@ -115,6 +119,8 @@ def report(request, plan_id):
         'crisisItem': crisisItem,
         'crisisID': json.dumps(crisisItem.crisis_ID),
         'curName': json.dumps(curAccount.name),
+        'jsonCrisis': serializers.serialize('json', graphUpdateList),
+        # 'jsonCrisis1': JsonResponse(serializers.serialize(graphUpdateList)),
         'updateItem': updateItem,
         'accountType': accountType,
         'curUser': curUser,
@@ -131,12 +137,21 @@ class crisisUpdates(ListView):
         return updateItem
 
 class graphUpdates(ListView):
-    template_name='pmoapp/crisisUpdates.html'
+    template_name='pmoapp/graphUpdates.html'
     find_id=""
     def get_queryset(self):
         find_id = self.kwargs['slug']
         updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=find_id)
         return updateItem
+
+    def get_context_data(self, **kwargs):
+        find_id = self.kwargs['slug']
+        updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=find_id)
+        context = {
+            'jsonCrisis1': serializers.serialize('json', updateItem)
+        }
+        return context
+
 
 def newsfeed(request):
     template=loader.get_template('pmoapp/newsfeed.html')
@@ -174,6 +189,7 @@ def test(request, plan_id):
     # tdelta = datetime.strptime(d1, FMT) - datetime.strptime(d2, FMT)
 
     updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=crisisItem2).latest('updates_datetime')
+    graphUpdateList = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=crisisItem.crisis_ID)
 
     # for item in planItem:
     #     planCrisisID = item.plan_crisisID
@@ -182,6 +198,7 @@ def test(request, plan_id):
         'planItem': planItem,
         'crisisItem': crisisItem,
         'crisisItem2': crisisItem2,
+        'jsonCrisis': serializers.serialize('json', graphUpdateList),
         'updateItem': updateItem,
         # 'tdelta': tdelta
     }
