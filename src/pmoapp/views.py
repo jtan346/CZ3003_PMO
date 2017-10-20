@@ -14,8 +14,32 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Max
 #from django.test import Client
 import operator
+import requests
+import json
+from rest_framework import permissions, viewsets
+import threading
+from .serializer import PlanSerializer,EvalPlanSerializer
+
+class PlanViewSet(viewsets.ModelViewSet):
+    lookup_field = 'plan_ID'
+    queryset = Plan.objects.all()
+    serializer_class = PlanSerializer
+
+class EvalPlanViewSet(viewsets.ModelViewSet):
+    lookup_field = 'eval_planID'
+    queryset = EvalPlan.objects.all()
+    serializer_class = EvalPlanSerializer
+
+def getJsonValueByAttributes():
+    response = requests.get('http://127.0.0.1:8000/api/plan/plan_ID/')
+    response_dict = response.json()
+    #for result1 in range(0,len(response_dict)):
+    #    print(response_dict[result1])
+    threading.Timer(60.0, getJsonValueByAttributes).start()
+    #set timer to call the api can change to value of 60 current set to 1 min
 
 def login(request):
+    getJsonValueByAttributes()
     return render(request, 'pmoapp/login.html', {})
 
 def otp(request):
