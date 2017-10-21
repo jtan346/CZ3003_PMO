@@ -376,75 +376,123 @@
 				  <input type="text" class="form-control" id="txtMaximumCDDeployment" value="{{ planItem.plan_CDMaximum }} %" readonly>
 				</div>
 			</div>
+			
 		
 			<h4 class="reportHeader"> Review of Crisis Report </h4>
+
+			{% if accountType == 'DPM' %}
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="card-header" id="reportPanel1" data-toggle="collapse" href="#filterPanel1" data-parent="#exampleAccordion">
+                                        <i class="fa fa-check-square" id="tickCross1"></i>
+                                        Deputy Prime Minister
+                                    <span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel1">
+                                        <i class="fa fa-chevron-right" id="panelArrow1"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-body" id="reportPanelBody1">
+                                <div id="filterPanel1" class="panel-collapse panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <div class="reportReview">
+                                            <textarea class="form-control" id="txtDeputyPM" rows="10"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+			{% elif accountType == 'MOFA' %}
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<div class="card-header" id="reportPanel{{ curAccount.user_type }}" data-toggle="collapse" href="#filterPanel{{ curAccount.user_type }}" data-parent="#exampleAccordion">
-							<i class="fa fa-check-square" id="tickCross{{ curAccount.user_type }}"></i>
-							{{ curAccount.appointment }}
-						<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel4">
-							<i class="fa fa-chevron-right" id="panelArrow{{ curAccount.user_type }}"></i>
+					<div class="card-header" id="reportPanel2" data-toggle="collapse" href="#filterPanel2" data-parent="#exampleAccordion">
+							<i class="fa fa-check-square" id="tickCross2"></i>
+							Minister of Foreign Affairs
+						<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel2">
+							<i class="fa fa-chevron-right" id="panelArrow2"></i>
 						</span>
 					</div>
 				</div>
-				<div class="card-body" id="reportPanelBody{{ curAccount.user_type }}">
-					<div id="filterPanel{{ curAccount.user_type }}" class="panel-collapse panel-collapse collapse">
+				<div class="card-body" id="reportPanelBody2">
+					<div id="filterPanel2" class="panel-collapse panel-collapse collapse">
 						<div class="panel-body">
 							<div class="reportReview">
-								{% if planItem.plan_submitted %}<textarea disabled class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{{ c.eval_text }} {% endfor %}</textarea>
-								{% else %}<textarea class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{{ c.eval_text }} {% endfor %}</textarea>{% endif %}
+								<textarea class="form-control" id="txtMOFA" rows="10"></textarea>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div id="commentUpdates">
-				{% for a in allAccounts %}
-					{% if a.user_type != accountType %} <!--PM-->
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<div class="card-header" id="reportPanel{{ a.user_type }}" data-toggle="collapse" href="#filterPanel{{ a.user_type }}" data-parent="#exampleAccordion">
-										<i class="fa fa-check-square" id="tickCross{{ a.user_type }}"></i>
-										{{ a.appointment }}
-									<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel{{ a.user_type }}">
-										<i class="fa fa-chevron-right" id="panelArrow{{ a.user_type }}"></i>
-									</span>
-								</div>
-							</div>
-							<div class="card-body" id="reportPanelBody{{ a.user_type }}">
-								<div id="filterPanel{{ a.user_type }}" class="panel-collapse panel-collapse collapse">
-									<div class="panel-body">
-										<div class="reportReview">
-											<!--<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ submittedUsers }}</textarea>-->
-											{% if a.user_type not in submittedUsers %}
-												<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ a.appointment }}: {{ a.name }} has not reviewed the Plan: {{ planItem.plan_ID}}.</textarea>
-											{% else %}
-												{% for c in allComments %}
-													{% if a.user_type == c.eval_userID.user_type %}
-														<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{% if c.eval_hasComment %}{{ c.eval_text }}{% else %}{{ a.appointment }}: {{ a.name }} has reviewed, and does not have any further comments for the Plan: {{ planItem.plan_ID}}.{% endif %}</textarea>
-													{% endif %}
-												{% endfor %}
-											{% endif %}
-										</div>
-									</div>
-								</div>
+			{% elif accountType == 'MOHA' %}
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<div class="card-header" id="reportPanel3" data-toggle="collapse" href="#filterPanel3" data-parent="#exampleAccordion">
+							<i class="fa fa-check-square" id="tickCross3"></i>
+							Minister of Home Affairs
+						<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel3">
+							<i class="fa fa-chevron-right" id="panelArrow3"></i>
+						</span>
+					</div>
+				</div>
+				<div class="card-body" id="reportPanelBody3">
+					<div id="filterPanel3" class="panel-collapse panel-collapse collapse">
+						<div class="panel-body">
+							<div class="reportReview">
+								<textarea class="form-control" id="txtMOHA" rows="10"></textarea>
 							</div>
 						</div>
-					{% endif %}
-				{% endfor %}
+					</div>
+				</div>
 			</div>
-			{% csrf_token %}
+			{% elif accountType == 'MDEF' %}
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="card-header" id="reportPanel4" data-toggle="collapse" href="#filterPanel4" data-parent="#exampleAccordion">
+                                        <i class="fa fa-check-square" id="tickCross4"></i>
+                                        {{ curAccount.appointment }}
+                                    <span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel4">
+                                        <i class="fa fa-chevron-right" id="panelArrow4"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-body" id="reportPanelBody4">
+                                <div id="filterPanel4" class="panel-collapse panel-collapse collapse">
+                                    <div class="panel-body">
+                                        <div class="reportReview">
+                                            {% if planItem.plan_submitted %}<textarea disabled class="form-control" id="txtMINDEF" rows="10">{% for c in myComments %}{{ c.eval_text }} {% endfor %}</textarea>
+                                            {% else %}<textarea class="form-control" id="txtMINDEF" rows="10">{% for c in myComments %}{{ c.eval_text }} {% endfor %}</textarea>{% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-            {% if accountType != "PM" %}
-                {% if planItem.plan_submitted %}<button disabled type="submit" class="btn btn-primary" id="btnSubmit">Submit Comments</button>
-                {% else %}<button type="submit" class="btn btn-primary" id="btnSubmit">Submit Comments</button>
-                {% endif %}
-            {% else %}
-                {% if planItem.plan_submitted %}<button disabled type="submit" class="btn btn-primary" id="btnPM">Submit Reviewed Report to CMO</button>
-                {% else %}<button type="submit" class="btn btn-primary" id="btnPM">Submit Reviewed Report to CMO</button>
-                {% endif %}
-            {% endif %}
+			{% elif accountType == 'PM' %}
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<div class="card-header" id="reportPanel5" data-toggle="collapse" href="#filterPanel5" data-parent="#exampleAccordion">
+							<i class="fa fa-check-square" id="tickCross5"></i>
+							Prime Minister
+						<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel5">
+							<i class="fa fa-chevron-right" id="panelArrow5"></i>
+						</span>
+					</div>
+				</div>
+				<div class="card-body" id="reportPanelBody5">
+					<div id="filterPanel5" class="panel-collapse panel-collapse collapse">
+						<div class="panel-body">
+							<div class="reportReview">
+								<textarea class="form-control" id="txtPM" rows="10"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% endif %}
+
+			{% csrf_token %}
+			<button type="submit" class="btn btn-primary" id="btnSubmit">Submit Report with Counter-Proposals</button>
 			</form>
 			</section>
 
@@ -621,12 +669,6 @@
         	//$("[data-toggle='toggle']").bootstrapToggle();
         },30000);
 
-        //For Comments Updates
-        setInterval(function(){
-        	var curPlanID ={{planID|safe}};
-            $('#commentUpdates').load("/commentUpdates/{{curAccount.user_type}}-"+curPlanID);
-        },15000);
-
         //For Report submission
         /*var MDEFtxt = "empty";
         var MOHAtxt = "empty";
@@ -644,7 +686,7 @@
 
         $('#btnSubmit').click(function() {
 			if(accountType == "MDEF"){
-			    var MDEFtxt = $('#txtMDEF').val();
+			    var MDEFtxt = $('#txtMINDEF').val();
 			    if(MDEFtxt == "" || MDEFtxt === undefined){ MDEFtxt = "MDEF: No Comment"; MDEFhasComment = "False";} else MDEFhasComment = "True";
                 var data = {
                         'planID': curPlanID,
@@ -656,7 +698,7 @@
 
 			    $.ajax({
                     type: 'POST', //GET, POST, PUT or DELETE
-                    url: '/saveComments/', //Rename! Location of the service
+                    url: '/sendcmo/', //Rename! Location of the service
                     data: data,
                     success: function (msg) {
                       //On Successful service call
@@ -671,7 +713,7 @@
 
                 $.ajax({
                     type: 'POST', //GET, POST, PUT or DELETE
-                    url: '/saveComments/', //Rename! Location of the service
+                    url: '/sendcmo/', //Rename! Location of the service
                     data: {
                         'planID': curPlanID,
                         'accType': accountType,
@@ -691,7 +733,7 @@
 
                 $.ajax({
                     type: 'POST', //GET, POST, PUT or DELETE
-                    url: '/saveComments/', //Rename! Location of the service
+                    url: '/sendcmo/', //Rename! Location of the service
                     data: {
                         'planID': curPlanID,
                         'accType': accountType,
@@ -711,7 +753,7 @@
 
                 $.ajax({
                     type: 'POST', //GET, POST, PUT or DELETE
-                    url: '/saveComments/', //Rename! Location of the service
+                    url: '/sendcmo/', //Rename! Location of the service
                     data: {
                         'planID': curPlanID,
                         'accType': accountType,
@@ -727,11 +769,11 @@
 			}else
 			if(accountType == "PM"){
                 var PMtxt = $('#txtPM').val();
-                if(PMtxt == "" || PMtxt === undefined) { PMtxt = "PM: No Comment"; PMhasComment = "False";} else PMhasComment = "True";
+                if(PMtxt == "" || PMtxt === undefined) { PMtxt = "MDEF: No Comment"; PMhasComment = "False";} else hasCommentPM = "True";
 
                 $.ajax({
                     type: 'POST', //GET, POST, PUT or DELETE
-                    url: '/saveComments/', //Rename! Location of the service
+                    url: '/sendcmo/', //Rename! Location of the service
                     data: {
                         'planID': curPlanID,
                         'accType': accountType,
@@ -741,65 +783,13 @@
                     },
                     success: function (msg) {
                       //On Successful service call
-                      alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
+                      alert(accountType,"'s response (Has Comment: ", PMhasComment ,") for ",curPlanID, " has been saved!");
                     }
                 });
 			}else
 			{
 			    console.log(accountType);
 			}
-	    });
-
-	    $('#btnPM').click(function() {
-	        var PMtxt = $('#txtPM').val();
-            if(PMtxt == "" || PMtxt === undefined) { PMtxt = "PM: No Comment"; PMhasComment = "False";} else PMhasComment = "True";
-
-            $.ajax({
-                type: 'POST', //GET, POST, PUT or DELETE
-                url: '/saveComments/', //Rename! Location of the service
-                data: {
-                    'planID': curPlanID,
-                    'accType': accountType,
-                    'commentTxt': PMtxt,
-                    'hasComment': PMhasComment,
-                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
-                },
-                success: function (msg) {
-                  //On Successful service call
-                  //alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
-                  console.log(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
-                }
-            });
-
-
-
-            var checkMinisters;
-            var allMinisters = [];
-            var unMinisters = [];
-
-            {% for c in allAccounts %} allMinisters.push("{{c.user_type}}"); {% endfor %}
-
-	        $.ajax({
-                type: 'GET', //GET, POST, PUT or DELETE
-                url: '/getComments/{{curAccount.user_type}}/{{planItem.plan_ID}}', //Rename! Location of the service
-                success: function(data) {
-                    console.log(data);
-                    var test = JSON.parse(data);
-                    var noReview = test['noReviewYet']
-                    console.log(noReview);
-
-                    if(noReview.length >0)
-                    {
-                        alert("The following PMO members have not reviewed the plan:");
-                        alert(noReview.join("\n"));
-                    }else
-                    {
-                        //Submit to CMO (ready for collection)
-                        alert("Report has been sent to CMO!");
-
-                    }
-                }
-            });
 	    });
 
 	  </script>

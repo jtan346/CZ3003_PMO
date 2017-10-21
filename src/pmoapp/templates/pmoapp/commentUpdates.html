@@ -1,0 +1,42 @@
+<script text="text/javascript">
+
+
+</script>
+
+{% for a in allAccounts %}
+    {% if a.user_type != currentUser.user_type %} <!--PM-->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                {% if a.user_type in hasComments %}<div class="card-header" id="reportPanel{{ a.user_type }}" data-toggle="collapse" href="#filterPanel{{ a.user_type }}" data-parent="#exampleAccordion" aria-expanded="True">
+                {% else %}<div class="card-header" id="reportPanel{{ a.user_type }}" data-toggle="collapse" href="#filterPanel{{ a.user_type }}" data-parent="#exampleAccordion">
+                {% endif %}
+                        <i class="fa fa-check-square" id="tickCross{{ a.user_type }}"></i>
+                        {{ a.appointment }}
+                    <span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel{{ a.user_type }}">
+                        <i class="fa fa-chevron-right" id="panelArrow{{ a.user_type }}"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="card-body" id="reportPanelBody{{ a.user_type }}">
+                {% if a.user_type in hasComments %}<div id="filterPanel{{ a.user_type }}" class="panel-collapse panel-collapse collapse show">
+                {% else %}<div id="filterPanel{{ a.user_type }}" class="panel-collapse panel-collapse collapse">
+                {% endif %}
+                    <div class="panel-body">
+                        <div class="reportReview">
+                            <!--<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ submittedUsers }}</textarea>-->
+                            {% if a.user_type not in submittedUsers %}
+                                <textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ a.appointment }}: {{ a.name }} has not reviewed the Plan: {{ currentPlan.plan_ID}}.</textarea>
+                            {% else %}
+                                {% for c in allComments %}
+                                    {% if a.user_type == c.eval_userID.user_type %}
+                                        <textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{% if c.eval_hasComment %}{{ c.eval_text }}{% else %}{{ a.appointment }}: {{ a.name }} has reviewed, and does not have any further comments for the Plan: {{ currentPlan.plan_ID}}.{% endif %}</textarea>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}

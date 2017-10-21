@@ -15,7 +15,7 @@ class CrisisAdmin(admin.ModelAdmin):
 
 class AccountAdmin(admin.ModelAdmin):
     model = Account
-    list_display = ('username','password','emailAddress','user_type', 'name')
+    list_display = ('username','password','emailAddress','appointment','user_type', 'name')
 
 class UpdateAdmin(admin.ModelAdmin):
     model = CrisisUpdates
@@ -28,7 +28,7 @@ class UpdateAdmin(admin.ModelAdmin):
 
 class PlanAdmin(admin.ModelAdmin):
     Model = Plan
-    list_display = ('plan_ID', 'get_crisisID', 'plan_status', 'plan_projResolutionTime', 'plan_projCasualtyRate', 'plan_SAFRecommended', 'plan_CDRecommended', 'plan_SCDFRecommended',
+    list_display = ('plan_ID', 'get_crisisID', 'plan_status', 'plan_submitted','plan_projResolutionTime', 'plan_projCasualtyRate', 'plan_SAFRecommended', 'plan_CDRecommended', 'plan_SCDFRecommended',
                     'plan_SAFMaximum', 'plan_CDMaximum', 'plan_SCDFMaximum')
     def get_crisisID(self, obj):
         return obj.plan_crisisID.crisis_ID
@@ -53,7 +53,11 @@ class ApproveAgencyAdmin(admin.ModelAdmin):
 
 class EvalPlanAdmin(admin.ModelAdmin):
     Model = EvalPlan
-    list_display = ('eval_planID','eval_userID','eval_text')
+    list_display = ('get_planID','get_userID','eval_text','eval_hasComment')
+    def get_planID(self, obj):
+        return obj.eval_planID.plan_ID
+    def get_userID(self, obj):
+        return obj.eval_userID.user_type
 
 admin.site.register(Account, AccountAdmin)
 #admin.site.register(CurrentReport)

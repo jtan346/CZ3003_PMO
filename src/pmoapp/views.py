@@ -118,13 +118,18 @@ def history(request):
 def report(request, plan_id):
     template = loader.get_template('pmoapp/report.html')
 
+    #until we have session..
+    curUserType = 'PM'
+    curUsername = "pmaccount"
+
     planItem = Plan.objects.filter(plan_ID=plan_id).get()
     crisisItem = planItem.plan_crisisID
     updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=crisisItem.crisis_ID).latest('updates_datetime')
 
-    curAccount = Account.objects.filter(user_type='MDEF').get() #in session or something
+    curAccount = Account.objects.filter(username=curUsername).get() #in session or something
     accountType = curAccount.user_type
     curUser = curAccount.name
+    allAccounts = Account.objects.all()
 
     crisisList = Crisis.objects.filter(crisis_status='Ongoing').order_by('-crisis_ID')
     planList = Plan.objects.filter(plan_crisisID__crisis_status='Ongoing')
@@ -138,19 +143,114 @@ def report(request, plan_id):
 
     graphUpdateList = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=crisisItem.crisis_ID)
 
+    #test to see if there is a comment by this minister yet
+    allComments = EvalPlan.objects.filter(eval_planID__plan_ID=plan_id)
+    myComments = EvalPlan.objects.filter(eval_planID__plan_ID=plan_id, eval_userID__user_type=curUserType)
+
+    submittedUsers = []
+    for c in allComments:
+        submittedUsers.append(c.eval_userID.user_type)
+
     context = {
         'planItem': planItem,
+        'allAccounts': allAccounts,
+        'submittedUsers': submittedUsers,
         'crisisItem': crisisItem,
+        'planID': planItem.plan_ID,
         'crisisID': json.dumps(crisisItem.crisis_ID),
         'curName': json.dumps(curAccount.name),
         'jsonCrisis': serializers.serialize('json', graphUpdateList),
-        # 'jsonCrisis1': JsonResponse(serializers.serialize(graphUpdateList)),
+        #'jsonCrisis1': JsonResponse(serializers.serialize(graphUpdateList)),
+        'jsonComments': serializers.serialize('json', allComments),
+        'allComments': allComments,
+        'myComments': myComments,
         'updateItem': updateItem,
         'accountType': accountType,
         'curUser': curUser,
-        'toDisplay': toDisplay
+        'curAccount': curAccount,
+        'toDisplay': toDisplay,
+        'planID': json.dumps(planItem.plan_ID)
     }
     return HttpResponse(template.render(context, request))
+
+def saveComment(request):
+    print(request)
+    if request.POST:
+        getPlanID = request.POST['planID']
+        getAccType = request.POST['accType']
+        getCommentTxt = request.POST['commentTxt']
+        getHasComment = request.POST['hasComment']
+
+        curAccount = Account.objects.filter(user_type=getAccType).get()
+        curPlan = Plan.objects.filter(plan_ID=getPlanID).get()
+        eval_entry = EvalPlan(eval_planID=curPlan, eval_userID=curAccount, eval_text=getCommentTxt, eval_hasComment=getHasComment)
+        testDuplicate = EvalPlan.objects.filter(eval_planID__plan_ID=getPlanID, eval_userID__user_type=getAccType)
+
+        if not testDuplicate:
+            #print("testDuplicate is empty!") #save here
+            eval_entry.save()
+        else:
+            #print("there is something here: " + testDuplicate[0].eval_text) #replace here
+            testDuplicate[0].delete()
+            eval_entry.save()
+            #testNew = EvalPlan.objects.filter(eval_planID__plan_ID=getPlanID, eval_userID__user_type=getAccType).get()
+            #print("New Text Saved: "+testNew.eval_text)
+    return HttpResponse('')
+
+def getComments(request, userType, plan_id):
+    print(userType, plan_id)
+    allComments = EvalPlan.objects.filter(eval_planID__plan_ID=plan_id)
+    allUsers = Account.objects.all()
+
+    diff = []
+    for user in allUsers:
+        found = False
+        for comment in allComments:
+            if(user.user_type==comment.eval_userID.user_type):
+                found = True
+                break
+        if not found:
+            diff.append(user.user_type)
+
+    print(diff)
+
+    context = {
+        'noReviewYet': diff
+    }
+    return HttpResponse(json.dumps(context))
+
+class commentUpdates(ListView):
+    template_name = 'pmoapp/commentUpdates.html'
+    find_id = ""
+
+    def get_queryset(self):
+        dataRec = self.kwargs['slug']
+        data2 = dataRec.replace('-', ' ').split(' ')
+        updateItem = Account.objects.filter(user_type=data2[0]).get()
+        return updateItem
+    def get_context_data(self, **kwargs):
+        dataRec = self.kwargs['slug']
+        data2 = dataRec.replace('-', ' ').split(' ')
+        curUser = Account.objects.filter(user_type=data2[0]).get()
+        curPlan = Plan.objects.filter(plan_ID=data2[1]).get()
+        allComments = EvalPlan.objects.filter(eval_planID__plan_ID=data2[1])
+        allAccounts = Account.objects.all()
+        submittedUsers = []
+        for c in allComments:
+            submittedUsers.append(c.eval_userID.user_type)
+        hasComments = []
+        for c in allComments:
+            if c.eval_hasComment:
+                hasComments.append(c.eval_userID.user_type)
+        context = {
+            'currentPlan': curPlan,
+            'currentUser': curUser,
+            'allComments': allComments,
+            'hasComments': hasComments,
+            'allAccounts': allAccounts,
+            'submittedUsers': submittedUsers,
+        }
+        return context
 
 class crisisUpdates(ListView):
     template_name = 'pmoapp/crisisUpdates.html'
@@ -167,7 +267,6 @@ class graphUpdates(ListView):
         find_id = self.kwargs['slug']
         updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=find_id)
         return updateItem
-
     def get_context_data(self, **kwargs):
         find_id = self.kwargs['slug']
         updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=find_id)

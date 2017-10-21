@@ -63,7 +63,8 @@ class Account(models.Model):
             MinValueValidator(80000000)
         ]
     )
-    user_type = models.CharField(max_length=15)  #Enum: PM, DPM, MOHA, MOFA, MinDef
+    user_type = models.CharField(max_length=15, primary_key=True)  #Enum: PM, DPM, MOHA, MOFA, MDef
+    appointment = models.CharField(max_length=150) #Long form of their user_type
 
 class ExternalAgency(models.Model): #many-to-many
     agency_name = models.CharField(max_length=70, primary_key=True)
@@ -134,7 +135,9 @@ class Plan(models.Model):
     plan_crisisID = models.ForeignKey(Crisis, on_delete=models.CASCADE)
     plan_description = models.CharField(max_length=500)
     plan_status = models.CharField(max_length=50)  # Enum: PendingPMO, PendingCMO, Approved(only when approved=True)
-    plan_approved = models.BooleanField(default=False)
+    plan_approved = models.BooleanField(default=False) #True: No comments, ready to go. False: Has comments
+    #plan_readyToSubmit = models.BooleanField(default=False)
+    plan_submitted = models.BooleanField(default=False) #True: Plan locked, no changes to be made.
     plan_dateTime = models.DateTimeField()
     plan_projRadius = models.IntegerField(
         validators=[MinValueValidator(0)]
@@ -157,10 +160,12 @@ class ApproveAgency(models.Model):
         verbose_name_plural = "Agency Approval"
 
 class EvalPlan(models.Model): #Comments by Ministers
-    eval_planID = models.ForeignKey(Plan, on_delete=models.CASCADE)
-    eval_userID = models.ForeignKey(Account, on_delete=models.CASCADE)
-    eval_text = models.CharField(max_length=500)
-
+    eval_planID = models.ForeignKey(Plan, on_delete=models.CASCADE, null=False)
+    eval_userID = models.ForeignKey(Account, on_delete=models.CASCADE, null=False)
+    eval_text = models.CharField(max_length=500, null=True, blank=True)
+    eval_hasComment = models.BooleanField(default=False) #True: Reject with Comment, False: Approved
+    class Meta:
+        unique_together = ["eval_planID","eval_userID"]
 
 """
 

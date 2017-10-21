@@ -480,6 +480,14 @@ label .fa {
 	line-height: 0.6;
 }
 
+#reportPanelPM,#reportPanelDPM,#reportPanelMDEF,#reportPanelMOFA,#reportPanelMOHA
+{
+	cursor: pointer;
+	background-color: #671e20;
+	color:#ffffff;
+	line-height: 0.6;
+}
+
 .fa-check-square
 {
 	font-size: 18px;
