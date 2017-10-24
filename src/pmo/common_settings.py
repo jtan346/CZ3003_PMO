@@ -99,6 +99,8 @@ ROOT_URLCONF = 'pmo.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'pmo.wsgi.application'
 
+LOGIN_REDIRECT_URL = 'otp'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
