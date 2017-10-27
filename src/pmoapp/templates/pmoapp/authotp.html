@@ -32,14 +32,14 @@
         </div>
         <div class="card-body">
           <div class="text-center mt-4 mb-5">
-            <h4>Welcome, Mr. Benjamin Tan</h4>
+            <h4>Welcome, Mr. {{user.first_name}} {{user.last_name}}</h4>
             <p>A One-Time Password (OTP) has been sent to your registered E-mail address. Please enter your OTP in the space provided.</p>
           </div>
           <form>
             <div class="form-group">
               <input type="text" class="form-control" id="OTPtxt" placeholder="Enter OTP">
             </div>
-            <a class="btn btn-primary btn-block" href="home">Login</a>
+            <a class="btn btn-primary btn-block" href="../home">Login</a>
           </form>
           <div class="text-center">
             <a class="d-block small mt-3" href="">Resend One-Time Password to E-Mail</a>

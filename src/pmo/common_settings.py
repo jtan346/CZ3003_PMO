@@ -90,8 +90,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'pmo.middleware.LoginRequiredMiddleware',
     # Uncomment the next line for simple clickjacking protection:
-    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'pmo.urls'
@@ -99,7 +100,6 @@ ROOT_URLCONF = 'pmo.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'pmo.wsgi.application'
 
-LOGIN_REDIRECT_URL = 'otp'
 
 TEMPLATES = [
     {
@@ -176,3 +176,12 @@ LOGGING = {
         },
     }
 }
+
+LOGIN_REDIRECT_URL = '/authotp/'
+
+LOGIN_URL = '/login/'
+
+LOGIN_EXEMPT_URLS = (
+
+
+)

@@ -16,8 +16,10 @@ router2.register(r'eval_planID',EvalPlanViewSet)
 urlpatterns = [ #pylint: disable=invalid-name
     #url(r'^$', login, name='login'),
     url(r'^$', auth_views.login, {'template_name': 'pmoapp/login.html'}, name='login'),
-    url(r'^authotp$', otp, name='otp'),
-    url(r'^home$', home, name='home'),
+    url(r'^login/$', auth_views.login, {'template_name': 'pmoapp/login.html'}, name='login'),
+    url(r'^logout/$', auth_views.logout, name='logout'),
+    url(r'^authotp/$', otp, name='otp'),
+    url(r'^home/$', home, name='home'),
     url(r'^report/(?P<plan_id>[0-9]{8})$', report, name='report'),
     url(r'^newsfeed', newsfeed, name='newsfeed'),
     url(r'^history', history, name='history'),
@@ -32,7 +34,7 @@ urlpatterns = [ #pylint: disable=invalid-name
     # http://127.0.0.1:8000/api/eval/eval_planID/ the link to call the api from CMO side
     url(r'^saveComments/',saveComment),
     url(r'^getComments/(?P<userType>[\w-]+)/(?P<plan_id>[\w-]+)/$', getComments),
-    url(r'^logout2/$', auth_views.logout, name='logout'),
+
     #url(r'^admin/', admin.site.urls),
 
 ]

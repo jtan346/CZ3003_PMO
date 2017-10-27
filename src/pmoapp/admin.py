@@ -15,7 +15,7 @@ class CrisisAdmin(admin.ModelAdmin):
 
 class AccountAdmin(admin.ModelAdmin):
     model = Account
-    list_display = ('username','password','emailAddress','appointment','user_type', 'name')
+    list_display = ('username','emailAddress','appointment','user_type', 'name')
 
 class UpdateAdmin(admin.ModelAdmin):
     model = CrisisUpdates

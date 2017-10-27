@@ -14,11 +14,12 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Max
 #from django.test import Client
 import operator
-import requests
+#import requests
 import json
 from rest_framework import permissions, viewsets
 import threading
 from .serializer import PlanSerializer,EvalPlanSerializer
+from django.contrib.auth.decorators import login_required
 
 class PlanViewSet(viewsets.ModelViewSet):
     lookup_field = 'plan_ID'
@@ -43,13 +44,19 @@ def login(request):
     return render(request, 'pmoapp/login.html', {})
 
 def otp(request):
+    #request.session['first_name'] = 'Benjamin'
+    # print(request.session['first_name'])
+    #print(request.user.first_name)
     return render(request, 'pmoapp/authotp.html', {})
 
 def home(request):
     template = loader.get_template('pmoapp/home.html')
     updateTime = datetime.now()
 
-    curAccount = Account.objects.filter(user_type='MDEF').get()  # in session or something
+
+    #curUsername = request.user
+    curUsername = request.user
+    curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
     accountType = curAccount.user_type
     curUser = curAccount.name
 
@@ -119,15 +126,14 @@ def report(request, plan_id):
     template = loader.get_template('pmoapp/report.html')
 
     #until we have session..
-    curUserType = 'PM'
-    curUsername = "pmaccount"
+    curUsername = request.user
 
     planItem = Plan.objects.filter(plan_ID=plan_id).get()
     crisisItem = planItem.plan_crisisID
     updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=crisisItem.crisis_ID).latest('updates_datetime')
 
     curAccount = Account.objects.filter(username=curUsername).get() #in session or something
-    accountType = curAccount.user_type
+    curUserType = curAccount.user_type
     curUser = curAccount.name
     allAccounts = Account.objects.all()
 
@@ -165,7 +171,7 @@ def report(request, plan_id):
         'allComments': allComments,
         'myComments': myComments,
         'updateItem': updateItem,
-        'accountType': accountType,
+        'accountType': curUserType,
         'curUser': curUser,
         'curAccount': curAccount,
         'toDisplay': toDisplay,

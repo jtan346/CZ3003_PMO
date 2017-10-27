@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 
 class Account(models.Model):
     username = models.CharField(max_length=15)
-    password = models.CharField(max_length=15)
+    #password = models.CharField(max_length=15)
     emailAddress = models.EmailField()
     name = models.CharField(max_length=50)
     handphone_number = models.IntegerField(
