@@ -183,5 +183,10 @@ LOGIN_URL = '/login/'
 
 LOGIN_EXEMPT_URLS = (
 
-
 )
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'pmossp3@gmail.com'
+EMAIL_HOST_PASSWORD = 'ssp3jones'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True

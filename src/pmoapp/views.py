@@ -20,6 +20,9 @@ from rest_framework import permissions, viewsets
 import threading
 from .serializer import PlanSerializer,EvalPlanSerializer
 from django.contrib.auth.decorators import login_required
+from random import randint
+from django.conf import settings
+from django.core.mail import send_mail
 
 class PlanViewSet(viewsets.ModelViewSet):
     lookup_field = 'plan_ID'
@@ -44,10 +47,31 @@ def login(request):
     return render(request, 'pmoapp/login.html', {})
 
 def otp(request):
-    #request.session['first_name'] = 'Benjamin'
-    # print(request.session['first_name'])
-    #print(request.user.first_name)
+    subject = 'OTP'
+    from_email = settings.EMAIL_HOST_USER
+    to_email = [from_email]
+    OTP = request.session['OTP'] = randint(10000000, 99999999)
+    send_mail(subject, str(OTP), from_email, to_email, fail_silently=False)
     return render(request, 'pmoapp/authotp.html', {})
+
+def resendOTP(request):
+    del request.session['OTP']
+    subject = 'OTP'
+    from_email = settings.EMAIL_HOST_USER
+    to_email = [from_email]
+    OTP = request.session['OTP'] = randint(10000000, 99999999)
+    send_mail(subject, str(OTP), from_email, to_email, fail_silently=False)
+    return render(request, 'pmoapp/authotp.html', {})
+
+def otpAuthentication(request):
+    if request.POST:
+        otp = request.POST['otp']
+        if (otp == str(request.session['OTP'])):
+            del request.session['OTP']
+            return HttpResponse('')
+
+    return HttpResponse('', status=401)
+
 
 def home(request):
     template = loader.get_template('pmoapp/home.html')
