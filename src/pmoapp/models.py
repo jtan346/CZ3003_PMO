@@ -19,6 +19,9 @@ class Account(models.Model):
     appointment = models.CharField(max_length=150) #Long form of their user_type
     profilePicURL = models.CharField(max_length=150, null=True)
 
+    def __str__(self):
+        return self.user_type
+
 class ExternalAgency(models.Model): #many-to-many
     agency_name = models.CharField(max_length=70, primary_key=True)
     agency_abbrev = models.CharField(max_length=10)
