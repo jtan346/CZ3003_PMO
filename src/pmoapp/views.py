@@ -14,11 +14,15 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Max
 #from django.test import Client
 import operator
-import requests
+#import requests
 import json
 from rest_framework import permissions, viewsets
 import threading
 from .serializer import PlanSerializer,EvalPlanSerializer
+from django.contrib.auth.decorators import login_required
+from random import randint
+from django.conf import settings
+from django.core.mail import send_mail
 
 class PlanViewSet(viewsets.ModelViewSet):
     lookup_field = 'plan_ID'
@@ -43,13 +47,40 @@ def login(request):
     return render(request, 'pmoapp/login.html', {})
 
 def otp(request):
+    subject = 'OTP'
+    from_email = settings.EMAIL_HOST_USER
+    to_email = [from_email]
+    OTP = request.session['OTP'] = randint(10000000, 99999999)
+    send_mail(subject, str(OTP), from_email, to_email, fail_silently=False)
     return render(request, 'pmoapp/authotp.html', {})
+
+def resendOTP(request):
+    del request.session['OTP']
+    subject = 'OTP'
+    from_email = settings.EMAIL_HOST_USER
+    to_email = [from_email]
+    OTP = request.session['OTP'] = randint(10000000, 99999999)
+    send_mail(subject, str(OTP), from_email, to_email, fail_silently=False)
+    return render(request, 'pmoapp/authotp.html', {})
+
+def otpAuthentication(request):
+    if request.POST:
+        otp = request.POST['otp']
+        if (otp == str(request.session['OTP'])):
+            del request.session['OTP']
+            return HttpResponse('')
+
+    return HttpResponse('', status=401)
+
 
 def home(request):
     template = loader.get_template('pmoapp/home.html')
     updateTime = datetime.now()
 
-    curAccount = Account.objects.filter(user_type='MDEF').get()  # in session or something
+
+    #curUsername = request.user
+    curUsername = request.user
+    curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
     accountType = curAccount.user_type
     curUser = curAccount.name
 
@@ -119,15 +150,14 @@ def report(request, plan_id):
     template = loader.get_template('pmoapp/report.html')
 
     #until we have session..
-    curUserType = 'PM'
-    curUsername = "pmaccount"
+    curUsername = request.user
 
     planItem = Plan.objects.filter(plan_ID=plan_id).get()
     crisisItem = planItem.plan_crisisID
     updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=crisisItem.crisis_ID).latest('updates_datetime')
 
     curAccount = Account.objects.filter(username=curUsername).get() #in session or something
-    accountType = curAccount.user_type
+    curUserType = curAccount.user_type
     curUser = curAccount.name
     allAccounts = Account.objects.all()
 
@@ -165,7 +195,7 @@ def report(request, plan_id):
         'allComments': allComments,
         'myComments': myComments,
         'updateItem': updateItem,
-        'accountType': accountType,
+        'accountType': curUserType,
         'curUser': curUser,
         'curAccount': curAccount,
         'toDisplay': toDisplay,

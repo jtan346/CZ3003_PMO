@@ -23,6 +23,7 @@
   </head>
 
   <body class="bg-dark">
+   {% csrf_token %}
 
     <div class="container">
 
@@ -32,17 +33,17 @@
         </div>
         <div class="card-body">
           <div class="text-center mt-4 mb-5">
-            <h4>Welcome, Mr. Benjamin Tan</h4>
+            <h4>Welcome, Mr. {{user.first_name}} {{user.last_name}}</h4>
             <p>A One-Time Password (OTP) has been sent to your registered E-mail address. Please enter your OTP in the space provided.</p>
           </div>
           <form>
             <div class="form-group">
-              <input type="text" class="form-control" id="OTPtxt" placeholder="Enter OTP">
+              <input type="otp" class="form-control" id="otp" placeholder="Enter OTP">
             </div>
-            <a class="btn btn-primary btn-block" href="home">Login</a>
+            <a class="btn btn-primary btn-block" id="otpBtn" onclick="otpAuth()" href="#">Login</a>
           </form>
           <div class="text-center">
-            <a class="d-block small mt-3" href="">Resend One-Time Password to E-Mail</a>
+            <a class="d-block small mt-3"  href="/resendOTP/">Resend One-Time Password to E-Mail</a>
           </div>
         </div>
       </div>
@@ -52,7 +53,33 @@
     <script src="/static/vendor/jquery/jquery.min.js"></script>
     <script src="/static/vendor/popper/popper.min.js"></script>
     <script src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
   </body>
+<script>
+     function otpAuth() {
+            var otp = document.getElementById("otp").value;
+             $.ajax({
+
+                type: 'POST', //GET or POST or PUT or DELETE verb
+
+                url: '/otpAuthentication/', // Location of the service
+
+                data: {
+                    'otp' : otp,
+                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+                }, //Data sent to server
+                success: function (msg) {
+                    //On Successfull service call
+                    location.href="/home"
+                },
+                error: function(msg){
+                     alert("Invalid OTP"); // <- this should run if user is not activated
+                 } // error
+
+
+            });
+        }
+    </script>
 
 </html>
