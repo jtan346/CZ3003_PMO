@@ -8,6 +8,9 @@ admin.site.register(YourModel)
 
 from django.contrib import admin
 from .models import *
+from django.contrib import admin
+import inspect
+from django.db.models import Model
 
 class CrisisAdmin(admin.ModelAdmin):
     model = Crisis
@@ -15,24 +18,27 @@ class CrisisAdmin(admin.ModelAdmin):
 
 class AccountAdmin(admin.ModelAdmin):
     model = Account
-    list_display = ('username','emailAddress','appointment','user_type', 'name')
+    list_display = ('username','appointment','user_type')
 
 class UpdateAdmin(admin.ModelAdmin):
     model = CrisisUpdates
-    list_display = ('updates_ID', 'get_crisisID', 'updates_curInjuries', 'updates_curDeaths', 'updates_curRadius', 'updates_curSAF', 'updates_curSCDF', 'updates_curCD')
+    list_display = ('get_crisisID', 'updates_curInjuries', 'updates_curDeaths', 'updates_curSAF', 'updates_curSCDF', 'updates_curCD')
     def get_crisisID(self, obj):
-        return obj.updates_crisisID.crisis_ID
+        return obj.updates_crisisID
     get_crisisID.admin_order_field = 'crisis'  # Allows column order sorting
     get_crisisID.short_description = 'Crisis ID '  # Renames column head
 
+class SubCrisisAdmin(admin.ModelAdmin):
+    model = SubCrisis
+    list_display = ('sc_ID', 'crisis_ID', 'latitude', 'longitude', 'radius')
 
 class PlanAdmin(admin.ModelAdmin):
     Model = Plan
-    list_display = ('plan_ID', 'get_crisisID', 'plan_status', 'plan_submitted','plan_projResolutionTime', 'plan_projCasualtyRate', 'plan_SAFRecommended', 'plan_CDRecommended', 'plan_SCDFRecommended',
+    list_display = ('id', 'plan_ID', 'get_crisisID', 'plan_status', 'plan_projResolutionTime', 'plan_projCasualtyRate', 'plan_SAFRecommended', 'plan_CDRecommended', 'plan_SCDFRecommended',
                     'plan_SAFMaximum', 'plan_CDMaximum', 'plan_SCDFMaximum')
     def get_crisisID(self, obj):
-        return obj.plan_crisisID.crisis_ID
-    get_crisisID.admin_order_field = 'crisis'  # Allows column order sorting
+        return obj.plan_crisisID
+    get_crisisID.admin_order_field = 'plan_crisisID'  # Allows column order sorting
     get_crisisID.short_description = 'Crisis ID '  # Renames column head
 
 class ExternalAgencyAdmin(admin.ModelAdmin):
@@ -53,9 +59,16 @@ class ApproveAgencyAdmin(admin.ModelAdmin):
 
 class EvalPlanAdmin(admin.ModelAdmin):
     Model = EvalPlan
-    list_display = ('get_planID','get_userID','eval_text','eval_hasComment')
+    list_display = ('id', 'eval_planID','get_userID','eval_text','eval_hasComment')
+
     def get_planID(self, obj):
-        return obj.eval_planID.plan_ID
+        return obj.eval_planID
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "plan":
+            kwargs["queryset"] = Plan.objects.order_by('id')
+        return super(EvalPlanAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
     def get_userID(self, obj):
         return obj.eval_userID.user_type
 
@@ -64,7 +77,14 @@ admin.site.register(Account, AccountAdmin)
 admin.site.register(Crisis, CrisisAdmin)
 admin.site.register(CrisisUpdates, UpdateAdmin)
 admin.site.register(Plan, PlanAdmin)
+admin.site.register(SubCrisis, SubCrisisAdmin)
 admin.site.register(ExternalAgency, ExternalAgencyAdmin)
 admin.site.register(ApproveAgency, ApproveAgencyAdmin)
 admin.site.register(EvalPlan, EvalPlanAdmin)
 
+# try:
+#     for name,obj in inspect.getmembers(models,inspect.isclass):
+#         if(issubclass(obj, Model)):
+#             admin.site.register(obj)
+# except(TypeError):
+#     print("Obj Throwing error : %s " % obj)

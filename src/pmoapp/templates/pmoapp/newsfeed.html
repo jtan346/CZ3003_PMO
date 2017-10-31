@@ -53,10 +53,18 @@
 			  <!--<li class="currentCrisisItem active">-->
 			 {% if toDisplay %}
                     {% for plan in toDisplay %}
-                        <li>
-                            <a href="../report/{{ plan.plan_ID }}">{{ plan.plan_crisisID.crisis_ID }}: {{ plan.plan_crisisID.crisis_name|truncatechars:20 }}</a>
-                        </li>
+                        {% for crisis in ongoingCrisis %}
+                            {% if crisis.crisis_ID == plan.plan_crisisID %}
+                                <li>
+                                    <a href="../report/{{ plan.id }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:20 }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
                     {% endfor %}
+                {% else %}
+                    <li>
+                        <p>No Ongoing Crisis</p>
+                    </li>
                 {% endif %}
             </ul>
           </li>

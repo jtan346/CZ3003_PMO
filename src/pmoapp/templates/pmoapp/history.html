@@ -52,12 +52,20 @@
 			<!--<ul class="sidenav-second-level show" id="collapseComponents">-->
 
 			  <!--<li class="currentCrisisItem active">-->
-			  {% if toDisplay %}
+			  {% if toDisplay2 %}
                     {% for plan in toDisplay2 %}
-                        <li>
-                            <a href="../report/{{ plan.plan_ID }}">{{ plan.plan_crisisID.crisis_ID }}: {{ plan.plan_crisisID.crisis_name|truncatechars:20 }}</a>
-                        </li>
+                        {% for crisis in allCrisis %}
+                            {% if crisis.crisis_ID == plan.plan_crisisID %}
+                                <li>
+                                    <a href="../report/{{ plan.id }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:20 }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
                     {% endfor %}
+                {% else %}
+                    <li>
+                        <p>No Ongoing Crisis</p>
+                    </li>
                 {% endif %}
             </ul>
           </li>
@@ -184,15 +192,19 @@
                 <tbody>
                 {% if toDisplay %}
                     {% for plan in toDisplay %}
-                        <tr>
-                            <!--<td>{{ plan.crisis_ID }}</td>-->
-                            <td>{{ plan.plan_crisisID.crisis_ID }}</td>
-                            <td><a href="/report/{{ plan.plan_ID }}">{{ plan.plan_crisisID.crisis_name }}</a></td>
-                            <td>{{ plan.plan_crisisID.crisis_datetime }}</td>
-                            <td>{{ plan.plan_ID }}</td>
-                            <td>{{ plan.plan_dateTime }}</td>
-                            <td>{{ plan.plan_status }}</td>
-                        </tr>
+                        {% for crisis in allCrisis %}
+                            {% if crisis.crisis_ID == plan.plan_crisisID %}
+                                <tr>
+                                    <!--<td>{{ plan.crisis_ID }}</td>-->
+                                    <td>Crisis: {{ plan.plan_crisisID }} - Plan: {{ plan.plan_ID }}</td>
+                                    <td><a href="/report/{{ plan.id }}">{{ crisis.crisis_name }}</a></td>
+                                    <td>{{ crisis.crisis_datetime }}</td>
+                                    <td>{{ plan.plan_ID }}</td>
+                                    <td>{{ plan.plan_dateTime }}</td>
+                                    <td>{{ plan.plan_status }}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
                     {% endfor %}
                 {% else %}
                     <tr><td>Singapore is safe!</td></tr>

@@ -14,7 +14,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Max
 #from django.test import Client
 import operator
-#import requests
+import requests
 import json
 from rest_framework import permissions, viewsets
 import threading
@@ -43,7 +43,8 @@ def getJsonValueByAttributes():
     #set timer to call the api can change to value of 60 current set to 1 min
 
 def login(request):
-    getJsonValueByAttributes()
+    #getJsonValueByAttributes()
+    CrisisUpdates.objects.all().delete()
     return render(request, 'pmoapp/login.html', {})
 
 def otp(request):
@@ -52,6 +53,7 @@ def otp(request):
     to_email = [from_email]
     OTP = request.session['OTP'] = randint(10000000, 99999999)
     send_mail(subject, str(OTP), from_email, to_email, fail_silently=False)
+    print(str(OTP))
     return render(request, 'pmoapp/authotp.html', {})
 
 def resendOTP(request):
@@ -69,126 +71,178 @@ def otpAuthentication(request):
         if (otp == str(request.session['OTP'])):
             del request.session['OTP']
             return HttpResponse('')
-
     return HttpResponse('', status=401)
-
 
 def home(request):
     template = loader.get_template('pmoapp/home.html')
+
+#Process Account/Session
     updateTime = datetime.now()
-
-
-    #curUsername = request.user
     curUsername = request.user
     curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
     accountType = curAccount.user_type
-    curUser = curAccount.name
 
-    crisisList = Crisis.objects.filter(crisis_status='Ongoing').order_by('-crisis_ID')
-    planList = Plan.objects.filter(plan_crisisID__crisis_status='Ongoing')
+    if(curAccount.gender):
+        salutation = "Mr."
+    else:
+        salutation = "Ms."
+
+    curUser = salutation + " " + request.user.last_name +" "+ request.user.first_name
+    print(curUser)
+
+#NOTE: WHEN TO PULL FROM CMO: ON EVERY PAGE LOAD, BECAUSE NOTIFICATION COME, CLICKING IT WILL REFRESH A PAGE!
+
+#Process Crisis/Plans
+    crisisList = Crisis.objects.filter(crisis_status='Ongoing')
+    print(crisisList)
+
+    # planList = []
+    # for crisis in crisisList:
+    #     latestPlan = Plan.objects.filter(plan_crisisID=crisis.crisis_ID).latest('plan_dateTime')
+    #     planList.append(latestPlan)
+    #
+    # print(planList)
+
     toDisplay = []
     for crisis in crisisList:
-        plansInCrisis = planList.filter(plan_crisisID__crisis_ID=crisis.crisis_ID)
+        plansInCrisis = Plan.objects.filter(plan_crisisID=crisis.crisis_ID)
         max = plansInCrisis[0]
         for plan in plansInCrisis:
-            if(plan.plan_ID > max.plan_ID ): max = plan
+            if(plan.plan_ID > max.plan_ID):
+                max = plan
         toDisplay.append(max)
+
+    print(toDisplay)
 
     context = {
         'toDisplay': toDisplay,
-        'updateTime':updateTime,
+        'ongoingCrisis': crisisList,
+        'updateTime': updateTime,
         'accountType': accountType,
         'curUser': curUser,
         # 'crisisID': json.dumps(crisisItem.crisis_ID),
-        'curName': json.dumps(curAccount.name)
+        'curName': json.dumps(curUser)
     }
     return HttpResponse(template.render(context, request))
 
 def history(request):
     template = loader.get_template('pmoapp/history.html')
 
-    crisisOngoingList = Crisis.objects.filter(crisis_status='Ongoing').order_by('-crisis_ID')
-    planOngoingList = Plan.objects.filter(plan_crisisID__crisis_status='Ongoing')
+#Get user info
 
-    planResolvedList = Plan.objects.exclude(plan_crisisID__crisis_status='Ongoing')
-    toDisplay = []
     updateTime = datetime.now()
-
-    crisisList = Crisis.objects.filter(crisis_status='Ongoing').order_by('-crisis_ID')
-    planList = Plan.objects.filter(plan_crisisID__crisis_status='Ongoing')
-    toDisplay2 = []
-    for crisis in crisisList:
-        plansInCrisis = planList.filter(plan_crisisID__crisis_ID=crisis.crisis_ID)
-        max = plansInCrisis[0]
-        for plan in plansInCrisis:
-            if (plan.plan_ID > max.plan_ID): max = plan
-        toDisplay2.append(max)
-
-    curAccount = Account.objects.filter(user_type='MDEF').get()  # in session or something
+    curUsername = request.user
+    curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
     accountType = curAccount.user_type
-    curUser = curAccount.name
 
-    for plan in planResolvedList:
-        toDisplay.append(plan)
+    if (curAccount.gender):
+        salutation = "Mr."
+    else:
+        salutation = "Ms."
 
-    for crisis in crisisOngoingList:
-        plansInCrisis = planOngoingList.filter(plan_crisisID__crisis_ID=crisis.crisis_ID)
+    curUser = salutation + " " + request.user.last_name + " " + request.user.first_name
+
+#Sidebar display list
+    allPlans = Plan.objects.all()
+    ongoingPlanList = []
+    ongoingCrisisList = Crisis.objects.filter(crisis_status='Ongoing')
+    toDisplay2 = []
+    for index, crisis in enumerate(ongoingCrisisList):
+        plansInCrisis = Plan.objects.filter(plan_crisisID=crisis.crisis_ID)
         max = plansInCrisis[0]
         for plan in plansInCrisis:
-            if (plan.plan_ID > max.plan_ID): max = plan
-        for plan in plansInCrisis:
-            if(plan != max): toDisplay.append(plan)
+            if (plan.plan_ID > max.plan_ID):
+                max = plan
+                ongoingPlanList.append(plansInCrisis[index-1])
 
+        toDisplay2.append(max)
+        #ongoingPlanList = ongoingPlanList.exclude(plan_ID=max.plan_ID)
+
+# Get all plans where Crisis status = Resolved
+    historicalCrisisList = Crisis.objects.filter(crisis_status='Resolved')
+    historicalPlanList = []
+    for crisis in historicalCrisisList:
+        for plan in allPlans:
+            if (crisis.crisis_ID == plan.plan_crisisID):
+                historicalPlanList.append(plan)
+
+# Get all plans except for latest plan where Crisis Status != Resolved
+
+    print("ongoing:")
+    for a in ongoingPlanList:
+        print(a.id)
+    print("historical:")
+    for b in historicalPlanList:
+        print(b.id)
+
+    toDisplay = ongoingPlanList + historicalPlanList
+    allCrisis = Crisis.objects.all()
     context = {
         'toDisplay': toDisplay,
         'toDisplay2': toDisplay2,
+        'ongoingCrisis': ongoingCrisisList,
         'updateTime': updateTime,
+        'allCrisis': allCrisis,
     }
     return HttpResponse(template.render(context, request))
 
 def report(request, plan_id):
     template = loader.get_template('pmoapp/report.html')
 
-    #until we have session..
+    updateTime = datetime.now()
     curUsername = request.user
-
-    planItem = Plan.objects.filter(plan_ID=plan_id).get()
-    crisisItem = planItem.plan_crisisID
-    updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=crisisItem.crisis_ID).latest('updates_datetime')
-
-    curAccount = Account.objects.filter(username=curUsername).get() #in session or something
+    curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
+    accountType = curAccount.user_type
     curUserType = curAccount.user_type
-    curUser = curAccount.name
     allAccounts = Account.objects.all()
 
-    crisisList = Crisis.objects.filter(crisis_status='Ongoing').order_by('-crisis_ID')
-    planList = Plan.objects.filter(plan_crisisID__crisis_status='Ongoing')
+    if (curAccount.gender):
+        salutation = "Mr."
+    else:
+        salutation = "Ms."
+
+    curUser = salutation + " " + request.user.last_name + " " + request.user.first_name
+    print(curUser)
+
+    planItem = Plan.objects.filter(id=plan_id).get()
+    crisisItem = Crisis.objects.filter(crisis_ID=planItem.plan_crisisID).get()
+    updateItem = CrisisUpdates.objects.filter(updates_crisisID=crisisItem.crisis_ID).latest('updates_datetime')
+
+    print(updateItem)
+
+    crisisList = Crisis.objects.filter(crisis_status='Ongoing')
     toDisplay = []
     for crisis in crisisList:
-        plansInCrisis = planList.filter(plan_crisisID__crisis_ID=crisis.crisis_ID)
+        plansInCrisis = Plan.objects.filter(plan_crisisID=crisis.crisis_ID)
         max = plansInCrisis[0]
         for plan in plansInCrisis:
-            if (plan.plan_ID > max.plan_ID): max = plan
+            if(plan.plan_ID > max.plan_ID):
+                max = plan
         toDisplay.append(max)
 
-    graphUpdateList = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=crisisItem.crisis_ID)
+    graphUpdateList = CrisisUpdates.objects.filter(updates_crisisID=crisisItem.crisis_ID)
 
     #test to see if there is a comment by this minister yet
-    allComments = EvalPlan.objects.filter(eval_planID__plan_ID=plan_id)
-    myComments = EvalPlan.objects.filter(eval_planID__plan_ID=plan_id, eval_userID__user_type=curUserType)
+    allComments = EvalPlan.objects.filter(eval_planID__id=plan_id)
+    myComments = EvalPlan.objects.filter(eval_planID__id=plan_id, eval_userID__user_type=curUserType)
 
     submittedUsers = []
     for c in allComments:
         submittedUsers.append(c.eval_userID.user_type)
 
+    allSubCrisis = SubCrisis.objects.filter(crisis_ID = crisisItem.crisis_ID)
+    print(allSubCrisis)
+
     context = {
         'planItem': planItem,
+        'ongoingCrisis': crisisList,
         'allAccounts': allAccounts,
         'submittedUsers': submittedUsers,
         'crisisItem': crisisItem,
         'planID': planItem.plan_ID,
+        'allSubCrisis': allSubCrisis,
         'crisisID': json.dumps(crisisItem.crisis_ID),
-        'curName': json.dumps(curAccount.name),
+        'curName': json.dumps(curUser),
         'jsonCrisis': serializers.serialize('json', graphUpdateList),
         #'jsonCrisis1': JsonResponse(serializers.serialize(graphUpdateList)),
         'jsonComments': serializers.serialize('json', allComments),
@@ -199,7 +253,7 @@ def report(request, plan_id):
         'curUser': curUser,
         'curAccount': curAccount,
         'toDisplay': toDisplay,
-        'planID': json.dumps(planItem.plan_ID)
+        'planID': json.dumps(planItem.id)
     }
     return HttpResponse(template.render(context, request))
 
@@ -212,9 +266,9 @@ def saveComment(request):
         getHasComment = request.POST['hasComment']
 
         curAccount = Account.objects.filter(user_type=getAccType).get()
-        curPlan = Plan.objects.filter(plan_ID=getPlanID).get()
+        curPlan = Plan.objects.filter(id=getPlanID).get()
         eval_entry = EvalPlan(eval_planID=curPlan, eval_userID=curAccount, eval_text=getCommentTxt, eval_hasComment=getHasComment)
-        testDuplicate = EvalPlan.objects.filter(eval_planID__plan_ID=getPlanID, eval_userID__user_type=getAccType)
+        testDuplicate = EvalPlan.objects.filter(eval_planID__id=getPlanID, eval_userID__user_type=getAccType)
 
         if not testDuplicate:
             #print("testDuplicate is empty!") #save here
@@ -228,21 +282,23 @@ def saveComment(request):
     return HttpResponse('')
 
 def getComments(request, userType, plan_id):
-    print(userType, plan_id)
-    allComments = EvalPlan.objects.filter(eval_planID__plan_ID=plan_id)
+    # print(userType, plan_id)
+    allComments = EvalPlan.objects.filter(eval_planID__id=plan_id)
     allUsers = Account.objects.all()
-
+    # for c in allComments:
+    #     print(c.id, c.eval_userID.user_type)
     diff = []
     for user in allUsers:
         found = False
         for comment in allComments:
+            #print(user.user_type, comment.eval_userID.user_type)
             if(user.user_type==comment.eval_userID.user_type):
                 found = True
                 break
         if not found:
             diff.append(user.user_type)
 
-    print(diff)
+    # print(diff)
 
     context = {
         'noReviewYet': diff
@@ -262,8 +318,8 @@ class commentUpdates(ListView):
         dataRec = self.kwargs['slug']
         data2 = dataRec.replace('-', ' ').split(' ')
         curUser = Account.objects.filter(user_type=data2[0]).get()
-        curPlan = Plan.objects.filter(plan_ID=data2[1]).get()
-        allComments = EvalPlan.objects.filter(eval_planID__plan_ID=data2[1])
+        curPlan = Plan.objects.filter(id=data2[1]).get()
+        allComments = EvalPlan.objects.filter(eval_planID__id=data2[1])
         allAccounts = Account.objects.all()
         submittedUsers = []
         for c in allComments:
@@ -287,7 +343,7 @@ class crisisUpdates(ListView):
     findID=""
     def get_queryset(self):
         find_id = self.kwargs['slug']
-        updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=find_id).latest('updates_datetime')
+        updateItem = CrisisUpdates.objects.filter(updates_crisisID=find_id).latest('updates_datetime')
         return updateItem
 
 class graphUpdates(ListView):
@@ -295,11 +351,11 @@ class graphUpdates(ListView):
     find_id=""
     def get_queryset(self):
         find_id = self.kwargs['slug']
-        updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=find_id)
+        updateItem = CrisisUpdates.objects.filter(updates_crisisID=find_id)
         return updateItem
     def get_context_data(self, **kwargs):
         find_id = self.kwargs['slug']
-        updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=find_id)
+        updateItem = CrisisUpdates.objects.filter(updates_crisisID=find_id)
         context = {
             'jsonCrisis1': serializers.serialize('json', updateItem)
         }
@@ -309,18 +365,51 @@ class graphUpdates(ListView):
 def newsfeed(request):
     template=loader.get_template('pmoapp/newsfeed.html')
 
-    crisisList = Crisis.objects.filter(crisis_status='Ongoing').order_by('-crisis_ID')
-    planList = Plan.objects.filter(plan_crisisID__crisis_status='Ongoing')
+    updateTime = datetime.now()
+    curUsername = request.user
+    curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
+    accountType = curAccount.user_type
+
+    if (curAccount.gender):
+        salutation = "Mr."
+    else:
+        salutation = "Ms."
+
+    curUser = salutation + " " + request.user.last_name + " " + request.user.first_name
+    print(curUser)
+
+    # NOTE: WHEN TO PULL FROM CMO: ON EVERY PAGE LOAD, BECAUSE NOTIFICATION COME, CLICKING IT WILL REFRESH A PAGE!
+
+    # Process Crisis/Plans
+    crisisList = Crisis.objects.filter(crisis_status='Ongoing')
+    print(crisisList)
+
+    # planList = []
+    # for crisis in crisisList:
+    #     latestPlan = Plan.objects.filter(plan_crisisID=crisis.crisis_ID).latest('plan_dateTime')
+    #     planList.append(latestPlan)
+    #
+    # print(planList)
+
     toDisplay = []
     for crisis in crisisList:
-        plansInCrisis = planList.filter(plan_crisisID__crisis_ID=crisis.crisis_ID)
+        plansInCrisis = Plan.objects.filter(plan_crisisID=crisis.crisis_ID)
         max = plansInCrisis[0]
         for plan in plansInCrisis:
-            if (plan.plan_ID > max.plan_ID): max = plan
+            if (plan.plan_ID > max.plan_ID):
+                max = plan
         toDisplay.append(max)
 
+    print(toDisplay)
+
     context = {
-        "toDisplay": toDisplay
+        'toDisplay': toDisplay,
+        'ongoingCrisis': crisisList,
+        'updateTime': updateTime,
+        'accountType': accountType,
+        'curUser': curUser,
+        # 'crisisID': json.dumps(crisisItem.crisis_ID),
+        'curName': json.dumps(curUser)
     }
     return HttpResponse(template.render(context, request))
 

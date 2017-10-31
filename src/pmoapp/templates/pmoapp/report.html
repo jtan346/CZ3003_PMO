@@ -12,8 +12,9 @@
     <title>PMOSIMS</title>
 	<!-- Chat Function -->
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.0/angular.min.js"></script>
+	      <script src="/static/vendor/jquery/jquery.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/3.6.4/firebase.js"></script>
-    <script>
+	      <script>
 		// This will be generated in the firebase console
 		var config = {
 			apiKey: "AIzaSyCGfibas_wVxOWSR-uqewBTLtYdcbwW37k",
@@ -35,6 +36,70 @@
 		if(jsonComments.length >0) console.log(jsonComments); else console.log("No comments for this plan");
 	</script>
 	<script src="/static/js/app.js"></script>
+	  <script type="text/javascript">
+	  var map;
+    var initMap = function(){
+        map = new google.maps.Map(document.getElementById("map"),{
+            zoom: 12,
+            center: new google.maps.LatLng(1.42000000, 103.65),
+            mapTypeId: 'roadmap'
+        });
+
+        var icon_loc = '../../static/images/map/';
+        var icons = {
+            Terrorism: icon_loc + "Terrorism.png",
+            Bombing:icon_loc + "Bombing.png",
+            Riot: icon_loc + "Riot.png",
+            Fire: icon_loc + "Fire.png"
+        };
+
+        {% if allSubCrisis %}
+        {% for report in allSubCrisis %}
+        var lat = {{report.latitude}}, long = {{report.longitude}};
+        var cent = new google.maps.LatLng(lat,long);
+        var radius = {{ report.radius }};
+
+
+        var image = {
+            url: icons['{{ report.crisis_type }}'],
+            //size: new google.maps.Size(100, 100),
+            // The origin for this image is (0, 0).
+            origin: new google.maps.Point(0, 0),
+            // The anchor with respect to the Lat and Long
+            anchor: new google.maps.Point(30, 30)
+        };
+
+        var crisisCircle = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35,
+            map: map,
+            center: cent,
+            radius: radius,//in metres (cannot use the loc, wierdly causes the radius to become super big
+        });
+
+        var marker = new google.maps.Marker({
+            position: cent,
+            icon: image,
+            map:map
+        });
+
+        {% endfor %}
+        {% endif %}
+    }
+    $(document).ready(function(){
+    	window.setTimeout( function(){
+
+    		google.maps.event.trigger(map, 'resize');
+    	}, 2000);
+    });
+
+</script>
+	  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDDacnVEtNIWnbMCw_QI94kynm0_ytIalQ&callback=initMap"
+        type="text/javascript"></script>
+
 	  <!--<script src="/static/js/mygraph.js"></script>-->
     <script src="https://cdn.firebase.com/libs/angularfire/2.2.0/angularfire.min.js"></script>
 
@@ -53,14 +118,14 @@
 
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
-      <a class="navbar-brand" href="../home">PMOSIMS</a>
+      <a class="navbar-brand" href="../../home">PMOSIMS</a>
       <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
              <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Home">
-            <a class="nav-link" href="../home">
+            <a class="nav-link" href="../../home">
               <i class="fa fa-fw fa-home"></i>
               <span class="nav-link-text">
                 Home</span>
@@ -76,38 +141,47 @@
 			<ul class="sidenav-second-level show" id="collapseComponents">
 
 			  <!--<li class="currentCrisisItem active">-->
-			  {% if toDisplay %}
+				{% if toDisplay %}
                     {% for plan in toDisplay %}
-						{% if plan.plan_ID == planItem.plan_ID %}
-                        <li class="active">
-                            <a href="../report/{{ plan.plan_ID }}">{{ plan.plan_crisisID.crisis_ID }}: {{ plan.plan_crisisID.crisis_name|truncatechars:20 }}</a>
-                        </li>
-						{% else %}
-						<li>
-                            <a href="../report/{{ plan.plan_ID }}">{{ plan.plan_crisisID.crisis_ID }}: {{ plan.plan_crisisID.crisis_name|truncatechars:20 }}</a>
-                        </li>
-						{% endif %}
+                        {% for crisis in ongoingCrisis %}
+                            {% if crisis.crisis_ID == plan.plan_crisisID %}
+                                {% if plan.plan_ID == planItem.plan_ID %}
+									<li class="active">
+										<a href="../../report/{{ plan.id }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:20 }}</a>
+									</li>
+								{% else %}
+									<li>
+										<a href="../../report/{{ plan.id }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:20 }}</a>
+									</li>
+								{% endif %}
+                            {% endif %}
+                        {% endfor %}
                     {% endfor %}
+                {% else %}
+                    <li>
+                        <p>No Ongoing Crisis</p>
+                    </li>
                 {% endif %}
+
             </ul>
           </li>
 	
           <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Past Reports">
-            <a class="nav-link" href="../history">
+            <a class="nav-link" href="../../history">
               <i class="fa fa-fw fa-history"></i>
               <span class="nav-link-text">
                 Past Reports</span>
             </a>
           </li>
           <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live News Feed">
-            <a class="nav-link" href="../newsfeed">
+            <a class="nav-link" href="../../newsfeed">
               <i class="fa fa-fw fa-feed"></i>
               <span class="nav-link-text">
                 Live News Feed</span>
             </a>
           </li>
 		  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live News Feed">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="../../#">
               <i class="fa fa-fw fa-feed"></i>
               <span class="nav-link-text">
                 CMO Public Broadcast</span>
@@ -198,8 +272,7 @@
           <div class="card-header">
             <!--<i class="fa fa-tv"></i>-->
             Explosion at Changi Airport Terminal 3
-			<i id="statusLabel">Pending:
-				<i id="statusText">PMO</i>
+			<i id="statusLabel">{{ planItem.plan_status }}
 			</i>
           </div>
 		  
@@ -211,42 +284,48 @@
 			<label class= "tab" for="tab2"><span>Dashboard</span></label>
 
 			<input id="tab3" type="radio" name="tabs">
-			<label class= "tab" for="tab3"><span>Test</span></label>
+			<label class= "tab" for="tab3"><span>Google Maps</span></label>
 
 			<section id="content1" class="tab-content">
 			<form>
                 <h4 class="reportHeader"> Crisis Details </h4>
-
 				<div class="form-row">
-				<label for="txtCrisisID" class="col-form-label col-md-2 text-left">Crisis ID:</label>
+					<label for="txtCrisisName" class="col-form-label col-md-2 text-left">Crisis Title:</label>
+					<div class="form-group col-md-9">
+					  <input type="text" class="form-control" id="txtCrisisName" value='{{ crisisItem.crisis_name }}' readonly>
+					</div>
+				</div>
+				<div class="form-row">
+				<!--<label for="txtCrisisID" class="col-form-label col-md-2 text-left">Crisis ID:</label>
 				<div class="form-group col-md-3">
 				  <input type="text" class="form-control" id="txtCrisisID" value='{{ crisisItem.crisis_ID }}' readonly>
-				</div>
-				<label for="txtCurPlanID" class="col-form-label col-md-2 offset-1 text-left">Crisis ID/Status:</label>
+				</div>-->
+				<label for="txtCurPlanID" class="col-form-label col-md-2 text-left">Crisis ID/Status:</label>
 				<div class="form-group col-md-3">
 				  <input type="text" class="form-control" id="txtCurPlanID" value="{{ crisisItem.crisis_ID }} : {{ crisisItem.crisis_status }}" readonly>
 				</div>
+				<label for="txtCrisisDateTime" class="col-form-label col-md-3 text-right">Crisis Reported Date/Time:</label>
+				<div class="form-group col-md-3">
+				  <input type="text" class="form-control" id="txtCrisisDateTime" value="{{ crisisItem.crisis_datetime }}" readonly>
+				</div>
               </div>
 			<div class="form-row">
-				<label for="txtCrisisAddr" class="col-form-label col-md-2 text-left">Latest Plan ID:</label>
+				<!--<label for="txtLatestPlanID" class="col-form-label col-md-2 text-left">Latest Plan ID:</label>
 				<div class="form-group col-md-3">
 				  <input type="text" class="form-control" id="txtLatestPlanID" value='{{ planItem.plan_ID }}' readonly>
-				</div>
-				<div class="offset-1 col-md-2"><label for="txtCrisisDateTime" class="col-form-label text-left">Plan ID/Status:</label></div>
+				</div>-->
+				<label for="txtCrisisDateTime" class="col-form-label col-md-2 text-left">Latest Plan ID/Status:</label>
 				<div class="form-group col-md-3">
 				  <input type="text" class="form-control" id="txtPlanStatus" value="{{ planItem.plan_ID }} : {{ planItem.plan_status }}" readonly>
 				</div>
               </div>
 
 				<div class="form-row">
-				<label for="txtCrisisAddr" class="col-form-label col-md-2 text-left">Crisis Address:</label>
+				<!--<label for="txtCrisisAddr" class="col-form-label col-md-2 text-left">Crisis Address:</label>
 				<div class="form-group col-md-3">
 				  <input type="text" class="form-control" id="txtCrisisAddr" value='{{ crisisItem.crisis_address }}' readonly>
-				</div>
-				<div class="offset-1 col-md-2"><label for="txtCrisisDateTime" class="col-form-label text-left">Crisis Reported Date/Time:</label></div>
-				<div class="form-group col-md-3">
-				  <input type="text" class="form-control" id="txtCrisisDateTime" value="{{ crisisItem.crisis_datetime }}" readonly>
-				</div>
+				</div>-->
+
               </div>
 			  
 			   <div class="form-group">
@@ -285,21 +364,20 @@
 
 				<div class="form-row">
 
-					<label for="txtAffectedRadius" class="col-form-label col-md-2 text-left" id="lblAffectedRadius">Affected Radius:</label>
+					<!--<label for="txtAffectedRadius" class="col-form-label col-md-2 text-left" id="lblAffectedRadius">Affected Radius:</label>
 					<div class="form-group col-md-2">
-
 					  <input type="text" class="form-control" id="txtAffectedRadius" value="{{ updateItem.updates_curRadius }} m" readonly>
-					</div>
-					<label for="txtCurSCDF" class="col-form-label col-md-3 offset-1 text-left" id="lblCurSCDF">Current SCDF Utilization:</label>
+					</div>-->
+					<label for="txtCurSCDF" class="col-form-label col-md-3 offset-5 text-left" id="lblCurSCDF">Current SCDF Utilization:</label>
 					<div class="form-group col-md-2">
 						<input type="text" class="form-control" id="txtCurSCDF" value="{{ updateItem.updates_curSCDF}} %" readonly>
 					</div>
 				</div>
 				<div class="form-row">
-					<label for="txtThreatLevel" class="col-form-label col-md-2 text-left" id="lblThreatLevel">Threat Level:</label>
+					<!--<label for="txtThreatLevel" class="col-form-label col-md-2 text-left" id="lblThreatLevel">Threat Level:</label>
 					<div class="form-group col-md-2">
 						<input type="text" class="form-control" id="txtThreatLevel" value="{{ updateItem.updates_curThreatLevel }}" readonly>
-					</div>
+					</div>-->
 				</div>
 			</div>
 			
@@ -322,34 +400,38 @@
 			  </div>
 			  
 			<div class="form-row">
-				<label for="txtProjectedCrisisRadius" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisRadius">Projected Crisis Radius:</label>
+				<!--<label for="txtProjectedCrisisRadius" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisRadius">Projected Crisis Radius:</label>
 				<div class="form-group col-md-3">
 				  <input type="text" class="form-control" id="txtProjectedCrisisRadius" value="{{ planItem.plan_projRadius }} m" readonly>
-				</div>
-				<label for="txtProjectedCasualties" class="col-form-label col-md-2 offset-1 text-left" id="lblProjectedCasualties">Projected Casualties:</label>
-				<div class="form-group col-md-2">
-				  <input type="text" class="form-control" id="txtProjectedCasualties" value="{{ planItem.plan_projCasualtyRate }} %" readonly>
-				</div>
-			</div>
-			<div class="form-row">
+				</div>-->
 				<label for="txtProjectedCrisisResolution" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisResolution">Est. Resolution Time:</label>
 				<div class="form-group col-md-3">
 				  <input type="text" class="form-control" id="txtProjectedCrisisResolution" value="{{ planItem.plan_projResolutionTime }}" readonly>
 				</div>
+				<label for="txtProjectedCasualties" class="col-form-label col-md-2 offset-1 text-left" id="lblProjectedCasualties">Projected Casualties:</label>
+				<div class="form-group col-md-3">
+				  <input type="text" class="form-control" id="txtProjectedCasualties" value="{{ planItem.plan_projCasualtyRate }} %" readonly>
+				</div>
 			</div>
+			<!--<div class="form-row">
+				<label for="txtProjectedCrisisResolution" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisResolution">Est. Resolution Time:</label>
+				<div class="form-group col-md-3">
+				  <input type="text" class="form-control" id="txtProjectedCrisisResolution" value="{{ planItem.plan_projResolutionTime }}" readonly>
+				</div>
+			</div>-->
 			
-			<h5 class="reportSubheader"> EF Deployment Details </h5>
+			<h5 class="reportSubheader mb-3"> EF Deployment Details </h5>
 			<div class="form-row">
                 <div class="col-form-label col-md-3">
 				    <label for="txtRecommendedSAFDeployment" class="text-left" id="lblRecommendedSAFDeployment">Recommended SAF Deployment:</label>
                 </div>
-				<div class="form-group col-md-1">
+				<div class="form-group col-md-2">
 				  <input type="text" class="form-control" id="txtRecommendedSAFDeployment" value="{{ planItem.plan_SAFRecommended }} %" readonly>
 				</div>
                 <div class="col-form-label col-md-3 offset-1">
                     <label for="txtMaximumSAFDeployment" class="text-left" id="lblMaximumSAFDeployment">Maximum SAF Deployment:</label>
                 </div>
-                <div class="form-group col-md-1">
+                <div class="form-group col-md-2">
                   <input type="text" class="form-control" id="txtMaximumSAFDeployment" value="{{ planItem.plan_SAFMaximum }} %" readonly>
                 </div>
 
@@ -357,22 +439,22 @@
 			
 			<div class="form-row">
 				<label for="txtRecommendedSCDFDeployment" class="col-form-label col-md-3 text-left" id="lblRecommendedSCDFDeployment">Recommended SCDF Deployment:</label>
-				<div class="form-group col-md-1">  
+				<div class="form-group col-md-2">
 				  <input type="text" class="form-control" id="txtRecommendedSCDFDeployment" value="{{ planItem.plan_SCDFRecommended }} %" readonly>
 				</div>
 				<label for="txtMaximumSCDFDeployment" class="col-form-label col-md-3 offset-1 text-left" id="lblMaximumSCDFDeployment">Maximum SCDF Deployment:</label>
-				<div class="form-group col-md-1">
+				<div class="form-group col-md-2">
 				  <input type="text" class="form-control" id="txtMaximumSCDFDeployment" value="{{ planItem.plan_SCDFMaximum }} %" readonly>
 				</div>
 			</div>
 			
 			<div class="form-row">
 				<label for="txtRecommendedCDDeployment" class="col-form-label col-md-3 text-left" id="lblRecommendedCDDeployment">Recommended CD Deployment:</label>
-				<div class="form-group col-md-1">  
+				<div class="form-group col-md-2">
 				  <input type="text" class="form-control" id="txtRecommendedCDDeployment" value="{{ planItem.plan_CDRecommended }} %" readonly>
 				</div>
 				<label for="txtMaximumCDDeployment" class="col-form-label col-md-3 offset-1 text-left" id="lblMaximumCDDeployment">Maximum CD Deployment:</label>
-				<div class="form-group col-md-1">
+				<div class="form-group col-md-2">
 				  <input type="text" class="form-control" id="txtMaximumCDDeployment" value="{{ planItem.plan_CDMaximum }} %" readonly>
 				</div>
 			</div>
@@ -392,8 +474,11 @@
 					<div id="filterPanel{{ curAccount.user_type }}" class="panel-collapse panel-collapse collapse">
 						<div class="panel-body">
 							<div class="reportReview">
-								{% if planItem.plan_submitted %}<textarea disabled class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{{ c.eval_text }} {% endfor %}</textarea>
-								{% else %}<textarea class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{{ c.eval_text }} {% endfor %}</textarea>{% endif %}
+								{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
+								<textarea disabled class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{% if c.eval_text %}{{ c.eval_text }}{% endif %}{% endfor %}</textarea>
+								{% else %}
+								<textarea class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{% if c.eval_text %}{{ c.eval_text }}{% endif %}{{ c.eval_text }}{% endfor %}</textarea>
+								{% endif %}
 							</div>
 						</div>
 					</div>
@@ -418,11 +503,11 @@
 										<div class="reportReview">
 											<!--<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ submittedUsers }}</textarea>-->
 											{% if a.user_type not in submittedUsers %}
-												<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ a.appointment }}: {{ a.name }} has not reviewed the Plan: {{ planItem.plan_ID}}.</textarea>
+											<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ a.appointment }}: {{ a.name }} has not reviewed the Plan: {{ planItem.plan_ID}} (pid: {{ planItem.id }}).</textarea>
 											{% else %}
 												{% for c in allComments %}
 													{% if a.user_type == c.eval_userID.user_type %}
-														<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{% if c.eval_hasComment %}{{ c.eval_text }}{% else %}{{ a.appointment }}: {{ a.name }} has reviewed, and does not have any further comments for the Plan: {{ planItem.plan_ID}}.{% endif %}</textarea>
+														<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{% if c.eval_hasComment %}{{ c.eval_text }}{% else %}{{ a.appointment }}: {{ a.name }} has reviewed, and does not have any further comments for the Plan: {{ planItem.plan_ID}} (pid: {{ planItem.id }}).{% endif %}	</textarea>
 													{% endif %}
 												{% endfor %}
 											{% endif %}
@@ -437,12 +522,16 @@
 			{% csrf_token %}
 
             {% if accountType != "PM" %}
-                {% if planItem.plan_submitted %}<button disabled type="submit" class="btn btn-primary" id="btnSubmit">Submit Comments</button>
-                {% else %}<button type="submit" class="btn btn-primary" id="btnSubmit">Submit Comments</button>
+                {% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
+					<button disabled type="submit" class="btn btn-primary" id="btnSubmit">Submit Comments</button>
+                {% else %}
+					<button type="submit" class="btn btn-primary" id="btnSubmit">Submit Comments</button>
                 {% endif %}
             {% else %}
-                {% if planItem.plan_submitted %}<button disabled type="submit" class="btn btn-primary" id="btnPM">Submit Reviewed Report to CMO</button>
-                {% else %}<button type="submit" class="btn btn-primary" id="btnPM">Submit Reviewed Report to CMO</button>
+				{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
+					<button disabled type="submit" class="btn btn-primary" id="btnPM">Submit Reviewed Report to CMO</button>
+                {% else %}
+					<button type="submit" class="btn btn-primary" id="btnPM">Submit Reviewed Report to CMO</button>
                 {% endif %}
             {% endif %}
 			</form>
@@ -461,17 +550,15 @@
 			  </div>
 			</section>
 
-			<!--<section id="content3">
+			<section id="content3" class="tab-content">
 				<div class="card mb-3" id="testing">
                     <div class="card-header">
-					  &lt;!&ndash;<i class="fa fa-area-chart"></i>&ndash;&gt;
-					  Dashboard  -  Last Updated: {{updateItem.updates_datetime}}
+					  <!--<i class="fa fa-area-chart"></i>-->
+					  Crisis Map
 				  </div>
-				  <div class="card-body">
-					  <canvas id="myAreaChart" width="100%" height="30"></canvas>
-				  </div>
+					 <div id="map" class="x_content" style="height:50vh;">
 				</div>
-			</section>-->
+			</section>
 		</div>
 
         </div>
@@ -530,13 +617,12 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            <a class="btn btn-primary" href="../logout">Logout</a>
+            <a class="btn btn-primary" href="../../logout">Logout</a>
           </div>
         </div>
       </div>
     </div>
     <!-- Bootstrap core JavaScript -->
-    <script src="/static/vendor/jquery/jquery.min.js"></script>
     <script src="/static/vendor/popper/popper.min.js"></script>
     <script src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
 
@@ -627,6 +713,13 @@
             $('#commentUpdates').load("/commentUpdates/{{curAccount.user_type}}-"+curPlanID);
         },15000);
 
+        $('#tab3').on('click', function() {
+        	window.setTimeout( function(){
+        		console.log("test");
+    			google.maps.event.trigger(map, 'resize');
+    	}, 500);
+        });
+
         //For Report submission
         /*var MDEFtxt = "empty";
         var MOHAtxt = "empty";
@@ -681,7 +774,7 @@
                     },
                     success: function (msg) {
                       //On Successful service call
-                      alert(accountType,"'s response (Has Comment: ", MOHAhasComment ,") for ",curPlanID, " has been saved!");
+                      alert(accountType+"'s response (Has Comment: "+ MOHAhasComment +") for "+curPlanID+ " has been saved!");
                     }
                 });
 			}else
@@ -701,12 +794,12 @@
                     },
                     success: function (msg) {
                       //On Successful service call
-                      alert(accountType,"'s response (Has Comment: ", MOFAhasComment ,") for ",curPlanID, " has been saved!");
+                      alert(accountType+"'s response (Has Comment: "+ MOFAhasComment +") for "+curPlanID+ " has been saved!");
                     }
                 });
 			}else
 			if(accountType == "DPM"){
-                var DPMtxt = $('#txtDeputyPM').val();
+                var DPMtxt = $('#txtDPM').val();
                 if(DPMtxt == "" || DPMtxt === undefined) { DPMtxt = "DPM: No Comment"; DPMhasComment = "False";} else DPMhasComment = "True";
 
                 $.ajax({
@@ -721,7 +814,7 @@
                     },
                     success: function (msg) {
                       //On Successful service call
-                      alert(accountType,"'s response (Has Comment: ", DPMhasComment ,") for ",curPlanID, " has been saved!");
+                      alert(accountType+"'s response (Has Comment: "+ DPMhasComment +") for "+curPlanID+ " has been saved!");
                     }
                 });
 			}else
@@ -781,7 +874,7 @@
 
 	        $.ajax({
                 type: 'GET', //GET, POST, PUT or DELETE
-                url: '/getComments/{{curAccount.user_type}}/{{planItem.plan_ID}}', //Rename! Location of the service
+                url: '/getComments/{{curAccount.user_type}}/{{planItem.id}}', //Rename! Location of the service
                 success: function(data) {
                     console.log(data);
                     var test = JSON.parse(data);
