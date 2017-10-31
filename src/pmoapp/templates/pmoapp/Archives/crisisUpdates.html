@@ -1,0 +1,45 @@
+<div class="form-row">
+    <!--<h6 class="col-form-label text-left bottom-buffer bold italic">Last Updated: {{object_list.updates_datetime}}</h6>-->
+    <h6 class="col-form-label text-left bottom-buffer bold italic">Last Updated: {% now "M. j, Y, h:i a" %}</h6>
+</div>
+
+<div class="form-row">
+    <label for="txtReportedDeaths" class="col-form-label col-md-2 text-left" id="lblReportedDeaths">Reported Deaths:</label>
+    <div class="form-group col-md-2">
+      <input type="text" class="form-control" id="txtReportedDeaths" value="{{ object_list.updates_curDeaths }}" readonly>
+    </div>
+    <label for="txtCurSAF" class="col-form-label col-md-3 offset-1 text-left" id="lblCurSAF">Current SAF Utilization:</label>
+    <div class="form-group col-md-2">
+      <input type="text" class="form-control" id="txtCurSAF" value="{{ object_list.updates_curSAF }} %" readonly>
+    </div>
+</div>
+
+<div class="form-row">
+    <label for="txtReportedInjuries" class="col-form-label col-md-2 text-left" id="lblReportedInjuries">Reported Injuries:</label>
+    <div class="form-group col-md-2">
+      <input type="text" class="form-control" id="txtReportedInjuries" value="{{ object_list.updates_curInjuries }}" readonly>
+    </div>
+    <label for="txtCurCD" class="col-form-label col-md-3 offset-1 text-left" id="lblCurCD">Current CD Utilization:</label>
+    <div class="form-group col-md-2">
+        <input type="text" class="form-control" id="txtCurCD" value="{{ object_list.updates_curCD }} %" readonly>
+    </div>
+</div>
+
+<div class="form-row">
+
+    <label for="txtAffectedRadius" class="col-form-label col-md-2 text-left" id="lblAffectedRadius">Affected Radius:</label>
+    <div class="form-group col-md-2">
+
+      <input type="text" class="form-control" id="txtAffectedRadius" value="{{ object_list.updates_curRadius }} m" readonly>
+    </div>
+    <label for="txtCurSCDF" class="col-form-label col-md-3 offset-1 text-left" id="lblCurSCDF">Current SCDF Utilization:</label>
+    <div class="form-group col-md-2">
+        <input type="text" class="form-control" id="txtCurSCDF" value="{{ object_list.updates_curSCDF}} %" readonly>
+    </div>
+</div>
+<div class="form-row">
+    <label for="txtThreatLevel" class="col-form-label col-md-2 text-left" id="lblThreatLevel">Threat Level:</label>
+    <div class="form-group col-md-2">
+        <input type="text" class="form-control" id="txtThreatLevel" value="{{ object_list.updates_curThreatLevel }}" readonly>
+    </div>
+</div>
