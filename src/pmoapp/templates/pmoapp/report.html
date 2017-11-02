@@ -124,6 +124,9 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+            <div class="form-row h-25 mt-2 mb-2 ml-2 mr-2 d-inline-block">
+                  <h6 style="color: white !important;">Welcome, {{ curUser }}</h6>
+             </div>
              <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Home">
             <a class="nav-link" href="../../home">
               <i class="fa fa-fw fa-home"></i>
@@ -390,7 +393,7 @@
 				</div>
 				 <label for="txtPlanReceipt" class="col-form-label col-md-2 offset-1 text-left">Plan Receipt:</label>
 				<div class="form-group col-md-3">
-				  <input type="text" class="form-control" id="txtPlanReceipt" value="{{ planItem.plan_dateTime }}" readonly>
+				  <input type="text" class="form-control" id="txtPlanReceipt" value="{{ planItem.plan_receipt }}" readonly>
 				</div>
 			  </div>
 			  
@@ -1152,6 +1155,7 @@
                                       //On Successful service call
                                       //alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
                                       console.log("Sent {{ planItem.id }} to python");
+                                      location.reload();
                                     }
                                 });
                             }

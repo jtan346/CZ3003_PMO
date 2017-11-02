@@ -98,7 +98,9 @@ class Plan(models.Model):
     plan_status = models.CharField(max_length=25)  # Enum: PendingPMO, PendingCMO, Approved(only when approved=True)
     #plan_approved = models.BooleanField(default=False) #True: No comments, ready to go. False: Has comments
     #plan_submitted = models.BooleanField(default=False) #True: Plan locked, no changes to be made.
-    plan_dateTime = models.DateTimeField() #ReceiptTime
+    # plan_dateTime = models.DateTimeField() #ReceiptTime
+    plan_receipt = models.DateTimeField() #ReceiptTime
+    plan_sendtime = models.DateTimeField(null=True, blank=True) #sendtime
     # plan_projRadius = models.IntegerField(
     #     validators=[MinValueValidator(0)]
     # )  # In Metres: 1,234

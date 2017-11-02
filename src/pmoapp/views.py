@@ -102,17 +102,22 @@ def home(request):
 
 #NOTE: WHEN TO PULL FROM CMO: ON EVERY PAGE LOAD, BECAUSE NOTIFICATION COME, CLICKING IT WILL REFRESH A PAGE!
 
+    #Code to receive, process and insert into my database.
+
 #Process Crisis/Plans
     crisisList = Crisis.objects.exclude(crisis_status='Resolved')
 
     toDisplay = []
     for crisis in crisisList:
         plansInCrisis = Plan.objects.filter(plan_crisisID=crisis.crisis_ID)
-        max = plansInCrisis[0]
-        for plan in plansInCrisis:
-            if(plan.plan_ID > max.plan_ID):
-                max = plan
-        toDisplay.append(max)
+        if plansInCrisis:
+            max = plansInCrisis[0]
+            for plan in plansInCrisis:
+                if(plan.plan_ID > max.plan_ID):
+                    max = plan
+            toDisplay.append(max)
+
+    print(crisisList)
 
     context = {
         'toDisplay': toDisplay,
@@ -180,6 +185,7 @@ def history(request):
         'ongoingCrisis': ongoingCrisisList,
         'updateTime': updateTime,
         'allCrisis': allCrisis,
+        'curUser': curUser,
     }
     return HttpResponse(template.render(context, request))
 
@@ -201,8 +207,14 @@ def report(request, plan_id):
 
     planItem = Plan.objects.filter(id=plan_id).get()
     crisisItem = Crisis.objects.filter(crisis_ID=planItem.plan_crisisID).get()
-    updateItem = CrisisUpdates.objects.filter(updates_crisisID=crisisItem.crisis_ID).latest('updates_datetime')
-
+    updateItem = []
+    if CrisisUpdates.objects.filter(updates_crisisID=crisisItem.crisis_ID):
+        updateItem = CrisisUpdates.objects.filter(updates_crisisID=crisisItem.crisis_ID).latest('updates_datetime')
+    else:
+        baseUpdate = CrisisUpdates(updates_crisisID=crisisItem.crisis_ID, updates_datetime=updateTime, updates_curInjuries = 0, updates_curDeaths = 0, updates_curSAF = 0, updates_curCD = 0, updates_curSCDF = 0)
+        baseUpdate.save()
+    # newAccount = Account(username="benji", password="12345", emailAddress="benjamintanjb@gmail.com", user_type="PM")
+    # newAccount.save()
     print(updateItem)
 
     crisisList = Crisis.objects.exclude(crisis_status='Resolved')
@@ -266,7 +278,7 @@ def sendReport(request):
 
         concatComments = ""
         for n in allComments:
-            concatComments += str(n.eval_userID.user_type) + ": " + str(n.eval_text) + "\n"
+            concatComments += str(n.eval_userID.user_type) + ": " + str(n.eval_text) + " \n "
 
         #2. Status
 
@@ -276,6 +288,7 @@ def sendReport(request):
                 reportStatus = "Rejected"
 
         #Change http when we have
+
         r = requests.post('http://127.0.0.1:8000/api/test/PlanID/', data={
             'PlanID': curPlanID,
             'Comments': concatComments,
@@ -284,15 +297,12 @@ def sendReport(request):
 
         print(r.status_code)
 
+        #Change the status of report to pending cmo
+
+        Plan.objects.filter(id=curPlanID).update(plan_status="Pending CMO")
+        Plan.objects.filter(id=curPlanID).update(plan_sendtime=datetime.now())
+
     return HttpResponse('')
-
-def postJsonTest(dataSet):
-    r = requests.post('http://127.0.0.1:8000/api/test/PlanID/', data=dataSet)
-    # if r.status_code == 200:
-    # r.json()
-    print(r.text)
-    print(r.status_code)
-
 
 def saveComment(request):
     print(request)
@@ -304,8 +314,6 @@ def saveComment(request):
         getMyApprovals = request.POST.getlist('myApprovals[]')
 
         print(getMyApprovals)
-
-
 
         curAccount = Account.objects.filter(user_type=getAccType).get()
         curPlan = Plan.objects.filter(id=getPlanID).get()

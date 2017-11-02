@@ -35,6 +35,9 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+            <div class="form-row h-25 mt-2 mb-2 ml-2 mr-2 d-inline-block">
+                  <h6 style="color: white !important;">Welcome, {{ curUser }}</h6>
+             </div>
              <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Home">
             <a class="nav-link" href="../home">
               <i class="fa fa-fw fa-home"></i>
@@ -200,7 +203,7 @@
                                     <td><a href="/report/{{ plan.id }}">{{ crisis.crisis_name }}</a></td>
                                     <td>{{ crisis.crisis_datetime }}</td>
                                     <td>{{ plan.plan_ID }}</td>
-                                    <td>{{ plan.plan_dateTime }}</td>
+                                    <td>{{ plan.plan_receipt }}</td>
                                     <td>{{ plan.plan_status }}</td>
                                 </tr>
                             {% endif %}
