@@ -28,6 +28,7 @@ urlpatterns = [ #pylint: disable=invalid-name
     url(r'^home/$', home, name='home'),
     url(r'^report/(?P<plan_id>[\w-]+)/$', report, name='report'),
     url(r'^newsfeed', newsfeed, name='newsfeed'),
+    url(r'^notificationBell', notificationBellUpdate.as_view(), name='notificationBell'),
     url(r'^history', history, name='history'),
     #url(r'^test', test, name='test'),
     url(r'^test/(?P<plan_id>[0-9]{8})$', test, name='test'),
@@ -43,6 +44,7 @@ urlpatterns = [ #pylint: disable=invalid-name
     url(r'^api/cmo/', include(router4.urls)),
     # http://127.0.0.1:8000/api/cmo/planID/ the link to test the api from CMO side
     url(r'^saveComments/',saveComment),
+    url(r'^updateNotiCount/',updateNotiCount),
     url(r'^sendReport/',sendReport),
     url(r'^getComments/(?P<userType>[\w-]+)/(?P<plan_id>[\w-]+)/$', getComments),
 

@@ -1,7 +1,7 @@
 """All Django views for pmoapp.
 """
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed
 from django.template import loader
 from django.views.generic.list import ListView
 from .models import *
@@ -53,8 +53,7 @@ def getJsonValueByAttributes():
     #set timer to call the api can change to value of 60 current set to 1 min
 
 def login(request):
-    #getJsonValueByAttributes()
-    CrisisUpdates.objects.all().delete()
+    #CrisisUpdates.objects.all().delete()
     return render(request, 'pmoapp/login.html', {})
 
 def otp(request):
@@ -80,6 +79,13 @@ def otpAuthentication(request):
         otp = request.POST['otp']
         if (otp == str(request.session['OTP'])):
             del request.session['OTP']
+
+            #Initialize Notifications
+
+            curnumNotifications = Notifications.objects.count()
+            print(curnumNotifications)
+            request.session['NumNotifications'] = curnumNotifications
+
             return HttpResponse('')
     return HttpResponse('', status=401)
 
@@ -117,7 +123,7 @@ def home(request):
                     max = plan
             toDisplay.append(max)
 
-    print(crisisList)
+    #print(crisisList)
 
     context = {
         'toDisplay': toDisplay,
@@ -402,6 +408,34 @@ class graphUpdates(ListView):
             'jsonCrisis1': serializers.serialize('json', updateItem)
         }
         return context
+
+class notificationBellUpdate(ListView):
+    template_name = 'pmoapp/notificationBell.html'
+
+    def get_queryset(self):
+        curNotifications = Notifications.objects.all()
+        return curNotifications
+
+    def get_context_data(self, **kwargs):
+        curNotifications1 = Notifications.objects.all()
+        context = {
+            'sessionNotiCount': self.request.session['NumNotifications'],
+            'outstandingCount': curNotifications1.count()-self.request.session['NumNotifications'],
+            'curNotification': curNotifications1,
+            'curNotificationsJson': serializers.serialize('json', curNotifications1)
+        }
+        return context
+
+
+def updateNotiCount(request):
+    # if not request.is_ajax() or not request.method == 'POST':
+    #     return HttpResponseNotAllowed(['POST'])
+
+    curNotifications = Notifications.objects.all()
+    curNotiCount = curNotifications.count()
+    request.session['NumNotifications'] = curNotiCount
+    print(request.session['NumNotifications'])
+    return HttpResponse('')
 
 
 def newsfeed(request):

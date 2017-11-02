@@ -130,7 +130,7 @@ class EvalPlan(models.Model): #Comments by Ministers
     eval_text = models.CharField(max_length=500, null=True, blank=True)
     eval_hasComment = models.BooleanField(default=False) #True: Reject with Comment, False: Approved
     class Meta:
-        unique_together = ["eval_planID","eval_userID"]
+        unique_together = ["eval_planID", "eval_userID"]
 
 class testmyfuckingapi(models.Model):
     PlanID = models.IntegerField()
@@ -138,13 +138,15 @@ class testmyfuckingapi(models.Model):
     PlanStatus = models.CharField(max_length=500, null=True, blank=True)
 
 class Notifications(models.Model):
+    PlanNum = models.IntegerField(primary_key=True) #Autoincrement
     PlanID = models.IntegerField()
     CrisisID = models.IntegerField()
     CrisisTitle = models.CharField(max_length=500, null=True, blank=True)
+    DateTime = models.DateTimeField(null=True, blank=True)
     class Meta: #For naming convention in django/admin
         verbose_name_plural = "Notifications"
-    def __str__(self):
-        return str(self.PlanID)
+    # def __str__(self):
+    #     return str(self.PlanID)
 
 """
 

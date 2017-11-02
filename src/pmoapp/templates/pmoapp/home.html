@@ -89,7 +89,7 @@
                         {% for crisis in ongoingCrisis %}
                             {% if crisis.crisis_ID == plan.plan_crisisID %}
                                 <li>
-                                    <a href="../report/{{ plan.id }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:20 }}</a>
+                                    <a href="../report/{{ plan.id }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:15 }}</a>
                                 </li>
                             {% endif %}
                         {% endfor %}
@@ -137,45 +137,33 @@
 
         <ul class="navbar-nav ml-auto">
 			<li class="nav-item dropdown" id="alertBellNotification">
-					<a class="nav-link dropdown-toggle mr-lg-2" href="#" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<a class="nav-link dropdown-toggle mr-lg-2" href="" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="updateNotiCount()">
 					  <i class="fa fa-fw fa-bell"></i>
 					  <span class="d-lg-none">Alerts
-						<span class="badge badge-pill badge-warning">3 New</span>
+						<span class="badge badge-pill badge-warning">0 New</span>
 					  </span>
 					  <span class="new-indicator text-warning d-none d-lg-block">
-						<i class="fa fa-fw fa-circle"></i>
-						<span class="number">3</span>
+						{% if object_list|length > 0 %}
+                            <i class="fa fa-fw fa-circle"></i>
+                            <span class="number">{{ object_list|length }}</span>
+                          {% endif %}
 					  </span>
 					</a>
 					<div class="dropdown-menu" aria-labelledby="alertsDropdown">
-					  <h6 class="dropdown-header">New Alerts:</h6>
-					  <div class="dropdown-divider"></div>
-					  <a class="dropdown-item" href="Changi T3.html">
-						<span class="text-danger">
-						  <strong>Report for Vetting</strong>
-						</span>
-						<span class="small float-right text-muted">11:21 AM</span>
-						<div class="dropdown-message small">Crisis: Bombing Incident at Changi Airport Terminal 3</div>
-					  </a>
-					  <div class="dropdown-divider"></div>
-					  <a class="dropdown-item" href="#">
-						<span class="text-danger">
-						  <strong>Report for Vetting</strong>
-						</span>
-						<span class="small float-right text-muted">11:21 AM</span>
-						<div class="dropdown-message small">Crisis: Bombing at Jurong Island</div>
-					  </a>
-					  <div class="dropdown-divider"></div>
+					  <h6 class="dropdown-header">Recent Notifications:</h6>
+
+					 <!-- <div class="dropdown-divider"></div>
 					  <a class="dropdown-item" href="Orchard Road.html">
 						<span class="text-success">
 						  <strong>Crisis Over</strong>
 						</span>
 						<span class="small float-right text-muted">11:21 AM</span>
 						<div class="dropdown-message small">Resolved: Bombing Incident at Orchard Road</div>
-					  </a>
+					  </a>-->
+
 					  <div class="dropdown-divider"></div>
-					  <a class="dropdown-item small" href="#">
-						View all alerts
+					  <a class="dropdown-item small" href="">
+						Last Updated: {% now "M. j, Y, h:i a" %}
 					  </a>
 					</div>
 			</li>
@@ -326,6 +314,54 @@
 
     <!-- Custom scripts for this template -->
     <script src="/static/js/sb-admin.min.js"></script>
+
+      <script type="text/javascript">
+        //For Crisis Updates
+        setInterval(function(){
+            $('#alertBellNotification').load("/notificationBell");
+            //console.log("HELLO");
+        },10000);
+
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        //Passing the CSRF Token with every ajax call
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                var csrfToken = getCookie('csrftoken');
+                xhr.setRequestHeader("X-CSRFToken", csrfToken);
+            }
+        });
+
+        function updateNotiCount() {
+            console.log("TEST");
+            $.ajax({
+                    type: 'POST', //GET, POST, PUT or DELETE
+                    url: '/updateNotiCount/',
+                    data: { },
+                    success: function (msg) {
+                      //On Successful service call
+                      //alert(accountType+"'s response (Has Comment: "+ MOHAhasComment +") for "+curPlanID+ " has been saved!");
+                      console.log("THELLOSs");
+                    }
+                    //csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+            });
+        }
+
+    </script>
 
   </body>
 

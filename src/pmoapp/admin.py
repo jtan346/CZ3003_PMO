@@ -78,7 +78,7 @@ class TestAdmin(admin.ModelAdmin):
 
 class NotificationAdmin(admin.ModelAdmin):
     Model = Notifications
-    list_display = ('PlanID', 'CrisisID', 'CrisisTitle')
+    list_display = ('PlanNum', 'PlanID', 'CrisisID', 'CrisisTitle', 'DateTime')
 
 admin.site.register(testmyfuckingapi, TestAdmin)
 admin.site.register(Notifications, NotificationAdmin)

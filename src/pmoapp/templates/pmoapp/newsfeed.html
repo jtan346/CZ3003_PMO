@@ -59,7 +59,7 @@
                         {% for crisis in ongoingCrisis %}
                             {% if crisis.crisis_ID == plan.plan_crisisID %}
                                 <li>
-                                    <a href="../report/{{ plan.id }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:20 }}</a>
+                                    <a href="../report/{{ plan.id }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:15 }}</a>
                                 </li>
                             {% endif %}
                         {% endfor %}
