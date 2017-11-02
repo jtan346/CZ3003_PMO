@@ -18,7 +18,7 @@ import requests
 import json
 from rest_framework import permissions, viewsets
 import threading
-from .serializer import PlanSerializer,EvalPlanSerializer
+from .serializer import PlanSerializer,EvalPlanSerializer,TestSerializer ,CMOSerializer
 from django.contrib.auth.decorators import login_required
 from random import randint
 from django.conf import settings
@@ -33,6 +33,16 @@ class EvalPlanViewSet(viewsets.ModelViewSet):
     lookup_field = 'eval_planID'
     queryset = EvalPlan.objects.all()
     serializer_class = EvalPlanSerializer
+
+class TestViewSet(viewsets.ModelViewSet):
+    lookup_field = 'PlanID'
+    queryset = testmyfuckingapi.objects.all()
+    serializer_class = TestSerializer
+
+class CMOViewSet(viewsets.ModelViewSet):
+    lookup_field = 'planID'
+    queryset = Notifications.objects.all()
+    serializer_class = CMOSerializer
 
 def getJsonValueByAttributes():
     response = requests.get('http://127.0.0.1:8000/api/plan/plan_ID/')
@@ -93,15 +103,7 @@ def home(request):
 #NOTE: WHEN TO PULL FROM CMO: ON EVERY PAGE LOAD, BECAUSE NOTIFICATION COME, CLICKING IT WILL REFRESH A PAGE!
 
 #Process Crisis/Plans
-    crisisList = Crisis.objects.filter(crisis_status='Ongoing')
-    print(crisisList)
-
-    # planList = []
-    # for crisis in crisisList:
-    #     latestPlan = Plan.objects.filter(plan_crisisID=crisis.crisis_ID).latest('plan_dateTime')
-    #     planList.append(latestPlan)
-    #
-    # print(planList)
+    crisisList = Crisis.objects.exclude(crisis_status='Resolved')
 
     toDisplay = []
     for crisis in crisisList:
@@ -111,8 +113,6 @@ def home(request):
             if(plan.plan_ID > max.plan_ID):
                 max = plan
         toDisplay.append(max)
-
-    print(toDisplay)
 
     context = {
         'toDisplay': toDisplay,
@@ -145,7 +145,7 @@ def history(request):
 #Sidebar display list
     allPlans = Plan.objects.all()
     ongoingPlanList = []
-    ongoingCrisisList = Crisis.objects.filter(crisis_status='Ongoing')
+    ongoingCrisisList = Crisis.objects.exclude(crisis_status='Resolved')
     toDisplay2 = []
     for index, crisis in enumerate(ongoingCrisisList):
         plansInCrisis = Plan.objects.filter(plan_crisisID=crisis.crisis_ID)
@@ -156,7 +156,6 @@ def history(request):
                 ongoingPlanList.append(plansInCrisis[index-1])
 
         toDisplay2.append(max)
-        #ongoingPlanList = ongoingPlanList.exclude(plan_ID=max.plan_ID)
 
 # Get all plans where Crisis status = Resolved
     historicalCrisisList = Crisis.objects.filter(crisis_status='Resolved')
@@ -166,14 +165,12 @@ def history(request):
             if (crisis.crisis_ID == plan.plan_crisisID):
                 historicalPlanList.append(plan)
 
-# Get all plans except for latest plan where Crisis Status != Resolved
-
-    print("ongoing:")
-    for a in ongoingPlanList:
-        print(a.id)
-    print("historical:")
-    for b in historicalPlanList:
-        print(b.id)
+    # print("ongoing:")
+    # for a in ongoingPlanList:
+    #     print(a.id)
+    # print("historical:")
+    # for b in historicalPlanList:
+    #     print(b.id)
 
     toDisplay = ongoingPlanList + historicalPlanList
     allCrisis = Crisis.objects.all()
@@ -188,11 +185,9 @@ def history(request):
 
 def report(request, plan_id):
     template = loader.get_template('pmoapp/report.html')
-
     updateTime = datetime.now()
     curUsername = request.user
     curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
-    accountType = curAccount.user_type
     curUserType = curAccount.user_type
     allAccounts = Account.objects.all()
 
@@ -210,7 +205,7 @@ def report(request, plan_id):
 
     print(updateItem)
 
-    crisisList = Crisis.objects.filter(crisis_status='Ongoing')
+    crisisList = Crisis.objects.exclude(crisis_status='Resolved')
     toDisplay = []
     for crisis in crisisList:
         plansInCrisis = Plan.objects.filter(plan_crisisID=crisis.crisis_ID)
@@ -231,7 +226,10 @@ def report(request, plan_id):
         submittedUsers.append(c.eval_userID.user_type)
 
     allSubCrisis = SubCrisis.objects.filter(crisis_ID = crisisItem.crisis_ID)
-    print(allSubCrisis)
+
+    #Approval package:
+
+    myAgencies = ExternalAgency.objects.filter(agency_approver__user_type=curUserType)
 
     context = {
         'planItem': planItem,
@@ -253,9 +251,48 @@ def report(request, plan_id):
         'curUser': curUser,
         'curAccount': curAccount,
         'toDisplay': toDisplay,
-        'planID': json.dumps(planItem.id)
+        'planID': json.dumps(planItem.id),
+        'myAgencies': serializers.serialize('json', myAgencies),
     }
     return HttpResponse(template.render(context, request))
+
+def sendReport(request):
+    if request.POST:
+        curPlanID = request.POST['planID']
+        print(curPlanID)
+        #1. Comments
+
+        allComments = EvalPlan.objects.filter(eval_planID=curPlanID) #Will return 5 objects
+
+        concatComments = ""
+        for n in allComments:
+            concatComments += str(n.eval_userID.user_type) + ": " + str(n.eval_text) + "\n"
+
+        #2. Status
+
+        reportStatus = "Approved"
+        for n in allComments:
+            if(n.eval_hasComment):
+                reportStatus = "Rejected"
+
+        #Change http when we have
+        r = requests.post('http://127.0.0.1:8000/api/test/PlanID/', data={
+            'PlanID': curPlanID,
+            'Comments': concatComments,
+            'PlanStatus': reportStatus
+        })
+
+        print(r.status_code)
+
+    return HttpResponse('')
+
+def postJsonTest(dataSet):
+    r = requests.post('http://127.0.0.1:8000/api/test/PlanID/', data=dataSet)
+    # if r.status_code == 200:
+    # r.json()
+    print(r.text)
+    print(r.status_code)
+
 
 def saveComment(request):
     print(request)
@@ -264,6 +301,11 @@ def saveComment(request):
         getAccType = request.POST['accType']
         getCommentTxt = request.POST['commentTxt']
         getHasComment = request.POST['hasComment']
+        getMyApprovals = request.POST.getlist('myApprovals[]')
+
+        print(getMyApprovals)
+
+
 
         curAccount = Account.objects.filter(user_type=getAccType).get()
         curPlan = Plan.objects.filter(id=getPlanID).get()
@@ -271,34 +313,24 @@ def saveComment(request):
         testDuplicate = EvalPlan.objects.filter(eval_planID__id=getPlanID, eval_userID__user_type=getAccType)
 
         if not testDuplicate:
-            #print("testDuplicate is empty!") #save here
             eval_entry.save()
         else:
-            #print("there is something here: " + testDuplicate[0].eval_text) #replace here
             testDuplicate[0].delete()
             eval_entry.save()
-            #testNew = EvalPlan.objects.filter(eval_planID__plan_ID=getPlanID, eval_userID__user_type=getAccType).get()
-            #print("New Text Saved: "+testNew.eval_text)
     return HttpResponse('')
 
 def getComments(request, userType, plan_id):
-    # print(userType, plan_id)
     allComments = EvalPlan.objects.filter(eval_planID__id=plan_id)
     allUsers = Account.objects.all()
-    # for c in allComments:
-    #     print(c.id, c.eval_userID.user_type)
     diff = []
     for user in allUsers:
         found = False
         for comment in allComments:
-            #print(user.user_type, comment.eval_userID.user_type)
             if(user.user_type==comment.eval_userID.user_type):
                 found = True
                 break
         if not found:
             diff.append(user.user_type)
-
-    # print(diff)
 
     context = {
         'noReviewYet': diff
@@ -381,15 +413,8 @@ def newsfeed(request):
     # NOTE: WHEN TO PULL FROM CMO: ON EVERY PAGE LOAD, BECAUSE NOTIFICATION COME, CLICKING IT WILL REFRESH A PAGE!
 
     # Process Crisis/Plans
-    crisisList = Crisis.objects.filter(crisis_status='Ongoing')
+    crisisList = Crisis.objects.exclude(crisis_status='Resolved')
     print(crisisList)
-
-    # planList = []
-    # for crisis in crisisList:
-    #     latestPlan = Plan.objects.filter(plan_crisisID=crisis.crisis_ID).latest('plan_dateTime')
-    #     planList.append(latestPlan)
-    #
-    # print(planList)
 
     toDisplay = []
     for crisis in crisisList:

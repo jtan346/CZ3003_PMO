@@ -130,6 +130,20 @@ class EvalPlan(models.Model): #Comments by Ministers
     class Meta:
         unique_together = ["eval_planID","eval_userID"]
 
+class testmyfuckingapi(models.Model):
+    PlanID = models.IntegerField()
+    Comments = models.CharField(max_length=5000, null=True, blank=True)
+    PlanStatus = models.CharField(max_length=500, null=True, blank=True)
+
+class Notifications(models.Model):
+    PlanID = models.IntegerField()
+    CrisisID = models.IntegerField()
+    CrisisTitle = models.CharField(max_length=500, null=True, blank=True)
+    class Meta: #For naming convention in django/admin
+        verbose_name_plural = "Notifications"
+    def __str__(self):
+        return str(self.PlanID)
+
 """
 
 Possible classes:

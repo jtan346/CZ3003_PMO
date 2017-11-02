@@ -72,6 +72,16 @@ class EvalPlanAdmin(admin.ModelAdmin):
     def get_userID(self, obj):
         return obj.eval_userID.user_type
 
+class TestAdmin(admin.ModelAdmin):
+    Model = testmyfuckingapi
+    list_display = ('PlanID', 'Comments', 'PlanStatus')
+
+class NotificationAdmin(admin.ModelAdmin):
+    Model = Notifications
+    list_display = ('PlanID', 'CrisisID', 'CrisisTitle')
+
+admin.site.register(testmyfuckingapi, TestAdmin)
+admin.site.register(Notifications, NotificationAdmin)
 admin.site.register(Account, AccountAdmin)
 #admin.site.register(CurrentReport)
 admin.site.register(Crisis, CrisisAdmin)

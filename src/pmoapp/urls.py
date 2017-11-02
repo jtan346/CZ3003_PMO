@@ -12,6 +12,10 @@ router = routers.SimpleRouter()
 router.register(r'plan_ID',PlanViewSet)
 router2 = routers.SimpleRouter()
 router2.register(r'eval_planID',EvalPlanViewSet)
+router3 = routers.SimpleRouter()
+router3.register(r'PlanID',TestViewSet)
+router4 = routers.SimpleRouter()
+router4.register(r'planID',CMOViewSet)
 
 urlpatterns = [ #pylint: disable=invalid-name
     #url(r'^$', login, name='login'),
@@ -34,7 +38,12 @@ urlpatterns = [ #pylint: disable=invalid-name
     # http://127.0.0.1:8000/api/plan/plan_ID/ the link to call the api from CMO side
     url(r'^api/eval/', include(router2.urls)),
     # http://127.0.0.1:8000/api/eval/eval_planID/ the link to call the api from CMO side
+    url(r'^api/test/', include(router3.urls)),
+    # http://127.0.0.1:8000/api/test/PlanID/ the link to test the api from CMO side
+    url(r'^api/cmo/', include(router4.urls)),
+    # http://127.0.0.1:8000/api/cmo/planID/ the link to test the api from CMO side
     url(r'^saveComments/',saveComment),
+    url(r'^sendReport/',sendReport),
     url(r'^getComments/(?P<userType>[\w-]+)/(?P<plan_id>[\w-]+)/$', getComments),
 
     #url(r'^admin/', admin.site.urls),

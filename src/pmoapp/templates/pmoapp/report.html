@@ -33,7 +33,7 @@
 		var accountType = "{{ accountType|safe }}";
 		var jsonComments = {{ jsonComments|safe }};
 
-		if(jsonComments.length >0) console.log(jsonComments); else console.log("No comments for this plan");
+		//if(jsonComments.length >0) console.log(jsonComments); else console.log("No comments for this plan");
 	</script>
 	<script src="/static/js/app.js"></script>
 	  <script type="text/javascript">
@@ -460,6 +460,7 @@
 			</div>
 		
 			<h4 class="reportHeader"> Review of Crisis Report </h4>
+			<h5 class="reportHeader pb-4"> Your Comments and Approvals</h5>
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<div class="card-header" id="reportPanel{{ curAccount.user_type }}" data-toggle="collapse" href="#filterPanel{{ curAccount.user_type }}" data-parent="#exampleAccordion">
@@ -473,17 +474,32 @@
 				<div class="card-body" id="reportPanelBody{{ curAccount.user_type }}">
 					<div id="filterPanel{{ curAccount.user_type }}" class="panel-collapse panel-collapse collapse">
 						<div class="panel-body">
+							<h5 class="reportHeader" style="padding-top:5px;"> Comments:</h5>
 							<div class="reportReview">
 								{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
 								<textarea disabled class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{% if c.eval_text %}{{ c.eval_text }}{% endif %}{% endfor %}</textarea>
 								{% else %}
-								<textarea class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{% if c.eval_text %}{{ c.eval_text }}{% endif %}{{ c.eval_text }}{% endfor %}</textarea>
+								<textarea class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{% if c.eval_text %}{{ c.eval_text }}{% endif %}{% endfor %}</textarea>
 								{% endif %}
 							</div>
+							<h5 class="reportHeader">Authorization of External Agencies:</h5>
+
+							<div class="form-group" id="dynamicInput">
+
+								<div class="form-row mb-3">
+									<button type="button" class="btn btn-default col-md-2 ml-1" id="anotherAgencyBtn" onClick="addInput('dynamicInput');">Add Agency</button>
+									<div class="col-md-5 pl-4" id="agencyDdl1">
+										<select id="agencyDdl" class="form-control agencyDdl" name="myInputs[]">
+										</select>
+									</div>
+								</div>
+							</div>
+
 						</div>
 					</div>
 				</div>
 			</div>
+			<h5 class="reportHeader pb-4"> Comments and Approvals from other Ministers </h5>
 			<div id="commentUpdates">
 				{% for a in allAccounts %}
 					{% if a.user_type != accountType %} <!--PM-->
@@ -520,20 +536,22 @@
 				{% endfor %}
 			</div>
 			{% csrf_token %}
-
-            {% if accountType != "PM" %}
-                {% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
-					<button disabled type="submit" class="btn btn-primary" id="btnSubmit">Submit Comments</button>
-                {% else %}
-					<button type="submit" class="btn btn-primary" id="btnSubmit">Submit Comments</button>
-                {% endif %}
-            {% else %}
-				{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
-					<button disabled type="submit" class="btn btn-primary" id="btnPM">Submit Reviewed Report to CMO</button>
-                {% else %}
-					<button type="submit" class="btn btn-primary" id="btnPM">Submit Reviewed Report to CMO</button>
-                {% endif %}
-            {% endif %}
+			<div class="form-row mb-5">
+					{% if accountType != "PM" %}
+						{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
+							<button disabled type="submit" class="btn btn-primary col-md-2 offset-5" id="btnSubmit">Submit Comments</button>
+						{% else %}
+							<button type="submit" class="btn btn-primary col-md-2 offset-5" id="btnSubmit">Submit Comments</button>
+						{% endif %}
+                    {% endif %}
+					{%  if accountType == "PM"  %}
+						{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
+							<button disabled type="submit" class="btn btn-primary col-md-4 offset-4" id="btnPM">Submit Reviewed Report to CMO</button>
+						{% else %}
+							<button type="submit" class="btn btn-primary col-md-4 offset-4" id="btnPM">Submit Reviewed Report to CMO</button>
+						{% endif %}
+					{% endif %}
+			</div>
 			</form>
 			</section>
 
@@ -635,6 +653,260 @@
     <!-- Custom scripts for this template -->
     <!--<script src="/static/js/sb-admin.min.js"></script>-->
 	<script src="/static/js/report-panel.js"></script>
+	<script text="text/javascript">
+		//Agencies Variables
+
+		var myAgencies = {{ myAgencies|safe }};
+		//var myApprovedAgencies = {{ approvedAgencies|safe }};
+		var counter = 1; //start with 1
+		var rowId = 1; //same as counter
+
+		//console.log(myAgencies);
+
+		var approvedAgencies = [];
+
+		//Get all unapproved agencies
+
+		//Fake data:
+		var currentApprovals = ["SGS", "MAS"];
+
+
+		var naAgencies = [];
+
+		for(var i = 0; i < myAgencies.length; i++) {
+			var found = false;
+			//for(var j = 0; j < myApprovedAgencies.length; j++) {
+				//if(myAgencies[i].pk == myApprovedAgencies[j].pk) {
+			for (var j = 0; j < currentApprovals.length; j++) {
+				//console.log(myAgencies[i].pk, currentApprovals[j]);
+				if(myAgencies[i].pk == currentApprovals[j]) {
+					found = true;
+					approvedAgencies.push(myAgencies[i]);
+				}
+			}
+			if(!found)
+				naAgencies.push(myAgencies[i]);
+		}
+
+		console.log(approvedAgencies);
+		console.log(naAgencies);
+
+		//PopulateDdl initial
+
+		var ddl = document.getElementById('agencyDdl');
+
+		ddl.innerHTML = "<option value =''>Select Agency</option>";
+
+		for(var i = 0; i < naAgencies.length; i++) {
+			ddl.innerHTML += "<option id=ddl"+naAgencies[i].pk+" value ="+naAgencies[i].pk+'>'+naAgencies[i].fields.agency_name+"</option>";
+		}
+
+		//populate initial selected stuffs
+
+		initialpushs();
+
+		function initialpushs() {
+			for(var i = 0; i < approvedAgencies.length; i++) {
+
+				 var agencyRow = '\'agencyRow' + (rowId + 1) + "\'";
+				 var removeInput = 'onclick=\'removeInput(" + agencyRow + ");\'';
+
+				  var newdiv = document.createElement('div');
+				  newdiv.className = "form-row col-md-12 pl-1 mb-2";
+				  //newdiv.id = "agencyRow" + (rowId + 1);
+					newdiv.id = approvedAgencies[i].pk;
+
+				  var newdiv1 = document.createElement('div');
+				  newdiv1.innerHTML = "<button type='button' class='btn btn-default removeButton' id='agencyRemove1' onClick='removeInput(&quot;" + approvedAgencies[i].pk + "&quot;);'><i class='fa fa-minus'></i></button>";
+
+				  var newdiv2 = document.createElement("label");
+				  newdiv2.className = "col-form-label col-md-1 text-right mr-3 ml-5";
+				  newdiv2.innerHTML = "Agency:";
+
+				  var newdiv3 = document.createElement("input");
+				  newdiv3.type = 'text';
+				  newdiv3.className = 'col-md-5 ml-3 pl-3 form-control';
+				  newdiv3.readOnly=true;
+				  newdiv3.value = approvedAgencies[i].pk + ": "+ approvedAgencies[i].fields.agency_name;
+
+				  var newdiv4 = document.createElement("label");
+				  newdiv4.className = "col-form-label col-md-2 text-right";
+				  newdiv4.innerHTML = "Agency POC:";
+
+				  var newdiv5 = document.createElement("input");
+				  newdiv5.type = 'text';
+				  newdiv5.className = 'col-md-2 ml-3 pl-3 form-control';
+				  newdiv5.readOnly=true;
+				  newdiv5.value = approvedAgencies[i].fields.agency_poc;
+
+				  newdiv.appendChild(newdiv1);
+				  newdiv.appendChild(newdiv2);
+				  newdiv.appendChild(newdiv3);
+				  newdiv.appendChild(newdiv4);
+				  newdiv.appendChild(newdiv5);
+
+				  document.getElementById('dynamicInput').appendChild(newdiv);
+
+				  counter++;
+				  rowId++;
+
+				console.log(counter, rowId);
+			}
+		}
+
+		function removeInput(divName){
+			var element = document.getElementById(divName);
+
+			for(var i = 0; i < myAgencies.length; i++) {
+				if(divName == myAgencies[i].pk)
+					naAgencies.push(myAgencies[i]);
+			}
+
+			//remove from currentapprovals
+
+			for(var i = 0; i < currentApprovals.length; i++) {
+				if(divName == currentApprovals[i])
+					currentApprovals.splice(i,1);
+			}
+
+			console.log(naAgencies, "added ", divName ," to ddl");
+			console.log(currentApprovals, "removed ", divName ," from current approvals");
+
+			element.outerHTML = "";
+			delete element;
+			counter--;
+			rowId--;
+
+			ddl.options.length = 0;
+
+			//Display all unapproved agencies in ddl
+
+			ddl.innerHTML = "<option value =''>Select Agency</option>";
+			for(var i = 0; i < naAgencies.length; i++) {
+				ddl.innerHTML += "<option id=ddl"+naAgencies[i].pk+" value ="+naAgencies[i].pk+'>'+naAgencies[i].fields.agency_name+"</option>";
+			}
+		}
+
+		function addInput(divName){
+			 if (naAgencies.length == 0)  {
+				  alert("You have no more Agencies to approve!");
+			 }else
+			 if(document.getElementById('agencyDdl').value != "") {
+			 	console.log(document.getElementById('agencyDdl').value);
+
+			 	currentApprovals.push(document.getElementById('agencyDdl').value);
+				console.log(currentApprovals, "added to currentApprovals");
+
+			 	naAgencies = [];
+
+			 	for(var i = 0; i < myAgencies.length; i++) {
+					var found = false;
+																				//for(var j = 0; j < myApprovedAgencies.length; j++) {
+																					//if(myAgencies[i].pk == myApprovedAgencies[j].pk) {
+					for (var j = 0; j < currentApprovals.length; j++) {
+						if(myAgencies[i].pk == currentApprovals[j]) {
+							found = true;
+						}
+					}
+					if(!found)
+						/*var found2 = false;
+						for(var k = 0; k < naAgencies.length; k++)
+							console.log(myAgencies[i].pk);
+							if(naAgencies[k].pk == myAgencies[i].pk)
+								found2 = true;
+						if(!found2)*/
+						naAgencies.push(myAgencies[i]);
+				}
+
+				//New Row
+
+				var agencyName;
+				var agencyPOC;
+
+				for(var i = 0; i < myAgencies.length; i++) {
+					if(ddl.value == myAgencies[i].pk) {
+						agencyName = myAgencies[i].fields.agency_name;
+						agencyPOC = myAgencies[i].fields.agency_poc;
+					}
+				}
+
+				 var agencyRow = '\'agencyRow' + (rowId + 1) + "\'";
+				 var removeInput = 'onclick=\'removeInput(" + agencyRow + ");\'';
+
+				  var newdiv = document.createElement('div');
+				  newdiv.className = "form-row col-md-12 pl-1 mb-2";
+				  //newdiv.id = "agencyRow" + (rowId + 1);
+					newdiv.id = ddl.value;
+
+				  var newdiv1 = document.createElement('div');
+				  newdiv1.innerHTML = "<button type='button' class='btn btn-default removeButton' id='agencyRemove1' onClick='removeInput(&quot;" + ddl.value + "&quot;);'><i class='fa fa-minus'></i></button>";
+
+				  var newdiv2 = document.createElement("label");
+				  newdiv2.className = "col-form-label col-md-1 text-right mr-3 ml-5";
+				  newdiv2.innerHTML = "Agency:";
+
+				  var newdiv3 = document.createElement("input");
+				  newdiv3.type = 'text';
+				  newdiv3.className = 'col-md-5 ml-3 pl-3 form-control';
+				  newdiv3.readOnly=true;
+				  newdiv3.value = ddl.value + ": "+ agencyName;
+
+				  var newdiv4 = document.createElement("label");
+				  newdiv4.className = "col-form-label col-md-2 text-right";
+				  newdiv4.innerHTML = "Agency POC:";
+
+				  var newdiv5 = document.createElement("input");
+				  newdiv5.type = 'text';
+				  newdiv5.className = 'col-md-2 ml-3 pl-3 form-control';
+				  newdiv5.readOnly=true;
+				  newdiv5.value = agencyPOC;
+
+				  newdiv.appendChild(newdiv1);
+				  newdiv.appendChild(newdiv2);
+				  newdiv.appendChild(newdiv3);
+				  newdiv.appendChild(newdiv4);
+				  newdiv.appendChild(newdiv5);
+
+
+				  document.getElementById(divName).appendChild(newdiv);
+
+				  counter++;
+				  rowId++;
+
+				console.log(counter, rowId);
+
+				//Remove all current agencies in ddl
+
+				ddl.options.length = 0;
+
+				//Display all unapproved agencies in ddl
+
+				ddl.innerHTML = "<option value =''>Select Agency</option>";
+				for(var i = 0; i < naAgencies.length; i++) {
+					ddl.innerHTML += "<option id=ddl"+naAgencies[i].pk+" value ="+naAgencies[i].pk+'>'+naAgencies[i].fields.agency_name+"</option>";
+				}
+
+				console.log(naAgencies);
+			 }else{
+			 	console.log("please select something bitch");
+			 	console.log(naAgencies);
+			 }
+		}
+
+
+	</script>
+	<!--<div class="form-row col-md-12 pl-1 mb-2" id="agencyRow1">
+		<button type="button" class="btn btn-default removeButton" id="agencyRemove1" onClick="removeInput(&quot;agencyRow1&quot;);"><i class="fa fa-minus"></i></button>
+		<label for="txtTesting" class="col-form-label col-md-1 text-right mr-3 ml-5" id="lblTesting">Agency:</label>
+		<div class="col-md-5 ml-3">
+		  <input type="text" class="form-control" id="txtTesting" value="ADF: Army Defence Force" readonly>
+		</div>
+
+		<label for="txtTesting2" class="col-form-label col-md-2 text-right" id="lblTesting2">Agency POC:</label>
+		<div class="col-md-2 ml-3">
+		  <input type="text" class="form-control" id="txtTesting2" value="Agent ADF" readonly>
+		</div>
+	</div>-->
 	<script text="text/javascript">
 			var graphData = [];
 			var labelData = [];
@@ -738,7 +1010,7 @@
         $('#btnSubmit').click(function() {
 			if(accountType == "MDEF"){
 			    var MDEFtxt = $('#txtMDEF').val();
-			    if(MDEFtxt == "" || MDEFtxt === undefined){ MDEFtxt = "MDEF: No Comment"; MDEFhasComment = "False";} else MDEFhasComment = "True";
+			    if(MDEFtxt == "" || MDEFtxt === undefined){ MDEFhasComment = "False";} else MDEFhasComment = "True";
                 var data = {
                         'planID': curPlanID,
                         'accType': accountType,
@@ -760,7 +1032,7 @@
 			}else
 			if(accountType == "MOHA"){
                 var MOHAtxt = $('#txtMOHA').val();
-                if(MOHAtxt == "" || MOHAtxt === undefined) { MOHAtxt = "MOHA: No Comment"; MOHAhasComment = "False";} else MOHAhasComment = "True";
+                if(MOHAtxt == "" || MOHAtxt === undefined) { MOHAhasComment = "False";} else MOHAhasComment = "True";
 
                 $.ajax({
                     type: 'POST', //GET, POST, PUT or DELETE
@@ -780,7 +1052,7 @@
 			}else
 			if(accountType == "MOFA"){
                 var MOFAtxt = $('#txtMOFA').val();
-                if(MOFAtxt == "" || MOFAtxt === undefined) { MOFAtxt = "MOFA: No Comment"; MOFAhasComment = "False";} else MOFAhasComment = "True";
+                if(MOFAtxt == "" || MOFAtxt === undefined) { MOFAhasComment = "False";} else MOFAhasComment = "True";
 
                 $.ajax({
                     type: 'POST', //GET, POST, PUT or DELETE
@@ -800,7 +1072,7 @@
 			}else
 			if(accountType == "DPM"){
                 var DPMtxt = $('#txtDPM').val();
-                if(DPMtxt == "" || DPMtxt === undefined) { DPMtxt = "DPM: No Comment"; DPMhasComment = "False";} else DPMhasComment = "True";
+                if(DPMtxt == "" || DPMtxt === undefined) { DPMhasComment = "False";} else DPMhasComment = "True";
 
                 $.ajax({
                     type: 'POST', //GET, POST, PUT or DELETE
@@ -817,27 +1089,8 @@
                       alert(accountType+"'s response (Has Comment: "+ DPMhasComment +") for "+curPlanID+ " has been saved!");
                     }
                 });
-			}else
-			if(accountType == "PM"){
-                var PMtxt = $('#txtPM').val();
-                if(PMtxt == "" || PMtxt === undefined) { PMtxt = "PM: No Comment"; PMhasComment = "False";} else PMhasComment = "True";
-
-                $.ajax({
-                    type: 'POST', //GET, POST, PUT or DELETE
-                    url: '/saveComments/', //Rename! Location of the service
-                    data: {
-                        'planID': curPlanID,
-                        'accType': accountType,
-                        'commentTxt': PMtxt,
-                        'hasComment': PMhasComment,
-                        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
-                    },
-                    success: function (msg) {
-                      //On Successful service call
-                      alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
-                    }
-                });
-			}else
+			}
+			else
 			{
 			    console.log(accountType);
 			}
@@ -845,7 +1098,8 @@
 
 	    $('#btnPM').click(function() {
 	        var PMtxt = $('#txtPM').val();
-            if(PMtxt == "" || PMtxt === undefined) { PMtxt = "PM: No Comment"; PMhasComment = "False";} else PMhasComment = "True";
+	        console.log(currentApprovals, "HERE");
+            if(PMtxt == "" || PMtxt === undefined) { PMhasComment = "False";} else PMhasComment = "True";
 
             $.ajax({
                 type: 'POST', //GET, POST, PUT or DELETE
@@ -855,42 +1109,54 @@
                     'accType': accountType,
                     'commentTxt': PMtxt,
                     'hasComment': PMhasComment,
+                    'myApprovals[]': currentApprovals,
                     csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
                 },
                 success: function (msg) {
                   //On Successful service call
                   //alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
                   console.log(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
-                }
-            });
 
+                    var checkMinisters;
+                    var allMinisters = [];
+                    var unMinisters = [];
 
+                    {% for c in allAccounts %} allMinisters.push("{{c.user_type}}"); {% endfor %}
 
-            var checkMinisters;
-            var allMinisters = [];
-            var unMinisters = [];
+                    $.ajax({
+                        type: 'GET', //GET, POST, PUT or DELETE
+                        url: '/getComments/{{curAccount.user_type}}/{{planItem.id}}', //Rename! Location of the service
+                        success: function(data) {
+                            console.log(data);
+                            var test = JSON.parse(data);
+                            var noReview = test['noReviewYet']
+                            console.log(noReview);
 
-            {% for c in allAccounts %} allMinisters.push("{{c.user_type}}"); {% endfor %}
+                            if(noReview.length >0)
+                            {
+                                alert("The following PMO members have not reviewed the plan:");
+                                alert(noReview.join("\n"));
+                            }else
+                            {
+                                //Submit to CMO (ready for collection)
+                                alert("Report has been sent to CMO!");
 
-	        $.ajax({
-                type: 'GET', //GET, POST, PUT or DELETE
-                url: '/getComments/{{curAccount.user_type}}/{{planItem.id}}', //Rename! Location of the service
-                success: function(data) {
-                    console.log(data);
-                    var test = JSON.parse(data);
-                    var noReview = test['noReviewYet']
-                    console.log(noReview);
-
-                    if(noReview.length >0)
-                    {
-                        alert("The following PMO members have not reviewed the plan:");
-                        alert(noReview.join("\n"));
-                    }else
-                    {
-                        //Submit to CMO (ready for collection)
-                        alert("Report has been sent to CMO!");
-
-                    }
+                                $.ajax({
+                                    type: 'POST', //GET, POST, PUT or DELETE
+                                    url: '/sendReport/', //Rename! Location of the service
+                                    data: {
+                                        'planID': {{ planItem.id }},
+                                        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                                    },
+                                    success: function (msg) {
+                                      //On Successful service call
+                                      //alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
+                                      console.log("Sent {{ planItem.id }} to python");
+                                    }
+                                });
+                            }
+                        }
+                    });
                 }
             });
 	    });
