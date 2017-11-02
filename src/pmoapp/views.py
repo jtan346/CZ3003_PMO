@@ -237,7 +237,9 @@ def report(request, plan_id):
     for c in allComments:
         submittedUsers.append(c.eval_userID.user_type)
 
-    allSubCrisis = SubCrisis.objects.filter(crisis_ID = crisisItem.crisis_ID)
+    allSubCrisis = []
+    if SubCrisis.objects.filter(crisis_ID = crisisItem.crisis_ID):
+        allSubCrisis = SubCrisis.objects.filter(crisis_ID = crisisItem.crisis_ID)
 
     #Approval package:
 
