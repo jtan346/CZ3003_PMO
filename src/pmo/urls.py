@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url,include
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 # from rest_framework import routers
 #
 #
@@ -27,7 +29,8 @@ urlpatterns = [ # pylint: disable=invalid-name
     url(r'^admin/', admin.site.urls),
     url(r'^/', include('pmoapp.urls')),
     url(r'^', include('pmoapp.urls')),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 
 #     url(r'^api/plan/', include(router.urls)),
 #     # http://127.0.0.1:8000/api/plan/plan_ID/ the link to call the api from CMO side

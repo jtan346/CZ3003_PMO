@@ -401,11 +401,14 @@ input {
 
 #tab1:checked ~ #content1,
 #tab2:checked ~ #content2,
-#tab3:checked ~ #content3 {
+#tab3:checked ~ #content3,
+#tab4:checked ~ #content4 
+{
   display: block;
   border-bottom: 2px solid #f0f0f0;
   padding-right:1%;
 }
+
 
 .tab_container .tab-content p,
 .tab_container .tab-content h3 {

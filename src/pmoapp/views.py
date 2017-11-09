@@ -23,6 +23,8 @@ from django.contrib.auth.decorators import login_required
 from random import randint
 from django.conf import settings
 from django.core.mail import send_mail
+from django.shortcuts import redirect
+
 
 class PlanViewSet(viewsets.ModelViewSet):
     lookup_field = 'plan_ID'
@@ -60,7 +62,11 @@ def otp(request):
     subject = 'OTP'
     from_email = settings.EMAIL_HOST_USER
     to_email = [from_email]
+    #Sessionstuff
     OTP = request.session['OTP'] = randint(10000000, 99999999)
+    loggedin = request.session['Loggedin'] = False
+    curnumNotifications = Notifications.objects.count()
+    request.session['NumNotifications'] = curnumNotifications
     send_mail(subject, str(OTP), from_email, to_email, fail_silently=False)
     print(str(OTP))
     return render(request, 'pmoapp/authotp.html', {})
@@ -72,6 +78,7 @@ def resendOTP(request):
     to_email = [from_email]
     OTP = request.session['OTP'] = randint(10000000, 99999999)
     send_mail(subject, str(OTP), from_email, to_email, fail_silently=False)
+    print(str(OTP))
     return render(request, 'pmoapp/authotp.html', {})
 
 def otpAuthentication(request):
@@ -79,17 +86,35 @@ def otpAuthentication(request):
         otp = request.POST['otp']
         if (otp == str(request.session['OTP'])):
             del request.session['OTP']
-
+            #print request.session['Loggedin']
+            request.session['Loggedin'] = True
+            #print request.session['Loggedin']
             #Initialize Notifications
 
-            curnumNotifications = Notifications.objects.count()
-            print(curnumNotifications)
-            request.session['NumNotifications'] = curnumNotifications
+            curnumNotifications = 0
 
+            print(request.session['NumNotifications'])
             return HttpResponse('')
     return HttpResponse('', status=401)
 
+
+def login_check(session):
+    if 'Loggedin' in session:
+        if session['Loggedin'] == True:
+            print "User logged in"
+            return True
+        else:
+            print "User not logged in"
+            return False
+    else:
+        print "Session not found"
+        return False
+
+#@user_passes_test(otp_check(requests), login_url='/authotp/')
 def home(request):
+    if not login_check(request.session):
+        return redirect('/logout')
+
     template = loader.get_template('pmoapp/home.html')
 
 #Process Account/Session
@@ -97,6 +122,7 @@ def home(request):
     curUsername = request.user
     curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
     accountType = curAccount.user_type
+    profilePicture = curAccount.profilePicture
 
     if(curAccount.gender):
         salutation = "Mr."
@@ -125,6 +151,9 @@ def home(request):
 
     #print(crisisList)
 
+
+
+
     context = {
         'toDisplay': toDisplay,
         'ongoingCrisis': crisisList,
@@ -132,7 +161,8 @@ def home(request):
         'accountType': accountType,
         'curUser': curUser,
         # 'crisisID': json.dumps(crisisItem.crisis_ID),
-        'curName': json.dumps(curUser)
+        'curName': json.dumps(curUser),
+        'profilePicture': profilePicture,
     }
     return HttpResponse(template.render(context, request))
 
@@ -145,6 +175,7 @@ def history(request):
     curUsername = request.user
     curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
     accountType = curAccount.user_type
+    profilePicture = curAccount.profilePicture
 
     if (curAccount.gender):
         salutation = "Mr."
@@ -192,6 +223,7 @@ def history(request):
         'updateTime': updateTime,
         'allCrisis': allCrisis,
         'curUser': curUser,
+        'profilePicture': profilePicture,
     }
     return HttpResponse(template.render(context, request))
 
@@ -202,6 +234,8 @@ def report(request, plan_id):
     curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
     curUserType = curAccount.user_type
     allAccounts = Account.objects.all()
+    profilePicture = curAccount.profilePicture
+    decisionTable = curAccount.decisionTable
 
     if (curAccount.gender):
         salutation = "Mr."
@@ -253,6 +287,8 @@ def report(request, plan_id):
 
     context = {
         'planItem': planItem,
+        'profilePicture': profilePicture,
+        'decisionTable': decisionTable,
         'ongoingCrisis': crisisList,
         'allAccounts': allAccounts,
         'submittedUsers': submittedUsers,
@@ -411,18 +447,37 @@ class graphUpdates(ListView):
 
 class notificationBellUpdate(ListView):
     template_name = 'pmoapp/notificationBell.html'
-
     def get_queryset(self):
         curNotifications = Notifications.objects.all()
         return curNotifications
 
     def get_context_data(self, **kwargs):
+        # for key in self.request.session.keys():
+        #     print key
+
         curNotifications1 = Notifications.objects.all()
+        curCount = curNotifications1.count()
+        sessionNotiCount = self.request.session['NumNotifications']
+
+        #Session: User's total read noti
+        #From db: Total noti
+
+        # print "User read:"
+        # print sessionNotiCount
+
+        leftNotiCount = curNotifications1.count()-sessionNotiCount
+
+        # print "From DB"
+        # print curCount
+        #
+        # print "Bell no. of new:"
+        # print leftNotiCount
+
         context = {
-            'sessionNotiCount': self.request.session['NumNotifications'],
-            'outstandingCount': curNotifications1.count()-self.request.session['NumNotifications'],
-            'curNotification': curNotifications1,
-            'curNotificationsJson': serializers.serialize('json', curNotifications1)
+            'sessionNotiCount': sessionNotiCount, #No. of User's Currently Read Notifications
+            'outstandingCount': leftNotiCount,  #No. of new notifications shown on bell
+            'curNotification': curNotifications1,   #All current notifications
+            'curNotificationsJson': serializers.serialize('json', curNotifications1), #All current notifications in JSON
         }
         return context
 
@@ -445,6 +500,7 @@ def newsfeed(request):
     curUsername = request.user
     curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
     accountType = curAccount.user_type
+    profilePicture = curAccount.profilePicture
 
     if (curAccount.gender):
         salutation = "Mr."
@@ -477,6 +533,7 @@ def newsfeed(request):
         'updateTime': updateTime,
         'accountType': accountType,
         'curUser': curUser,
+        'profilePicture': profilePicture,
         # 'crisisID': json.dumps(crisisItem.crisis_ID),
         'curName': json.dumps(curUser)
     }

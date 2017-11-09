@@ -18,6 +18,8 @@ class Account(models.Model):
     user_type = models.CharField(max_length=15)  #Enum: PM, DPM, MOHA, MOFA, MDef
     appointment = models.CharField(max_length=150) #Long form of their user_type
     profilePicURL = models.CharField(max_length=150, null=True, blank=True)
+    profilePicture = models.ImageField(upload_to='profilepics', blank=True)
+    decisionTable = models.ImageField(upload_to='decisiontables', blank=True)
     gender = models.BooleanField(default=True) #True = male, False = female
     def __str__(self):
         return self.user_type

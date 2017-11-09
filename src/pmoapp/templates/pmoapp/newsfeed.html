@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load staticfiles %}
 <html lang="en">
 
   <head>
@@ -21,6 +22,19 @@
 
     <!-- Custom styles for this template -->
     <link href="/static/css/sb-admin.css" rel="stylesheet">
+      <style>
+  #profilePic {
+	margin:10px;
+    border-radius: 35%;
+  }
+  .article {
+	  float: left;
+	}
+
+	.article:nth-child(odd) {
+	  clear: left;
+	}
+</style>
 
   </head>
 
@@ -34,9 +48,17 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-            <div class="form-row h-25 mt-2 mb-2 ml-2 mr-2 d-inline-block">
-                  <h6 style="color: white !important;">Welcome, {{ curUser }}</h6>
-             </div>
+            <li>
+                <div class="article-container" style="color:#ffffff; height:120px;">
+                  <div class="article">
+                        <img src="{% static profilePicture %}"  id ="profilePic" alt = "image" width="100px" height="100px"/>
+                  </div>
+                  <div class="article" style="width:118px; padding-top:20px;">
+                        Welcome,<br/>{{accountType}} {{curUser}}
+                  </div>
+                </div>
+          </li>
+
              <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Home">
             <a class="nav-link" href="../home">
               <i class="fa fa-fw fa-home"></i>

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load staticfiles %}
 <html lang="en" ng-app="chatApp">
 
   <head>
@@ -111,6 +112,19 @@
     <link href="/static/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
     <!-- Custom styles for this template -->
     <link href="/static/css/sb-admin.css" rel="stylesheet">
+	  <style>
+  #profilePic {
+	margin:10px;
+    border-radius: 35%;
+  }
+  .article {
+	  float: left;
+	}
+
+	.article:nth-child(odd) {
+	  clear: left;
+	}
+</style>
 
   </head>
 
@@ -124,9 +138,17 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-            <div class="form-row h-25 mt-2 mb-2 ml-2 mr-2 d-inline-block">
-                  <h6 style="color: white !important;">Welcome, {{ curUser }}</h6>
-             </div>
+			<li>
+                <div class="article-container" style="color:#ffffff; height:120px;">
+                  <div class="article">
+                        <img src="{% static profilePicture %}"  id ="profilePic" alt = "image" width="100px" height="100px"/>
+                  </div>
+                  <div class="article" style="width:118px; padding-top:20px;">
+                        Welcome,<br/>{{accountType}} {{curUser}}
+                  </div>
+                </div>
+          </li>
+
              <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Home">
             <a class="nav-link" href="../../home">
               <i class="fa fa-fw fa-home"></i>
@@ -204,45 +226,33 @@
 
         <ul class="navbar-nav ml-auto">
 			<li class="nav-item dropdown" id="alertBellNotification">
-					<a class="nav-link dropdown-toggle mr-lg-2" href="#" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<a class="nav-link dropdown-toggle mr-lg-2" href="" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="updateNotiCount()">
 					  <i class="fa fa-fw fa-bell"></i>
 					  <span class="d-lg-none">Alerts
-						<span class="badge badge-pill badge-warning">3 New</span>
+						<span class="badge badge-pill badge-warning">0 New</span>
 					  </span>
 					  <span class="new-indicator text-warning d-none d-lg-block">
-						<i class="fa fa-fw fa-circle"></i>
-						<span class="number">3</span>
+						{% if object_list|length > 0 %}
+                            <i class="fa fa-fw fa-circle"></i>
+                            <span class="number">{{ object_list|length }}</span>
+                          {% endif %}
 					  </span>
 					</a>
 					<div class="dropdown-menu" aria-labelledby="alertsDropdown">
-					  <h6 class="dropdown-header">New Alerts:</h6>
-					  <div class="dropdown-divider"></div>
-					  <a class="dropdown-item" href="Changi T3.html">
-						<span class="text-danger">
-						  <strong>Report for Vetting</strong>
-						</span>
-						<span class="small float-right text-muted">11:21 AM</span>
-						<div class="dropdown-message small">Crisis: Bombing Incident at Changi Airport Terminal 3</div>
-					  </a>
-					  <div class="dropdown-divider"></div>
-					  <a class="dropdown-item" href="#">
-						<span class="text-danger">
-						  <strong>Report for Vetting</strong>
-						</span>
-						<span class="small float-right text-muted">11:21 AM</span>
-						<div class="dropdown-message small">Crisis: Bombing at Jurong Island</div>
-					  </a>
-					  <div class="dropdown-divider"></div>
+					  <h6 class="dropdown-header">Recent Notifications:</h6>
+
+					 <!-- <div class="dropdown-divider"></div>
 					  <a class="dropdown-item" href="Orchard Road.html">
 						<span class="text-success">
 						  <strong>Crisis Over</strong>
 						</span>
 						<span class="small float-right text-muted">11:21 AM</span>
 						<div class="dropdown-message small">Resolved: Bombing Incident at Orchard Road</div>
-					  </a>
+					  </a>-->
+
 					  <div class="dropdown-divider"></div>
-					  <a class="dropdown-item small" href="#">
-						View all alerts
+					  <a class="dropdown-item small" href="">
+						Last Updated: {% now "M. j, Y, h:i a" %}
 					  </a>
 					</div>
 			</li>
@@ -288,6 +298,9 @@
 
 			<input id="tab3" type="radio" name="tabs">
 			<label class= "tab" for="tab3"><span>Google Maps</span></label>
+
+			 <input id="tab4" type="radio" name="tabs">
+			<label class= "tab" for="tab4"><span>Decision Table</span></label>
 
 			<section id="content1" class="tab-content">
 			<form>
@@ -577,9 +590,22 @@
 					  <!--<i class="fa fa-area-chart"></i>-->
 					  Crisis Map
 				  </div>
-					 <div id="map" class="x_content" style="height:50vh;">
+					 <div id="map" class="x_content" style="height:50vh;"></div>
 				</div>
 			</section>
+
+			  <section id="content4" class="tab-content">
+				<div class="card mb-3" id="decisiontable">
+                    <div class="card-header">
+					  <!--<i class="fa fa-area-chart"></i>-->
+					  Decision Table for {{ curUser }}
+				  </div>
+				</div>
+<div class="card-body">
+					  <img src="{% static decisionTable %}" alt = "image" width="1080" height="480"/>
+				  </div>
+			</section>
+
 		</div>
 
         </div>
@@ -1229,7 +1255,51 @@
         myPieChart=new Chart(ctx,{type:"pie",data:{labels:["Blue","Red","Yellow","Green"],datasets:[{data:[12.21,15.58,11.25,8.32],backgroundColor:["#007bff","#dc3545","#ffc107","#28a745"]}]}});
 
 </script>
+<script type="text/javascript">
+        //For Crisis Updates
+        $('#alertBellNotification').load("/notificationBell");
+        setInterval(function(){
+            $('#alertBellNotification').load("/notificationBell");
+            //console.log("HELLO");
+        },10000);
 
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        //Passing the CSRF Token with every ajax call
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                var csrfToken = getCookie('csrftoken');
+                xhr.setRequestHeader("X-CSRFToken", csrfToken);
+            }
+        });
+
+        function updateNotiCount() {
+
+            $.ajax({
+                type: 'POST', //GET, POST, PUT or DELETE
+                url: '/updateNotiCount/',
+                data: { },
+                success: function (msg) {
+                  console.log("notification bell updated");
+                }
+            });
+        }
+
+    </script>
 
   </body>
 
