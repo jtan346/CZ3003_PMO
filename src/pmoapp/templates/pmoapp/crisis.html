@@ -159,30 +159,23 @@
             </a>
 			<!--<ul class="sidenav-second-level collapse" id="collapseComponents">-->
 			<ul class="sidenav-second-level show" id="collapseComponents">
-
-			  <!--<li class="currentCrisisItem active">-->
-				{% if toDisplay %}
-                    {% for plan in toDisplay %}
-                        {% for crisis in ongoingCrisis %}
-                            {% if crisis.crisis_ID == plan.plan_crisisID %}
-                                {% if plan.plan_ID == planItem.plan_ID %}
-									<li class="active">
-										<a href="../../report/{{ plan.plan_ID }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:15 }}</a>
-									</li>
-								{% else %}
-									<li>
-										<a href="../../report/{{ plan.plan_ID }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:15 }}</a>
-									</li>
-								{% endif %}
-                            {% endif %}
-                        {% endfor %}
+                {% if ongoingCrisis %}
+                    {% for c in ongoingCrisis %}
+                        {% if c.crisis_ID|stringformat:"i" == crisis_ID %}
+                            <li class="active">
+                                <a href="../../crisis/{{ c.crisis_ID }}">Crisis {{ c.crisis_ID }}: {{ c.crisis_name|truncatechars:15 }}</a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="../../crisis/{{ c.crisis_ID }}">Crisis {{ c.crisis_ID }}: {{ c.crisis_name|truncatechars:15 }}</a>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 {% else %}
                     <li>
                         <p>No Ongoing Crisis</p>
                     </li>
                 {% endif %}
-
             </ul>
           </li>
 	
@@ -327,7 +320,11 @@
 				</div>-->
 				<label for="txtCrisisDateTime" class="col-form-label col-md-2 text-left">Latest Plan ID/Status:</label>
 				<div class="form-group col-md-3">
+				{% if planID > 0 %}
 				  <input type="text" class="form-control" id="txtPlanStatus" value="{{ planItem.plan_ID }} : {{ planItem.plan_status }}" readonly>
+				{% else %}
+				  <input type="text" class="form-control" id="txtPlanStatus" value="No Plan Submitted by CMO" readonly>
+				{% endif %}
 				</div>
               </div>
 
@@ -391,178 +388,184 @@
 					</div>-->
 				</div>
 			</div>
-			
 			<h4 class="reportHeader"> Crisis Resolution Plan </h4>
-			
-			 <div class="form-row">
-				<label for="txtPlanID" class="col-form-label col-md-2">Plan ID/Status:</label>
-				<div class="form-group col-md-3">
-				  <input type="text" class="form-control" id="txtPlanID" value="{{ planItem.plan_ID }}: {{ planItem.plan_status }}" readonly>
-				</div>
-				 <label for="txtPlanReceipt" class="col-form-label col-md-2 offset-1 text-left">Plan Receipt:</label>
-				<div class="form-group col-md-3">
-				  <input type="text" class="form-control" id="txtPlanReceipt" value="{{ planItem.plan_receipt }}" readonly>
-				</div>
-			  </div>
-			  
-			   <div class="form-group">
-				<label for="txtPlanDescription">Plan Description:</label>
-				<textarea class="form-control col-md-11" id="txtPlanDescription" rows="5" readonly>{{ planItem.plan_description }}</textarea>
-			  </div>
-			  
-			<div class="form-row">
-				<!--<label for="txtProjectedCrisisRadius" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisRadius">Projected Crisis Radius:</label>
-				<div class="form-group col-md-3">
-				  <input type="text" class="form-control" id="txtProjectedCrisisRadius" value="{{ planItem.plan_projRadius }} m" readonly>
-				</div>-->
-				<label for="txtProjectedCrisisResolution" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisResolution">Est. Resolution Time:</label>
-				<div class="form-group col-md-3">
-				  <input type="text" class="form-control" id="txtProjectedCrisisResolution" value="{{ planItem.plan_projResolutionTime }}" readonly>
-				</div>
-				<label for="txtProjectedCasualties" class="col-form-label col-md-2 offset-1 text-left" id="lblProjectedCasualties">Projected Casualties:</label>
-				<div class="form-group col-md-3">
-				  <input type="text" class="form-control" id="txtProjectedCasualties" value="{{ planItem.plan_projCasualtyRate }} %" readonly>
-				</div>
-			</div>
-			<!--<div class="form-row">
-				<label for="txtProjectedCrisisResolution" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisResolution">Est. Resolution Time:</label>
-				<div class="form-group col-md-3">
-				  <input type="text" class="form-control" id="txtProjectedCrisisResolution" value="{{ planItem.plan_projResolutionTime }}" readonly>
-				</div>
-			</div>-->
-			
-			<h5 class="reportSubheader mb-3"> EF Deployment Details </h5>
-			<div class="form-row">
-                <div class="col-form-label col-md-3">
-				    <label for="txtRecommendedSAFDeployment" class="text-left" id="lblRecommendedSAFDeployment">Recommended SAF Deployment:</label>
-                </div>
-				<div class="form-group col-md-2">
-				  <input type="text" class="form-control" id="txtRecommendedSAFDeployment" value="{{ planItem.plan_SAFRecommended }} %" readonly>
-				</div>
-                <div class="col-form-label col-md-3 offset-1">
-                    <label for="txtMaximumSAFDeployment" class="text-left" id="lblMaximumSAFDeployment">Maximum SAF Deployment:</label>
-                </div>
-                <div class="form-group col-md-2">
-                  <input type="text" class="form-control" id="txtMaximumSAFDeployment" value="{{ planItem.plan_SAFMaximum }} %" readonly>
-                </div>
+			{% if plan_id > 0 %}
 
-			</div>
-			
-			<div class="form-row">
-				<label for="txtRecommendedSCDFDeployment" class="col-form-label col-md-3 text-left" id="lblRecommendedSCDFDeployment">Recommended SCDF Deployment:</label>
-				<div class="form-group col-md-2">
-				  <input type="text" class="form-control" id="txtRecommendedSCDFDeployment" value="{{ planItem.plan_SCDFRecommended }} %" readonly>
-				</div>
-				<label for="txtMaximumSCDFDeployment" class="col-form-label col-md-3 offset-1 text-left" id="lblMaximumSCDFDeployment">Maximum SCDF Deployment:</label>
-				<div class="form-group col-md-2">
-				  <input type="text" class="form-control" id="txtMaximumSCDFDeployment" value="{{ planItem.plan_SCDFMaximum }} %" readonly>
-				</div>
-			</div>
-			
-			<div class="form-row">
-				<label for="txtRecommendedCDDeployment" class="col-form-label col-md-3 text-left" id="lblRecommendedCDDeployment">Recommended CD Deployment:</label>
-				<div class="form-group col-md-2">
-				  <input type="text" class="form-control" id="txtRecommendedCDDeployment" value="{{ planItem.plan_CDRecommended }} %" readonly>
-				</div>
-				<label for="txtMaximumCDDeployment" class="col-form-label col-md-3 offset-1 text-left" id="lblMaximumCDDeployment">Maximum CD Deployment:</label>
-				<div class="form-group col-md-2">
-				  <input type="text" class="form-control" id="txtMaximumCDDeployment" value="{{ planItem.plan_CDMaximum }} %" readonly>
-				</div>
-			</div>
-		
-			<h4 class="reportHeader"> Review of Crisis Report </h4>
-			<h5 class="reportHeader pb-4"> Your Comments and Approvals</h5>
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<div class="card-header" id="reportPanel{{ curAccount.user_type }}" data-toggle="collapse" href="#filterPanel{{ curAccount.user_type }}" data-parent="#exampleAccordion">
-							<i class="fa fa-check-square" id="tickCross{{ curAccount.user_type }}"></i>
-							{{ curAccount.appointment }}
-						<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel4">
-							<i class="fa fa-chevron-right" id="panelArrow{{ curAccount.user_type }}"></i>
-						</span>
+				 <div class="form-row">
+					<label for="txtPlanID" class="col-form-label col-md-2">Plan ID/Status:</label>
+					<div class="form-group col-md-3">
+					  <input type="text" class="form-control" id="txtPlanID" value="{{ planItem.plan_ID }}: {{ planItem.plan_status }}" readonly>
+					</div>
+					 <label for="txtPlanReceipt" class="col-form-label col-md-2 offset-1 text-left">Plan Receipt:</label>
+					<div class="form-group col-md-3">
+					  <input type="text" class="form-control" id="txtPlanReceipt" value="{{ planItem.plan_receipt }}" readonly>
+					</div>
+				  </div>
+
+				   <div class="form-group">
+					<label for="txtPlanDescription">Plan Description:</label>
+					<textarea class="form-control col-md-11" id="txtPlanDescription" rows="5" readonly>{{ planItem.plan_description }}</textarea>
+				  </div>
+
+				<div class="form-row">
+					<!--<label for="txtProjectedCrisisRadius" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisRadius">Projected Crisis Radius:</label>
+					<div class="form-group col-md-3">
+					  <input type="text" class="form-control" id="txtProjectedCrisisRadius" value="{{ planItem.plan_projRadius }} m" readonly>
+					</div>-->
+					<label for="txtProjectedCrisisResolution" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisResolution">Est. Resolution Time:</label>
+					<div class="form-group col-md-3">
+					  <input type="text" class="form-control" id="txtProjectedCrisisResolution" value="{{ planItem.plan_projResolutionTime }}" readonly>
+					</div>
+					<label for="txtProjectedCasualties" class="col-form-label col-md-2 offset-1 text-left" id="lblProjectedCasualties">Projected Casualties:</label>
+					<div class="form-group col-md-3">
+					  <input type="text" class="form-control" id="txtProjectedCasualties" value="{{ planItem.plan_projCasualtyRate }} %" readonly>
 					</div>
 				</div>
-				<div class="card-body" id="reportPanelBody{{ curAccount.user_type }}">
-					<div id="filterPanel{{ curAccount.user_type }}" class="panel-collapse panel-collapse collapse">
-						<div class="panel-body">
-							<h5 class="reportHeader" style="padding-top:5px;"> Comments:</h5>
-							<div class="reportReview">
-								{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
-								<textarea disabled class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{% if c.eval_text %}{{ c.eval_text }}{% endif %}{% endfor %}</textarea>
-								{% else %}
-								<textarea class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{% if c.eval_text %}{{ c.eval_text }}{% endif %}{% endfor %}</textarea>
-								{% endif %}
-							</div>
-							<h5 class="reportHeader">Authorization of External Agencies:</h5>
+				<!--<div class="form-row">
+					<label for="txtProjectedCrisisResolution" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisResolution">Est. Resolution Time:</label>
+					<div class="form-group col-md-3">
+					  <input type="text" class="form-control" id="txtProjectedCrisisResolution" value="{{ planItem.plan_projResolutionTime }}" readonly>
+					</div>
+				</div>-->
 
-							<div class="form-group" id="dynamicInput">
+				<h5 class="reportSubheader mb-3"> EF Deployment Details </h5>
+				<div class="form-row">
+					<div class="col-form-label col-md-3">
+						<label for="txtRecommendedSAFDeployment" class="text-left" id="lblRecommendedSAFDeployment">Recommended SAF Deployment:</label>
+					</div>
+					<div class="form-group col-md-2">
+					  <input type="text" class="form-control" id="txtRecommendedSAFDeployment" value="{{ planItem.plan_SAFRecommended }} %" readonly>
+					</div>
+					<div class="col-form-label col-md-3 offset-1">
+						<label for="txtMaximumSAFDeployment" class="text-left" id="lblMaximumSAFDeployment">Maximum SAF Deployment:</label>
+					</div>
+					<div class="form-group col-md-2">
+					  <input type="text" class="form-control" id="txtMaximumSAFDeployment" value="{{ planItem.plan_SAFMaximum }} %" readonly>
+					</div>
 
-								<div class="form-row mb-3">
-									<button type="button" class="btn btn-default col-md-2 ml-1" id="anotherAgencyBtn" onClick="addInput('dynamicInput');">Add Agency</button>
-									<div class="col-md-5 pl-4" id="agencyDdl1">
-										<select id="agencyDdl" class="form-control agencyDdl" name="myInputs[]">
-										</select>
+				</div>
+
+				<div class="form-row">
+					<label for="txtRecommendedSCDFDeployment" class="col-form-label col-md-3 text-left" id="lblRecommendedSCDFDeployment">Recommended SCDF Deployment:</label>
+					<div class="form-group col-md-2">
+					  <input type="text" class="form-control" id="txtRecommendedSCDFDeployment" value="{{ planItem.plan_SCDFRecommended }} %" readonly>
+					</div>
+					<label for="txtMaximumSCDFDeployment" class="col-form-label col-md-3 offset-1 text-left" id="lblMaximumSCDFDeployment">Maximum SCDF Deployment:</label>
+					<div class="form-group col-md-2">
+					  <input type="text" class="form-control" id="txtMaximumSCDFDeployment" value="{{ planItem.plan_SCDFMaximum }} %" readonly>
+					</div>
+				</div>
+
+				<div class="form-row">
+					<label for="txtRecommendedCDDeployment" class="col-form-label col-md-3 text-left" id="lblRecommendedCDDeployment">Recommended CD Deployment:</label>
+					<div class="form-group col-md-2">
+					  <input type="text" class="form-control" id="txtRecommendedCDDeployment" value="{{ planItem.plan_CDRecommended }} %" readonly>
+					</div>
+					<label for="txtMaximumCDDeployment" class="col-form-label col-md-3 offset-1 text-left" id="lblMaximumCDDeployment">Maximum CD Deployment:</label>
+					<div class="form-group col-md-2">
+					  <input type="text" class="form-control" id="txtMaximumCDDeployment" value="{{ planItem.plan_CDMaximum }} %" readonly>
+					</div>
+				</div>
+
+				<h4 class="reportHeader"> Review of Crisis Report </h4>
+				<h5 class="reportHeader pb-4"> Your Comments and Approvals</h5>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<div class="card-header" id="reportPanel{{ curAccount.user_type }}" data-toggle="collapse" href="#filterPanel{{ curAccount.user_type }}" data-parent="#exampleAccordion">
+								<i class="fa fa-check-square" id="tickCross{{ curAccount.user_type }}"></i>
+								{{ curAccount.appointment }}
+							<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel4">
+								<i class="fa fa-chevron-right" id="panelArrow{{ curAccount.user_type }}"></i>
+							</span>
+						</div>
+					</div>
+					<div class="card-body" id="reportPanelBody{{ curAccount.user_type }}">
+						<div id="filterPanel{{ curAccount.user_type }}" class="panel-collapse panel-collapse collapse">
+							<div class="panel-body">
+								<h5 class="reportHeader" style="padding-top:5px;"> Comments:</h5>
+								<div class="reportReview">
+									{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
+									<textarea disabled class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{% if c.eval_text %}{{ c.eval_text }}{% endif %}{% endfor %}</textarea>
+									{% else %}
+									<textarea class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{% if c.eval_text %}{{ c.eval_text }}{% endif %}{% endfor %}</textarea>
+									{% endif %}
+								</div>
+								<h5 class="reportHeader">Authorization of External Agencies:</h5>
+
+								<div class="form-group" id="dynamicInput">
+
+									<div class="form-row mb-3">
+										<button type="button" class="btn btn-default col-md-2 ml-1" id="anotherAgencyBtn" onClick="addInput('dynamicInput');">Add Agency</button>
+										<div class="col-md-5 pl-4" id="agencyDdl1">
+											<select id="agencyDdl" class="form-control agencyDdl" name="myInputs[]">
+											</select>
+										</div>
 									</div>
 								</div>
-							</div>
 
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<h5 class="reportHeader pb-4"> Comments and Approvals from other Ministers </h5>
-			<div id="commentUpdates">
-				{% for a in allAccounts %}
-					{% if a.user_type != accountType %} <!--PM-->
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<div class="card-header" id="reportPanel{{ a.user_type }}" data-toggle="collapse" href="#filterPanel{{ a.user_type }}" data-parent="#exampleAccordion">
-										<i class="fa fa-check-square" id="tickCross{{ a.user_type }}"></i>
-										{{ a.appointment }}
-									<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel{{ a.user_type }}">
-										<i class="fa fa-chevron-right" id="panelArrow{{ a.user_type }}"></i>
-									</span>
+				<h5 class="reportHeader pb-4"> Comments and Approvals from other Ministers </h5>
+				<div id="commentUpdates">
+					{% for a in allAccounts %}
+						{% if a.user_type != accountType %} <!--PM-->
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<div class="card-header" id="reportPanel{{ a.user_type }}" data-toggle="collapse" href="#filterPanel{{ a.user_type }}" data-parent="#exampleAccordion">
+											<i class="fa fa-check-square" id="tickCross{{ a.user_type }}"></i>
+											{{ a.appointment }}
+										<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel{{ a.user_type }}">
+											<i class="fa fa-chevron-right" id="panelArrow{{ a.user_type }}"></i>
+										</span>
+									</div>
 								</div>
-							</div>
-							<div class="card-body" id="reportPanelBody{{ a.user_type }}">
-								<div id="filterPanel{{ a.user_type }}" class="panel-collapse panel-collapse collapse">
-									<div class="panel-body">
-										<div class="reportReview">
-											<!--<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ submittedUsers }}</textarea>-->
-											{% if a.user_type not in submittedUsers %}
-											<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ a.appointment }}: {{ a.name }} has not reviewed the Plan: {{ planItem.plan_ID}} (pid: {{ planItem.plan_ID }}).</textarea>
-											{% else %}
-												{% for c in allComments %}
-													{% if a.user_type == c.eval_userID.user_type %}
-														<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{% if c.eval_hasComment %}{{ c.eval_text }}{% else %}{{ a.appointment }}: {{ a.name }} has reviewed, and does not have any further comments for the Plan: {{ planItem.plan_ID}} (pid: {{ planItem.plan_ID }}).{% endif %}	</textarea>
-													{% endif %}
-												{% endfor %}
-											{% endif %}
+								<div class="card-body" id="reportPanelBody{{ a.user_type }}">
+									<div id="filterPanel{{ a.user_type }}" class="panel-collapse panel-collapse collapse">
+										<div class="panel-body">
+											<div class="reportReview">
+												<!--<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ submittedUsers }}</textarea>-->
+												{% if a.user_type not in submittedUsers %}
+												<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ a.appointment }}: {{ a.name }} has not reviewed the Plan: {{ planItem.plan_ID}} (pid: {{ planItem.plan_ID }}).</textarea>
+												{% else %}
+													{% for c in allComments %}
+														{% if a.user_type == c.eval_userID.user_type %}
+															<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{% if c.eval_hasComment %}{{ c.eval_text }}{% else %}{{ a.appointment }}: {{ a.name }} has reviewed, and does not have any further comments for the Plan: {{ planItem.plan_ID}} (pid: {{ planItem.plan_ID }}).{% endif %}	</textarea>
+														{% endif %}
+													{% endfor %}
+												{% endif %}
+											</div>
 										</div>
 									</div>
 								</div>
 							</div>
-						</div>
-					{% endif %}
-				{% endfor %}
-			</div>
-			{% csrf_token %}
-			<div class="form-row mb-5">
-					{% if accountType != "PM" %}
-						{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
-							<button disabled type="submit" class="btn btn-primary col-md-2 offset-5" id="btnSubmit">Submit Comments</button>
-						{% else %}
-							<button type="submit" class="btn btn-primary col-md-2 offset-5" id="btnSubmit">Submit Comments</button>
 						{% endif %}
-                    {% endif %}
-					{%  if accountType == "PM"  %}
-						{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
-							<button disabled type="submit" class="btn btn-primary col-md-4 offset-4" id="btnPM">Submit Reviewed Report to CMO</button>
-						{% else %}
-							<button type="submit" class="btn btn-primary col-md-4 offset-4" id="btnPM">Submit Reviewed Report to CMO</button>
+					{% endfor %}
+				</div>
+				{% csrf_token %}
+				<div class="form-row mb-5">
+						{% if accountType != "PM" %}
+							{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
+								<button disabled type="submit" class="btn btn-primary col-md-2 offset-5" id="btnSubmit">Submit Comments</button>
+							{% else %}
+								<button type="submit" class="btn btn-primary col-md-2 offset-5" id="btnSubmit">Submit Comments</button>
+							{% endif %}
 						{% endif %}
-					{% endif %}
-			</div>
+						{%  if accountType == "PM"  %}
+							{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
+								<button disabled type="submit" class="btn btn-primary col-md-4 offset-4" id="btnPM">Submit Reviewed Report to CMO</button>
+							{% else %}
+								<button type="submit" class="btn btn-primary col-md-4 offset-4" id="btnPM">Submit Reviewed Report to CMO</button>
+							{% endif %}
+						{% endif %}
+				</div>
+			{% else %}
+				<div class="mb-5 mt-2">
+					<h4>No plan submitted by CMO for Crisis: {{ crisisItem.crisis_ID }}</h4>
+				</div>
+
+			{% endif %}
 			</form>
 			</section>
 
@@ -678,6 +681,8 @@
     <!--<script src="/static/js/sb-admin.min.js"></script>-->
 	<script src="/static/vendor/js/report-panel.js"></script>
 	<script text="text/javascript">
+	if({{ planID }} > 0)
+	{
 		//Agencies Variables
 
 		var myAgencies = {{ myAgencies|safe }};
@@ -916,7 +921,7 @@
 			 	console.log(naAgencies);
 			 }
 		}
-
+	}
 
 	</script>
 	<!--<div class="form-row col-md-12 pl-1 mb-2" id="agencyRow1">
@@ -991,200 +996,204 @@
 			var tickWidth = maxY/5;
 		</script>
 	  <script text="text/javascript">
-	    //For Crisis Updates
-        setInterval(function(){
-            $('#crisisUpdates').load("/crisisUpdates/{{crisisItem.crisis_ID}}");
-        },10000);
+		//For Crisis Updates
+		setInterval(function(){
+			$('#crisisUpdates').load("/crisisUpdates/{{crisisItem.crisis_ID}}");
+			console.log("HELLO");
+		},10000);
 
-        //For Graph Update
-        setInterval(function(){
-        	$('#dashboard').load("/graphUpdates/{{crisisItem.crisis_ID}}");
-        	//$("[data-toggle='toggle']").bootstrapToggle('destroy');
-        	//$("[data-toggle='toggle']").bootstrapToggle();
-        },30000);
+		//For Graph Update
+		setInterval(function(){
+			$('#dashboard').load("/graphUpdates/{{crisisItem.crisis_ID}}");
+			//$("[data-toggle='toggle']").bootstrapToggle('destroy');
+			//$("[data-toggle='toggle']").bootstrapToggle();
+		},30000);
 
-        //For Comments Updates
-        setInterval(function(){
-        	var curPlanID ={{planID|safe}};
-            $('#commentUpdates').load("/commentUpdates/{{curAccount.user_type}}-"+curPlanID);
-        },15000);
+		if({{ planID }} > 0)
+		{
+			//For Comments Updates
+			setInterval(function(){
+				var curPlanID ={{planID|safe}};
+				$('#commentUpdates').load("/commentUpdates/{{curAccount.user_type}}-"+curPlanID);
+			},15000);
 
-        $('#tab3').on('click', function() {
-        	window.setTimeout( function(){
-        		console.log("test");
-    			google.maps.event.trigger(map, 'resize');
-    	}, 500);
-        });
+			$('#tab3').on('click', function() {
+				window.setTimeout( function(){
+					console.log("test");
+					google.maps.event.trigger(map, 'resize');
+			}, 500);
+			});
 
-        //For Report submission
-        /*var MDEFtxt = "empty";
-        var MOHAtxt = "empty";
-        var MOFAtxt = "empty";
-        var DPMtxt = "empty";
-        var PMtxt = "empty";*/
+			//For Report submission
+			/*var MDEFtxt = "empty";
+			var MOHAtxt = "empty";
+			var MOFAtxt = "empty";
+			var DPMtxt = "empty";
+			var PMtxt = "empty";*/
 
-        var MDEFhasComment = "False";
-        var MOHAhasComment = "False";
-        var MOFAhasComment = "False";
-        var DPMhasComment = "False";
-        var PMhasComment = "False";
+			var MDEFhasComment = "False";
+			var MOHAhasComment = "False";
+			var MOFAhasComment = "False";
+			var DPMhasComment = "False";
+			var PMhasComment = "False";
 
-        var curPlanID = {{planID|safe}};
+			var curPlanID = {{planID|safe}};
 
-        $('#btnSubmit').click(function() {
-			if(accountType == "MDEF"){
-			    var MDEFtxt = $('#txtMDEF').val();
-			    if(MDEFtxt == "" || MDEFtxt === undefined){ MDEFhasComment = "False";} else MDEFhasComment = "True";
-                var data = {
-                        'planID': curPlanID,
-                        'accType': accountType,
-                        'commentTxt': MDEFtxt,
-                        'hasComment': MDEFhasComment,
-                        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
-                    };
+			$('#btnSubmit').click(function() {
+				if(accountType == "MDEF"){
+					var MDEFtxt = $('#txtMDEF').val();
+					if(MDEFtxt == "" || MDEFtxt === undefined){ MDEFhasComment = "False";} else MDEFhasComment = "True";
+					var data = {
+							'planID': curPlanID,
+							'accType': accountType,
+							'commentTxt': MDEFtxt,
+							'hasComment': MDEFhasComment,
+							csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+						};
 
-			    $.ajax({
-                    type: 'POST', //GET, POST, PUT or DELETE
-                    url: '/saveComments/', //Rename! Location of the service
-                    data: data,
-                    success: function (msg) {
-                      //On Successful service call
-                      alert(accountType+"'s response (Has Comment: "+ MDEFhasComment +") for "+curPlanID+ " has been saved!");
-                    }
-		        });
+					$.ajax({
+						type: 'POST', //GET, POST, PUT or DELETE
+						url: '/saveComments/', //Rename! Location of the service
+						data: data,
+						success: function (msg) {
+						  //On Successful service call
+						  alert(accountType+"'s response (Has Comment: "+ MDEFhasComment +") for "+curPlanID+ " has been saved!");
+						}
+					});
 
-			}else
-			if(accountType == "MOHA"){
-                var MOHAtxt = $('#txtMOHA').val();
-                if(MOHAtxt == "" || MOHAtxt === undefined) { MOHAhasComment = "False";} else MOHAhasComment = "True";
+				}else
+				if(accountType == "MOHA"){
+					var MOHAtxt = $('#txtMOHA').val();
+					if(MOHAtxt == "" || MOHAtxt === undefined) { MOHAhasComment = "False";} else MOHAhasComment = "True";
 
-                $.ajax({
-                    type: 'POST', //GET, POST, PUT or DELETE
-                    url: '/saveComments/', //Rename! Location of the service
-                    data: {
-                        'planID': curPlanID,
-                        'accType': accountType,
-                        'commentTxt': MOHAtxt,
-                        'hasComment': MOHAhasComment,
-                        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
-                    },
-                    success: function (msg) {
-                      //On Successful service call
-                      alert(accountType+"'s response (Has Comment: "+ MOHAhasComment +") for "+curPlanID+ " has been saved!");
-                    }
-                });
-			}else
-			if(accountType == "MOFA"){
-                var MOFAtxt = $('#txtMOFA').val();
-                if(MOFAtxt == "" || MOFAtxt === undefined) { MOFAhasComment = "False";} else MOFAhasComment = "True";
+					$.ajax({
+						type: 'POST', //GET, POST, PUT or DELETE
+						url: '/saveComments/', //Rename! Location of the service
+						data: {
+							'planID': curPlanID,
+							'accType': accountType,
+							'commentTxt': MOHAtxt,
+							'hasComment': MOHAhasComment,
+							csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+						},
+						success: function (msg) {
+						  //On Successful service call
+						  alert(accountType+"'s response (Has Comment: "+ MOHAhasComment +") for "+curPlanID+ " has been saved!");
+						}
+					});
+				}else
+				if(accountType == "MOFA"){
+					var MOFAtxt = $('#txtMOFA').val();
+					if(MOFAtxt == "" || MOFAtxt === undefined) { MOFAhasComment = "False";} else MOFAhasComment = "True";
 
-                $.ajax({
-                    type: 'POST', //GET, POST, PUT or DELETE
-                    url: '/saveComments/', //Rename! Location of the service
-                    data: {
-                        'planID': curPlanID,
-                        'accType': accountType,
-                        'commentTxt': MOFAtxt,
-                        'hasComment': MOFAhasComment,
-                        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
-                    },
-                    success: function (msg) {
-                      //On Successful service call
-                      alert(accountType+"'s response (Has Comment: "+ MOFAhasComment +") for "+curPlanID+ " has been saved!");
-                    }
-                });
-			}else
-			if(accountType == "DPM"){
-                var DPMtxt = $('#txtDPM').val();
-                if(DPMtxt == "" || DPMtxt === undefined) { DPMhasComment = "False";} else DPMhasComment = "True";
+					$.ajax({
+						type: 'POST', //GET, POST, PUT or DELETE
+						url: '/saveComments/', //Rename! Location of the service
+						data: {
+							'planID': curPlanID,
+							'accType': accountType,
+							'commentTxt': MOFAtxt,
+							'hasComment': MOFAhasComment,
+							csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+						},
+						success: function (msg) {
+						  //On Successful service call
+						  alert(accountType+"'s response (Has Comment: "+ MOFAhasComment +") for "+curPlanID+ " has been saved!");
+						}
+					});
+				}else
+				if(accountType == "DPM"){
+					var DPMtxt = $('#txtDPM').val();
+					if(DPMtxt == "" || DPMtxt === undefined) { DPMhasComment = "False";} else DPMhasComment = "True";
 
-                $.ajax({
-                    type: 'POST', //GET, POST, PUT or DELETE
-                    url: '/saveComments/', //Rename! Location of the service
-                    data: {
-                        'planID': curPlanID,
-                        'accType': accountType,
-                        'commentTxt': DPMtxt,
-                        'hasComment': DPMhasComment,
-                        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
-                    },
-                    success: function (msg) {
-                      //On Successful service call
-                      alert(accountType+"'s response (Has Comment: "+ DPMhasComment +") for "+curPlanID+ " has been saved!");
-                    }
-                });
-			}
-			else
-			{
-			    console.log(accountType);
-			}
-	    });
+					$.ajax({
+						type: 'POST', //GET, POST, PUT or DELETE
+						url: '/saveComments/', //Rename! Location of the service
+						data: {
+							'planID': curPlanID,
+							'accType': accountType,
+							'commentTxt': DPMtxt,
+							'hasComment': DPMhasComment,
+							csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+						},
+						success: function (msg) {
+						  //On Successful service call
+						  alert(accountType+"'s response (Has Comment: "+ DPMhasComment +") for "+curPlanID+ " has been saved!");
+						}
+					});
+				}
+				else
+				{
+					console.log(accountType);
+				}
+			});
 
-	    $('#btnPM').click(function() {
-	        var PMtxt = $('#txtPM').val();
-	        console.log(currentApprovals, "HERE");
-            if(PMtxt == "" || PMtxt === undefined) { PMhasComment = "False";} else PMhasComment = "True";
+			$('#btnPM').click(function() {
+				var PMtxt = $('#txtPM').val();
+				console.log(currentApprovals, "HERE");
+				if(PMtxt == "" || PMtxt === undefined) { PMhasComment = "False";} else PMhasComment = "True";
 
-            $.ajax({
-                type: 'POST', //GET, POST, PUT or DELETE
-                url: '/saveComments/', //Rename! Location of the service
-                data: {
-                    'planID': curPlanID,
-                    'accType': accountType,
-                    'commentTxt': PMtxt,
-                    'hasComment': PMhasComment,
-                    'myApprovals[]': currentApprovals,
-                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
-                },
-                success: function (msg) {
-                  //On Successful service call
-                  //alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
-                  console.log(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
+				$.ajax({
+					type: 'POST', //GET, POST, PUT or DELETE
+					url: '/saveComments/', //Rename! Location of the service
+					data: {
+						'planID': curPlanID,
+						'accType': accountType,
+						'commentTxt': PMtxt,
+						'hasComment': PMhasComment,
+						'myApprovals[]': currentApprovals,
+						csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+					},
+					success: function (msg) {
+					  //On Successful service call
+					  //alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
+					  console.log(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
 
-                    var checkMinisters;
-                    var allMinisters = [];
-                    var unMinisters = [];
+						var checkMinisters;
+						var allMinisters = [];
+						var unMinisters = [];
 
-                    {% for c in allAccounts %} allMinisters.push("{{c.user_type}}"); {% endfor %}
+						{% for c in allAccounts %} allMinisters.push("{{c.user_type}}"); {% endfor %}
 
-                    $.ajax({
-                        type: 'GET', //GET, POST, PUT or DELETE
-                        url: '/getComments/{{curAccount.user_type}}/{{planItem.plan_ID}}', //Rename! Location of the service
-                        success: function(data) {
-                            console.log(data);
-                            var test = JSON.parse(data);
-                            var noReview = test['noReviewYet']
-                            console.log(noReview);
+						$.ajax({
+							type: 'GET', //GET, POST, PUT or DELETE
+							url: '/getComments/{{curAccount.user_type}}/{{planItem.plan_ID}}', //Rename! Location of the service
+							success: function(data) {
+								console.log(data);
+								var test = JSON.parse(data);
+								var noReview = test['noReviewYet']
+								console.log(noReview);
 
-                            if(noReview.length >0)
-                            {
-                                alert("The following PMO members have not reviewed the plan:");
-                                alert(noReview.join("\n"));
-                            }else
-                            {
-                                //Submit to CMO (ready for collection)
-                                alert("Report has been sent to CMO!");
+								if(noReview.length >0)
+								{
+									alert("The following PMO members have not reviewed the plan:");
+									alert(noReview.join("\n"));
+								}else
+								{
+									//Submit to CMO (ready for collection)
+									alert("Report has been sent to CMO!");
 
-                                $.ajax({
-                                    type: 'POST', //GET, POST, PUT or DELETE
-                                    url: '/sendReport/', //Rename! Location of the service
-                                    data: {
-                                        'planID': {{ planItem.plan_ID }},
-                                        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
-                                    },
-                                    success: function (msg) {
-                                      //On Successful service call
-                                      //alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
-                                      console.log("Sent {{ planItem.plan_ID }} to python");
-                                      location.reload();
-                                    }
-                                });
-                            }
-                        }
-                    });
-                }
-            });
-	    });
+									$.ajax({
+										type: 'POST', //GET, POST, PUT or DELETE
+										url: '/sendReport/', //Rename! Location of the service
+										data: {
+											'planID': {{ planID }},
+											csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+										},
+										success: function (msg) {
+										  //On Successful service call
+										  //alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
+										  console.log("Sent {{ planItem.plan_ID }} to python");
+										  location.reload();
+										}
+									});
+								}
+							}
+						});
+					}
+				});
+			});
+		}
 
 	  </script>
   <script>

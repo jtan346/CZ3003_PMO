@@ -26,6 +26,7 @@ urlpatterns = [ #pylint: disable=invalid-name
     url(r'^otpAuthentication/$', otpAuthentication, name='otpAuthentication'),
     url(r'^resendOTP/$', resendOTP, name='resendOTP'),
     url(r'^home/$', home, name='home'),
+    url(r'^crisis/(?P<crisis_id>[\w-]+)/$', crisis, name='report'),
     url(r'^report/(?P<plan_id>[\w-]+)/$', report, name='report'),
     url(r'^newsfeed', newsfeed, name='newsfeed'),
     url(r'^notificationBell', notificationBellUpdate.as_view(), name='notificationBell'),

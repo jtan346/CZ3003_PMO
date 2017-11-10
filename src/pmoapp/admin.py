@@ -30,7 +30,7 @@ class UpdateAdmin(admin.ModelAdmin):
 
 class SubCrisisAdmin(admin.ModelAdmin):
     model = SubCrisis
-    list_display = ('sc_ID', 'crisis_ID', 'latitude', 'longitude', 'radius')
+    list_display = ('sc_ID', 'datetime', 'crisis_ID', 'latitude', 'longitude', 'radius')
 
 class PlanAdmin(admin.ModelAdmin):
     Model = Plan

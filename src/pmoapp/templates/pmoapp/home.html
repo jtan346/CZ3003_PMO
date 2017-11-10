@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 {% load staticfiles %}
 <html lang="en" ng-app="chatApp">
-
   <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -40,8 +38,7 @@
 		    console.log('CrisisID: {{ p.crisis_ID }}, Crisis Name: {{ p.crisis_name }}, Crisis Status: {{ p.crisis_status }}');
 		{% endfor %}
 	</script>
-    <script src="/static/js/app.js"></script>
-
+    <script src="/static/js/FirebaseManager.js"></script>
     <script src="https://cdn.firebase.com/libs/angularfire/2.2.0/angularfire.min.js"></script>
     <!-- Bootstrap core CSS -->
     <link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -53,20 +50,20 @@
     <link href="/static/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="/static/css/sb-admin.css" rel="stylesheet">
+    <link href="/static/vendor/css/sb-admin.css" rel="stylesheet">
       <style>
-  #profilePic {
-	margin:10px;
-    border-radius: 35%;
-  }
-  .article {
-	  float: left;
-	}
+          #profilePic {
+            margin:10px;
+            border-radius: 35%;
+          }
+          .article {
+              float: left;
+            }
 
-	.article:nth-child(odd) {
-	  clear: left;
-	}
-</style>
+            .article:nth-child(odd) {
+              clear: left;
+            }
+    </style>
   </head>
 
   <body class="fixed-nav sticky-footer bg-dark" id="page-top">
@@ -105,15 +102,11 @@
             </a>
 			<ul class="sidenav-second-level collapse" id="collapseComponents">
 			<!--<ul class="sidenav-second-level show" id="collapseComponents">-->
-                {% if toDisplay %}
-                    {% for plan in toDisplay %}
-                        {% for crisis in ongoingCrisis %}
-                            {% if crisis.crisis_ID == plan.plan_crisisID %}
-                                <li>
-                                    <a href="../report/{{ plan.plan_ID }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:15 }}</a>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
+                {% if ongoingCrisis %}
+                    {% for crisis in ongoingCrisis %}
+                        <li>
+                            <a href="../crisis/{{ crisis.crisis_ID }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:15 }}</a>
+                        </li>
                     {% endfor %}
                 {% else %}
                     <li>
@@ -234,23 +227,46 @@
                   </tr>
                 </thead>
                 <tbody>
-                {% if toDisplay %}
-                    {% for plan in toDisplay %}
-                        {% for crisis in ongoingCrisis %}
-                            {% if crisis.crisis_ID == plan.plan_crisisID %}
-                                <tr>
-                                    <td>Crisis: {{ plan.plan_crisisID }} - Plan: {{ plan.plan_ID }}</td>
-                                    <td><a href="/report/{{ plan.plan_ID }}">{{ crisis.crisis_name }}</a></td>
-                                    <td>{{ crisis.crisis_datetime }}</td>
-                                    <!--<td>{{ plan.plan_ID }}</td>-->
-                                    <td>{{ plan.plan_receipt }}</td>
-                                    <td>{{ plan.plan_status }}</td>
-                                </tr>
-                            {% endif %}
-                        {% endfor %}
+                {% if ongoingCrisis %}
+                    {% for crisis in ongoingCrisis %}
+                        {% if toDisplay %}
+                            <!--have plans for some-->
+                            {% for plan in toDisplay %}
+                                {% if crisis.crisis_ID == plan.plan_crisisID %}
+                                    <!--if this crisis has plan-->
+                                    <tr>
+                                        <td>Crisis: {{ plan.plan_crisisID }} - Plan: {{ plan.plan_ID }}</td>
+                                        <!--<td><a href="/report/{{ plan.plan_ID }}">{{ crisis.crisis_name }}</a></td>-->
+                                        <td><a href="/crisis/{{ plan.plan_crisisID }}">{{ crisis.crisis_name }}</a></td>
+                                        <td>{{ crisis.crisis_datetime }}</td>
+                                        <!--<td>{{ plan.plan_ID }}</td>-->
+                                        <td>{{ plan.plan_receipt }}</td>
+                                        <td>{{ plan.plan_status }}</td>
+                                    </tr>
+                                {% else %}
+                                    <!--if this crisis has no plan-->
+                                    <tr>
+                                        <td>Crisis: {{ crisis.crisis_ID }} - Plan: None</td>
+                                        <td><a href="/crisis/{{ crisis.crisis_ID }}">{{ crisis.crisis_name }}</a></td>
+                                        <td>{{ crisis.crisis_datetime }}</td>
+                                        <!--<td>{{ plan.plan_ID }}</td>-->
+                                        <td colspan="2">No plan Received</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <!--no plans at all-->
+                            <tr>
+                                <td>Crisis: {{ crisis.crisis_ID }} - Plan: None</td>
+                                <td><a href="/crisis/{{ crisis.crisis_ID }}">{{ crisis.crisis_name }}</a></td>
+                                <td>{{ crisis.crisis_datetime }}</td>
+                                <!--<td>{{ plan.plan_ID }}</td>-->
+                                <td colspan="2">No plan Received</td>
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                 {% else %}
-                    <tr><td>Singapore is safe!</td></tr>
+                    <tr><td colspan="5">Singapore is safe!</td></tr>
                 {% endif %}
                 </tbody>
               </table>
@@ -334,7 +350,7 @@
     <script src="/static/vendor/datatables/dataTables.bootstrap4.js"></script>
 
     <!-- Custom scripts for this template -->
-    <script src="/static/js/sb-admin.min.js"></script>
+    <script src="/static/vendor/js/sb-admin.min.js"></script>
 
       <script type="text/javascript">
         //For Crisis Updates
