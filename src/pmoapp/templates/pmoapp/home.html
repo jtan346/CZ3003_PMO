@@ -33,7 +33,7 @@
 		{% if user.is_authenticated %} console.log('{{user}}') {% endif %}
 
 		{% for p in toDisplay %}
-		    console.log('CrisisID: {{ p.plan_crisisID }}, PlanID: {{ p.plan_ID }}, defaultID: {{ p.id }}');
+		    console.log('CrisisID: {{ p.plan_crisisID }}, PlanID: {{ p.plan_num }}, defaultID: {{ p.plan_ID}}');
 		{% endfor %}
 
 		{% for p in ongoingCrisis %}
@@ -110,7 +110,7 @@
                         {% for crisis in ongoingCrisis %}
                             {% if crisis.crisis_ID == plan.plan_crisisID %}
                                 <li>
-                                    <a href="../report/{{ plan.id }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:15 }}</a>
+                                    <a href="../report/{{ plan.plan_ID }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:15 }}</a>
                                 </li>
                             {% endif %}
                         {% endfor %}
@@ -240,7 +240,7 @@
                             {% if crisis.crisis_ID == plan.plan_crisisID %}
                                 <tr>
                                     <td>Crisis: {{ plan.plan_crisisID }} - Plan: {{ plan.plan_ID }}</td>
-                                    <td><a href="/report/{{ plan.id }}">{{ crisis.crisis_name }}</a></td>
+                                    <td><a href="/report/{{ plan.plan_ID }}">{{ crisis.crisis_name }}</a></td>
                                     <td>{{ crisis.crisis_datetime }}</td>
                                     <!--<td>{{ plan.plan_ID }}</td>-->
                                     <td>{{ plan.plan_receipt }}</td>

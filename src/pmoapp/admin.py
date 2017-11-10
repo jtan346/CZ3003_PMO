@@ -34,7 +34,7 @@ class SubCrisisAdmin(admin.ModelAdmin):
 
 class PlanAdmin(admin.ModelAdmin):
     Model = Plan
-    list_display = ('id', 'plan_ID', 'get_crisisID', 'plan_status', 'plan_projResolutionTime', 'plan_projCasualtyRate', 'plan_SAFRecommended', 'plan_CDRecommended', 'plan_SCDFRecommended',
+    list_display = ('plan_num', 'plan_ID', 'get_crisisID', 'plan_status', 'plan_projResolutionTime', 'plan_projCasualtyRate', 'plan_SAFRecommended', 'plan_CDRecommended', 'plan_SCDFRecommended',
                     'plan_SAFMaximum', 'plan_CDMaximum', 'plan_SCDFMaximum')
     def get_crisisID(self, obj):
         return obj.plan_crisisID

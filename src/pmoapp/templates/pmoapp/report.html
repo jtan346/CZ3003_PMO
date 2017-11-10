@@ -172,11 +172,11 @@
                             {% if crisis.crisis_ID == plan.plan_crisisID %}
                                 {% if plan.plan_ID == planItem.plan_ID %}
 									<li class="active">
-										<a href="../../report/{{ plan.id }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:15 }}</a>
+										<a href="../../report/{{ plan.plan_ID }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:15 }}</a>
 									</li>
 								{% else %}
 									<li>
-										<a href="../../report/{{ plan.id }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:15 }}</a>
+										<a href="../../report/{{ plan.plan_ID }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:15 }}</a>
 									</li>
 								{% endif %}
                             {% endif %}
@@ -535,11 +535,11 @@
 										<div class="reportReview">
 											<!--<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ submittedUsers }}</textarea>-->
 											{% if a.user_type not in submittedUsers %}
-											<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ a.appointment }}: {{ a.name }} has not reviewed the Plan: {{ planItem.plan_ID}} (pid: {{ planItem.id }}).</textarea>
+											<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ a.appointment }}: {{ a.name }} has not reviewed the Plan: {{ planItem.plan_ID}} (pid: {{ planItem.plan_ID }}).</textarea>
 											{% else %}
 												{% for c in allComments %}
 													{% if a.user_type == c.eval_userID.user_type %}
-														<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{% if c.eval_hasComment %}{{ c.eval_text }}{% else %}{{ a.appointment }}: {{ a.name }} has reviewed, and does not have any further comments for the Plan: {{ planItem.plan_ID}} (pid: {{ planItem.id }}).{% endif %}	</textarea>
+														<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{% if c.eval_hasComment %}{{ c.eval_text }}{% else %}{{ a.appointment }}: {{ a.name }} has reviewed, and does not have any further comments for the Plan: {{ planItem.plan_ID}} (pid: {{ planItem.plan_ID }}).{% endif %}	</textarea>
 													{% endif %}
 												{% endfor %}
 											{% endif %}
@@ -1154,7 +1154,7 @@
 
                     $.ajax({
                         type: 'GET', //GET, POST, PUT or DELETE
-                        url: '/getComments/{{curAccount.user_type}}/{{planItem.id}}', //Rename! Location of the service
+                        url: '/getComments/{{curAccount.user_type}}/{{planItem.plan_ID}}', //Rename! Location of the service
                         success: function(data) {
                             console.log(data);
                             var test = JSON.parse(data);
@@ -1174,13 +1174,13 @@
                                     type: 'POST', //GET, POST, PUT or DELETE
                                     url: '/sendReport/', //Rename! Location of the service
                                     data: {
-                                        'planID': {{ planItem.id }},
+                                        'planID': {{ planItem.plan_ID }},
                                         csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
                                     },
                                     success: function (msg) {
                                       //On Successful service call
                                       //alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
-                                      console.log("Sent {{ planItem.id }} to python");
+                                      console.log("Sent {{ planItem.plan_ID }} to python");
                                       location.reload();
                                     }
                                 });

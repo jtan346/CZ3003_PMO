@@ -42,8 +42,8 @@ class Crisis(models.Model):
         #max_length=4,
         #validators=[RegexValidator(regex='^\w{4}$', message='Length has to be 4', code='nomatch')]
     )
-    crisis_name = models.CharField(max_length=50)
-    crisis_description = models.TextField()
+    crisis_name = models.CharField(max_length=500)
+    crisis_description = models.TextField(null=True, blank=True)
     crisis_datetime = models.DateTimeField() #Initial 911
     #crisis_address = models.CharField(max_length=50) #Sub with CrisisReports
     crisis_status = models.CharField(max_length=50)  # Enum: Ongoing, Cleaning-Up, Resolved
@@ -61,6 +61,8 @@ class SubCrisis(models.Model): #For address, and granularity
     latitude = models.DecimalField(max_digits=12, decimal_places=8)
     longitude = models.DecimalField(max_digits=12, decimal_places=8)
     radius = models.IntegerField(verbose_name="Radius(Metres)", validators=[MinValueValidator(0)])
+    datetime = models.DateTimeField()
+    description = models.TextField(null=True, blank=True)
 
     class Meta: #For naming convention in django/admin
         verbose_name_plural = "Sub Crisis"
@@ -84,16 +86,19 @@ class CrisisUpdates(models.Model): #EF Updates
     updates_curSAF = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
     updates_curCD = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
     updates_curSCDF = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
+    updates_description = models.TextField(null=True, blank=True)
+
 
     class Meta: #For naming convention in django/admin
         verbose_name_plural = "Crisis Updates"
 
 class Plan(models.Model):
-    plan_ID = models.IntegerField()
+    plan_ID = models.IntegerField(primary_key=True)
         #primary_key=True,
         #max_length=8,
         #validators=[RegexValidator(regex='^\w{8}$', message='Length has to be 8', code='nomatch')]
     # ) # PK
+    plan_num = models.IntegerField()
     #plan_crisisID = models.ForeignKey(Crisis, on_delete=models.CASCADE)
     plan_crisisID = models.IntegerField()
     plan_description = models.TextField()
@@ -117,7 +122,7 @@ class Plan(models.Model):
     plan_SCDFMaximum = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
 
     def __str__(self):
-        return str(self.id)
+        return str(self.plan_ID)
 
 class ApproveAgency(models.Model):
     approve_agency = models.ForeignKey(ExternalAgency, on_delete=models.CASCADE)

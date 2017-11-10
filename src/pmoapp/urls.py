@@ -1,7 +1,7 @@
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.views.generic import TemplateView
-from views import *
+from pmoapp.views import *
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 

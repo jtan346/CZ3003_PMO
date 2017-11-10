@@ -1,7 +1,7 @@
 """Development Django settings.
 """
 import os.path
-from common_settings import *  # pylint: disable=wildcard-import,unused-wildcard-import
+from pmo.common_settings import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
 DATABASES = {
     'default': {
