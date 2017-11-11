@@ -550,6 +550,7 @@ def crisis(request, crisis_id):
         'crisisItem': crisisItem,
         'plan_ID': plan_id,
         'allSubCrisis': allSubCrisis,
+        'crisisStatus':json.dumps(crisisItem.crisis_status),
         'crisisID': json.dumps(crisisItem.crisis_ID),
         'crisis_ID': crisis_id,
         'curName': json.dumps(curUser),
@@ -567,7 +568,6 @@ def crisis(request, crisis_id):
         'myAgencies': serializers.serialize('json', myAgencies),
     }
     return HttpResponse(template.render(context, request))
-
 
 def report(request, plan_id):
     if not login_check(request.session):
@@ -602,7 +602,7 @@ def report(request, plan_id):
         baseUpdate.save()
     # newAccount = Account(username="benji", password="12345", emailAddress="benjamintanjb@gmail.com", user_type="PM")
     # newAccount.save()
-    print(updateItem)
+    #print(updateItem)
 
     crisisList = Crisis.objects.exclude(crisis_status='Resolved')
     toDisplay = []
@@ -633,6 +633,15 @@ def report(request, plan_id):
 
     myAgencies = ExternalAgency.objects.filter(agency_approver__user_type=curUserType)
 
+    if (ApproveAgency.objects.filter(approve_approver__user_type=curUserType, approve_crisis__crisis_ID=crisisItem.crisis_ID)):
+        curAgencies = ApproveAgency.objects.filter(approve_approver__user_type=curUserType, approve_crisis__crisis_ID=crisisItem.crisis_ID)
+    else:
+        curAgencies = []
+
+    print("open")
+    print(crisisItem.crisis_status)
+    print("closed")
+
     context = {
         'planItem': planItem,
         'profilePicture': profilePicture,
@@ -641,7 +650,8 @@ def report(request, plan_id):
         'allAccounts': allAccounts,
         'submittedUsers': submittedUsers,
         'crisisItem': crisisItem,
-        'planID': planItem.plan_ID,
+        'plan_ID': planItem.plan_ID,
+        'curAgencies': serializers.serialize('json', curAgencies),
         'allSubCrisis': allSubCrisis,
         'crisisID': json.dumps(crisisItem.crisis_ID),
         'curName': json.dumps(curUser),
@@ -657,6 +667,8 @@ def report(request, plan_id):
         'toDisplay': toDisplay,
         'planID': json.dumps(planItem.plan_ID),
         'myAgencies': serializers.serialize('json', myAgencies),
+        'crisisStatus': json.dumps(crisisItem.crisis_status),
+        'crisis_ID': crisisItem.crisis_status,
     }
     return HttpResponse(template.render(context, request))
 

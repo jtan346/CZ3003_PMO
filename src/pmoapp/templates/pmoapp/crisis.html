@@ -792,6 +792,8 @@
 
 		initialpushs();
 
+		var crisisStatus = {{ crisisStatus|safe }};
+
 		function initialpushs() {
 			for(var i = 0; i < approvedAgencies.length; i++) {
 
@@ -804,8 +806,13 @@
 					newdiv.id = approvedAgencies[i].pk;
 
 				  var newdiv1 = document.createElement('div');
-				  newdiv1.innerHTML = "<button type='button' class='btn btn-default removeButton' id='agencyRemove1' onClick='removeInput(&quot;" + approvedAgencies[i].pk + "&quot;);'><i class='fa fa-minus'></i></button>";
+				  if(crisisStatus != 'Resolved') {
+				        newdiv1.innerHTML = "<button type='button' class='btn btn-default removeButton' id='agencyRemove1' onClick='removeInput(&quot;" + approvedAgencies[i].pk + "&quot;);'><i class='fa fa-minus'></i></button>";
+					}
+					else {
+						newdiv1.innerHTML = "<button disabled type='button' class='btn btn-default removeButton' id='agencyRemove1' onClick='removeInput(&quot;" + approvedAgencies[i].pk + "&quot;);'><i class='fa fa-minus'></i></button>";
 
+					}
 				  var newdiv2 = document.createElement("label");
 				  newdiv2.className = "col-form-label col-md-1 text-right mr-3 ml-5";
 				  newdiv2.innerHTML = "Agency:";
