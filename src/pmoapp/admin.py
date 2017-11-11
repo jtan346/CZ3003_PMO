@@ -51,7 +51,7 @@ class ExternalAgencyAdmin(admin.ModelAdmin):
 
 class ApproveAgencyAdmin(admin.ModelAdmin):
     Model = ApproveAgency
-    list_display = ('crisis', 'agency', 'approve_text')
+    list_display = ('crisis', 'agency')
     def agency(self, obj):
         return obj.approve_agency.agency_abbrev
     def crisis(self, obj):

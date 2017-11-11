@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -32,37 +32,52 @@
             transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
         }
     </style>
-</head>
-<body class="bg-dark">
-<div class="container">
-    <div class="card card-login mx-auto mt-5" style="max-width: 25rem;">
-        <div class="card-header">
-            PMOSIMS Login
-        </div>
-        <div class="card-body">
-            <form method="post">
-                {%csrf_token %}
-                <div class="form-group">
-                    <label>Username</label>
-                    <div>{{form.username}}</div>
+
+  </head>
+    <body class="bg-dark">
+        <div class="container">
+            <div class="card card-login mx-auto mt-5" style="max-width: 25rem;">
+                <div class="card-header">
+                    PMOSIMS Logout
                 </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <div>{{form.password}}</div>
+                <div class="card-body">
+                    Thank you for using PMOSIMS. Have a nice day.<br>
+                    Redirecting to login page in <span class="c" id="5"></span>
+                    <meta http-equiv="refresh" content="5;url=/logout/">
                 </div>
-                <button class="btn btn-primary btn-block" type="submit">Login</button>
-            </form>
-            <!--<div class="text-center">-->
-            <!--<a class="d-block small" href="forgot-password.html">Forgot Password?</a>-->
-            <!--</div>-->
+            </div>
         </div>
-            {% if form.errors %}
-            {{ form.non_field_errors }} <!-- display the form errors if they exist -->
-            {% endif %}
-    </div>
-</div>
-<script src="/static/vendor/jquery/jquery.min.js"></script>
-<script src="/static/vendor/popper/popper.min.js"></script>
-<script src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
-</body>
+    <script src="/static/vendor/jquery/jquery.min.js"></script>
+    <script src="/static/vendor/popper/popper.min.js"></script>
+    <script src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
+  </body>
+  <script>
+function c()
+{
+    var n=$('.c').attr('id');
+    var c=n;
+    $('.c').text(c);
+    setInterval(function()
+    {
+        c--;
+        if(c>=0)
+        {
+            $('.c').text(c);
+        }
+        if(c==0)
+        {
+            $('.c').text(n);
+        }
+    },1000);
+}
+
+// Start
+c();
+
+// Loop
+setInterval(function()
+{
+    c();
+},5000);
+</script>
 </html>

@@ -128,7 +128,8 @@ class Plan(models.Model):
 class ApproveAgency(models.Model):
     approve_agency = models.ForeignKey(ExternalAgency, on_delete=models.CASCADE)
     approve_crisis = models.ForeignKey(Crisis, on_delete=models.CASCADE)
-    approve_text = models.CharField(max_length=50)
+    approve_approver = models.ForeignKey(Account, on_delete=models.CASCADE)
+    #approve_text = models.CharField(max_length=50)
     class Meta: #For naming convention in django/admin
         verbose_name_plural = "Agency Approval"
 

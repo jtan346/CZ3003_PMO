@@ -1,6 +1,5 @@
 var app = angular.module('chatApp', ['firebase']);
 //Only for PMO - CMO
-
 app.controller('ChatController', function($scope, $firebaseArray) {
 	
 	var d = new Date();

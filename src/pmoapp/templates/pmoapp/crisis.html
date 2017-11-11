@@ -610,12 +610,12 @@
 		</div>
 
         </div>
-			<div class="card mb-1 col-md-3" ng-controller="ChatController" style="padding-left:0px; padding-right:0px; margin-left:5px; -ms-flex:0 0 25%;flex:0 0 25%;max-width:calc(25% - 5px);">
+			<div class="card mb-1 col-md-3" ng-controller="ChatController" id="myDiv" style="padding-left:0px; padding-right:0px; margin-left:5px; -ms-flex:0 0 25%;flex:0 0 25%;max-width:calc(25% - 5px);">
 				  <div class="card-header">
 					<!--<i class="fa fa-comments-o"></i>-->
 					CMO Messenger - Crisis ID: {{crisisItem.crisis_ID}}
 				  </div>
-				  <div class="card-body"  style="overflow-x: hidden; overflow-y:scroll; min-height:60vh; max-height:64vh;">
+				  <div class="card-body" style="overflow-x: hidden; overflow-y:scroll; min-height:60vh; max-height:64vh;">
 					<!--<p ng-repeat="m in messages">{{ m.messages }}- </p>-->
 					  <div>
 					  <p ng-repeat="m in fbmessages"> {% verbatim %}{{m.date | date:'short'}} - {{m.sender}}: <br> {{m.message}}{% endverbatim %}</p>
@@ -623,17 +623,17 @@
 					</div>
 				  </div>
 				<div class="form-row">
-						<div class="form-group col-md-9" style="margin-left:5px; max-width:calc(75% - 5px); padding-top:5px;">
-							<input type="text" id = "txtFBMsgs" class="form-control" placeholder="Message here..." ng-model="messageText" onkeydown = "if (event.keyCode == 13) document.getElementById('sendBtn').click()">
-						</div>
-						<div class="form-group col-md-3" style="max-width:calc(25% - 5px);" >
-							<button type="submit" class="btn btn-primary btn-block" id="sendBtn" ng-click="send()">Send</button>
-						</div>
+					<div class="form-group col-md-9" style="margin-left:5px; max-width:calc(75% - 5px); padding-top:5px;">
+						<input type="text" id = "txtFBMsgs" class="form-control" placeholder="Message here..." ng-model="messageText" onkeydown = "if (event.keyCode == 13) document.getElementById('sendBtn').click()">
+					</div>
+					<div class="form-group col-md-3" style="max-width:calc(25% - 5px);" >
+						<button type="submit" class="btn btn-primary btn-block" id="sendBtn" ng-click="send()">Send</button>
 					</div>
 				</div>
+			</div>
       </div>
-      <!-- /.container-fluid -->
-</div>
+	      <!-- /.container-fluid -->
+	</div>
     </div>
     <!-- /.content-wrapper -->
 
@@ -665,7 +665,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            <a class="btn btn-primary" href="../../logout">Logout</a>
+            <a class="btn btn-primary" href="../../logout2">Logout</a>
           </div>
         </div>
       </div>
@@ -746,8 +746,16 @@
 		//Get all unapproved agencies
 
 		//Fake data:
-		var currentApprovals = ["SGS", "MAS"];
+		//var currentApprovals = ["SGS", "MAS"]
+		var currentApprovals = [];
+		var recApprovals = {{ curAgencies|safe }}
+		if(recApprovals.length>0){
+			for(var i = 0; i < recApprovals.length; i++) {
+				currentApprovals.push(recApprovals[i].fields['approve_agency']);
+			}
+		}
 
+		console.log("HELLO",currentApprovals);
 
 		var naAgencies = [];
 
@@ -755,6 +763,7 @@
 			var found = false;
 			//for(var j = 0; j < myApprovedAgencies.length; j++) {
 				//if(myAgencies[i].pk == myApprovedAgencies[j].pk) {
+
 			for (var j = 0; j < currentApprovals.length; j++) {
 				//console.log(myAgencies[i].pk, currentApprovals[j]);
 				if(myAgencies[i].pk == currentApprovals[j]) {
@@ -1099,6 +1108,7 @@
 							'accType': accountType,
 							'commentTxt': MDEFtxt,
 							'hasComment': MDEFhasComment,
+							'myApprovals[]': currentApprovals,
 							csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
 						};
 
@@ -1130,6 +1140,7 @@
 							'accType': accountType,
 							'commentTxt': MOHAtxt,
 							'hasComment': MOHAhasComment,
+							'myApprovals[]': currentApprovals,
 							csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
 						},
 						success: function (msg) {
@@ -1146,7 +1157,12 @@
 				if(accountType == "MOFA"){
 					var MOFAtxt = $('#txtMOFA').val();
 					if(MOFAtxt == "" || MOFAtxt === undefined) { MOFAhasComment = "False";} else MOFAhasComment = "True";
-
+					/*ref = firebase.database().ref().child('2').child('CMO-PMO');
+					channel = 2;
+					$("#myDiv").load(location.href+" #myDiv>*","");
+					initChat();
+					console.log("here");
+					console.log(ref);*/
 					$.ajax({
 						type: 'POST', //GET, POST, PUT or DELETE
 						url: '/saveComments/', //Rename! Location of the service
@@ -1155,6 +1171,7 @@
 							'accType': accountType,
 							'commentTxt': MOFAtxt,
 							'hasComment': MOFAhasComment,
+							'myApprovals[]': currentApprovals,
 							csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
 						},
 						success: function (msg) {
@@ -1180,6 +1197,7 @@
 							'accType': accountType,
 							'commentTxt': DPMtxt,
 							'hasComment': DPMhasComment,
+							'myApprovals[]': currentApprovals,
 							csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
 						},
 						success: function (msg) {
@@ -1308,7 +1326,7 @@
 
 	  </script>
   <script>
-
+		
         !function(a){"use strict";a('.navbar-sidenav [data-toggle="tooltip"]').tooltip({template:'<div class="tooltip navbar-sidenav-tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'}),a("#sidenavToggler").click(function(e){e.preventDefault(),a("body").toggleClass("sidenav-toggled"),a(".navbar-sidenav .nav-link-collapse").addClass("collapsed"),a(".navbar-sidenav .sidenav-second-level, .navbar-sidenav .sidenav-third-level").removeClass("show")}),a(".navbar-sidenav .nav-link-collapse").click(function(e){e.preventDefault(),a("body").removeClass("sidenav-toggled")}),a("body.fixed-nav .navbar-sidenav, body.fixed-nav .sidenav-toggler, body.fixed-nav .navbar-collapse").on("mousewheel DOMMouseScroll",function(a){var e=a.originalEvent,t=e.wheelDelta||-e.detail;this.scrollTop+=30*(t<0?1:-1),a.preventDefault()}),a(document).scroll(function(){a(this).scrollTop()>100?a(".scroll-to-top").fadeIn():a(".scroll-to-top").fadeOut()}),a('[data-toggle="tooltip"]').tooltip(),a(document).on("click","a.scroll-to-top",function(e){var t=a(this);a("html, body").stop().animate({scrollTop:a(t.attr("href")).offset().top},1e3,"easeInOutExpo"),e.preventDefault()}),a(document).ready(function(){a("#dataTable").DataTable()})}(jQuery), Chart.defaults.global.defaultFontFamily='-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif',Chart.defaults.global.defaultFontColor="#292b2c",
         ctx=document.getElementById("myAreaChart"),
         myLineChart = new Chart(ctx,{type:"line",

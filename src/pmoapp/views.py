@@ -7,7 +7,7 @@ from django.views.generic.list import ListView
 from .models import *
 from datetime import datetime
 from django.core import serializers
-import requests
+#import requests
 import json
 from rest_framework import permissions, viewsets
 from .serializer import PlanSerializer,EvalPlanSerializer,TestSerializer ,CMOSerializer
@@ -281,6 +281,12 @@ def MyCMOApi():
 def login(request):
     return render(request, 'pmoapp/login.html', {})
 
+def logout(request):
+    return render(request, 'pmoapp/logout.html', {})
+
+def otplogout(request):
+    return render(request, 'pmoapp/otplogout.html', {})
+
 def otp(request):
     subject = 'OTP'
     from_email = settings.EMAIL_HOST_USER
@@ -316,19 +322,19 @@ def otpAuthentication(request):
 def login_check(session):
     if 'Loggedin' in session:
         if session['Loggedin'] == True:
-            print("User logged in")
+            #print("User logged in")
             return True
         else:
-            print("User not logged in")
+            #print("User not logged in")
             return False
     else:
-        print("Session not found")
+        #print("Session not found")
         return False
 
 #@user_passes_test(otp_check(requests), login_url='/authotp/')
 def home(request):
     if not login_check(request.session):
-        return redirect('/logout')
+        return redirect('/otplogout')
     MyCMOApi()
     template = loader.get_template('pmoapp/home.html')
 #Process Account/Session
@@ -344,7 +350,7 @@ def home(request):
         salutation = "Ms."
 
     curUser = salutation + " " + request.user.last_name +" "+ request.user.first_name
-    print(curUser)
+    #print(curUser)
 
 #NOTE: WHEN TO PULL FROM CMO: ON EVERY PAGE LOAD, BECAUSE NOTIFICATION COME, CLICKING IT WILL REFRESH A PAGE!
 
@@ -378,7 +384,7 @@ def home(request):
 
 def history(request):
     if not login_check(request.session):
-        return redirect('/logout')
+        return redirect('/otplogout')
 
     template = loader.get_template('pmoapp/history.html')
 
@@ -435,6 +441,7 @@ def history(request):
         'ongoingCrisis': ongoingCrisisList,
         'updateTime': updateTime,
         'allCrisis': allCrisis,
+        'accountType':accountType,
         'curUser': curUser,
         'profilePicture': profilePicture,
     }
@@ -442,7 +449,7 @@ def history(request):
 
 def crisis(request, crisis_id):
     if not login_check(request.session):
-        return redirect('/logout')
+        return redirect('/otplogout')
 
     template = loader.get_template('pmoapp/crisis.html')
     updateTime = datetime.now()
@@ -521,8 +528,20 @@ def crisis(request, crisis_id):
 
     myAgencies = ExternalAgency.objects.filter(agency_approver__user_type=curUserType)
 
+    if(ApproveAgency.objects.filter(approve_approver__user_type=curUserType, approve_crisis__crisis_ID=crisis_id)):
+        curAgencies = ApproveAgency.objects.filter(approve_approver__user_type=curUserType, approve_crisis__crisis_ID=crisis_id)
+    else:
+        curAgencies = []
+
+    # print("open")
+    # print(crisis_id)
+    # print(curUserType)
+    # print(curAgencies)
+    # print("close")
+
     context = {
         'planItem': planItem,
+        'curAgencies': serializers.serialize('json', curAgencies),
         'profilePicture': profilePicture,
         'decisionTable': decisionTable,
         'ongoingCrisis': crisisList,
@@ -552,7 +571,7 @@ def crisis(request, crisis_id):
 
 def report(request, plan_id):
     if not login_check(request.session):
-        return redirect('/logout')
+        return redirect('/otplogout')
 
     template = loader.get_template('pmoapp/report.html')
     updateTime = datetime.now()
@@ -675,6 +694,8 @@ def sendReport(request):
         print(concatComments)
         print(reportStatus)
 
+
+
         #Change the status of report to pending cmo fortesting
         if(reportStatus == True):
             Plan.objects.filter(plan_ID=curPlanID).update(plan_status="Approved")
@@ -694,12 +715,33 @@ def saveComment(request):
         getHasComment = request.POST['hasComment']
         getMyApprovals = request.POST.getlist('myApprovals[]')
 
-        print(getMyApprovals)
-
         curAccount = Account.objects.filter(user_type=getAccType).get()
         curPlan = Plan.objects.filter(plan_ID=getPlanID).get()
         eval_entry = EvalPlan(eval_planID=curPlan, eval_userID=curAccount, eval_text=getCommentTxt, eval_hasComment=getHasComment)
         testDuplicate = EvalPlan.objects.filter(eval_planID__plan_ID=getPlanID, eval_userID__user_type=getAccType)
+
+        crisis_id = curPlan.plan_crisisID
+        curCrisis = Crisis.objects.filter(crisis_ID=crisis_id).get()
+
+        curAgencies = []
+        if (ApproveAgency.objects.filter(approve_approver__user_type=getAccType, approve_crisis__crisis_ID=crisis_id)):
+            curAgencies = ApproveAgency.objects.filter(approve_approver__user_type=getAccType, approve_crisis__crisis_ID=crisis_id)
+            for item in curAgencies:
+                item.delete()
+
+        for agency in getMyApprovals:
+            theagency = ExternalAgency.objects.filter(agency_abbrev=agency).get()
+            newAgency = ApproveAgency(approve_approver=curAccount,approve_agency=theagency,approve_crisis=curCrisis)
+            newAgency.save()
+
+        print("open")
+        print(curAgencies)
+
+        testmyinserts = ApproveAgency.objects.filter(approve_approver__user_type=getAccType, approve_crisis__crisis_ID=crisis_id)
+        for item in testmyinserts:
+            print(item.approve_agency)
+
+        print("close")
 
         if not testDuplicate:
             eval_entry.save()
@@ -834,7 +876,7 @@ def updateNotiCount(request):
 
 def newsfeed(request):
     if not login_check(request.session):
-        return redirect('/logout')
+        return redirect('/otplogout')
     template=loader.get_template('pmoapp/newsfeed.html')
 
     updateTime = datetime.now()

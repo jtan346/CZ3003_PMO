@@ -22,6 +22,8 @@ urlpatterns = [ #pylint: disable=invalid-name
     url(r'^$', auth_views.login, {'template_name': 'pmoapp/login.html'}, name='login'),
     url(r'^login/$', auth_views.login, {'template_name': 'pmoapp/login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, name='logout'),
+    url(r'^logout2/$', logout, name='logout2'),
+    url(r'^otplogout', otplogout, name='otplogout'),
     url(r'^authotp/$', otp, name='otp'),
     url(r'^otpAuthentication/$', otpAuthentication, name='otpAuthentication'),
     url(r'^resendOTP/$', resendOTP, name='resendOTP'),
