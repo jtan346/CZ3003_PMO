@@ -187,16 +187,22 @@
             Live News Feed
           </div>
           <div class="card-body">
-            <div class="row">
-              <div class="col-sm-8 my-auto">
+				<div class="row">
+					<label for="liveNewsLinktxt" class="col-form-label ml-2" id="liveNewsLinkLabel">URL:</label>
+					<div class="form-group col-md-10">
+					  <input type="text" class="form-control" id="liveNewsLinktxt">
+					</div>
+					<div>
+						<button type="button" class="btn btn-default" id="updateURL" onClick="updateLink();">Set URL</button>
+					</div>
+				</div>
+                <div class="row" id="dynamicVideo">
+					<div class="embed-responsive embed-responsive-16by9" id="dynamicVideoUrl">
+						<iframe class="embed-responsive-item"  id="liveNews" src="https://www.youtube.com/embed/B50QaZqVu08" frameborder="0" allowfullscreen></iframe>
+					</div>
 
-                <div class="embed-responsive embed-responsive-16by9" >
-                  <iframe width="1903" height="764" src="https://www.youtube.com/embed/B50QaZqVu08" frameborder="0" allowfullscreen></iframe>
-                  <!--<iframe class="embed-responsive-item"  id="liveNews" src="https://youtube.com/embed/PfZ46V3ucDE?autoplay=1" frameborder="0" allowfullscreen></iframe>-->
                 </div>
               </div>
-            </div>
-          </div>
         </div>
         <!-- /Card Columns -->
 
@@ -310,6 +316,35 @@
                 }
             });
         }
+
+        function updateLink(){
+
+          //delete current video displayed
+          var element = document.getElementById("dynamicVideoUrl");
+          element.outerHTML = "";
+          delete element;
+
+
+          //convert youtube link to embed
+
+          var youTubeUrl = document.getElementById("liveNewsLinktxt").value;
+          var youTubeId;
+          var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+          var match = youTubeUrl.match(regExp);
+          if (match && match[2].length == 11) {
+             youTubeId = match[2];
+          }
+
+          //add video to website
+          var newdiv1 = document.createElement('div');
+          newdiv1.className = "embed-responsive embed-responsive-16by9";
+          newdiv1.id = "dynamicVideoUrl";
+          newdiv1.innerHTML = "<iframe class='embed-responsive-item'  id='liveNews' src='https://www.youtube.com/embed/" + youTubeId + "?autoplay=1' frameborder='0' allowfullscreen></iframe>";
+          document.getElementById("dynamicVideo").appendChild(newdiv1);
+
+          document.getElementById("liveNewsLinktxt").value = "";
+      }
+
 
     </script>
 
