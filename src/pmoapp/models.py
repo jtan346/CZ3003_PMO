@@ -2,6 +2,7 @@
 
 from django.db import models
 from django.core.validators import *
+import datetime
 from django.contrib.auth.models import User
 
 class Account(models.Model):
@@ -84,7 +85,7 @@ class CrisisUpdates(models.Model): #EF Updates
     #     validators=[MinValueValidator(0)]
     # )  # In Metres: 1,234
     updates_curSAF = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
-    updates_curCD = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
+    updates_curSPF = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
     updates_curSCDF = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
     updates_description = models.TextField(null=True, blank=True)
 
@@ -112,13 +113,13 @@ class Plan(models.Model):
     #     validators=[MinValueValidator(0)]
     # )  # In Metres: 1,234
     plan_projCasualtyRate = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
-    plan_projResolutionTime = models.DateTimeField()
+    plan_projResolutionTime = models.DurationField(default=datetime.timedelta, null=True, blank=True)
     #plan_projETAResolution = models.DecimalField(max_digits=4, decimal_places=1)  # In hours: 0.5
     plan_SAFRecommended = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
-    plan_CDRecommended = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
+    plan_SPFRecommended = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
     plan_SCDFRecommended = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
     plan_SAFMaximum = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
-    plan_CDMaximum = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
+    plan_SPFMaximum = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
     plan_SCDFMaximum = models.DecimalField(max_digits=4, decimal_places=1)  # Default: 0.0, min; 0.0, max: 100.0
 
     def __str__(self):
@@ -145,7 +146,7 @@ class testmyfuckingapi(models.Model):
     PlanStatus = models.CharField(max_length=500, null=True, blank=True)
 
 class Notifications(models.Model):
-    PlanNum = models.IntegerField(primary_key=True) #Autoincrement
+    PlanNum = models.IntegerField() #Autoincrement
     PlanID = models.IntegerField()
     CrisisID = models.IntegerField()
     CrisisTitle = models.CharField(max_length=500, null=True, blank=True)

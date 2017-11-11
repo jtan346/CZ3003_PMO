@@ -52,3 +52,7 @@ urlpatterns = [ #pylint: disable=invalid-name
     #url(r'^admin/', admin.site.urls),
 
 ]
+
+#pseudo startup-class
+startupInits()
+

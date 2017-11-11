@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -32,17 +32,16 @@
             transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
         }
     </style>
-
-  </head>
-    <body class="bg-dark">
-        <div class="container">
-            <div class="card card-login mx-auto mt-5" style="max-width: 25rem;">
-            <div class="card-header">
-              PMOSIMS Login
-            </div>
-            <div class="card-body">
+</head>
+<body class="bg-dark">
+<div class="container">
+    <div class="card card-login mx-auto mt-5" style="max-width: 25rem;">
+        <div class="card-header">
+            PMOSIMS Login
+        </div>
+        <div class="card-body">
             <form method="post">
-                 {%csrf_token %}
+                {%csrf_token %}
                 <div class="form-group">
                     <label>Username</label>
                     <div>{{form.username}}</div>
@@ -51,16 +50,16 @@
                     <label>Password</label>
                     <div>{{form.password}}</div>
                 </div>
-                 <button class="btn btn-primary btn-block" type="submit">Login</button>
+                <button class="btn btn-primary btn-block" type="submit">Login</button>
             </form>
-                <!--<div class="text-center">-->
-                <!--<a class="d-block small" href="forgot-password.html">Forgot Password?</a>-->
-              <!--</div>-->
+            <!--<div class="text-center">-->
+            <!--<a class="d-block small" href="forgot-password.html">Forgot Password?</a>-->
+            <!--</div>-->
         </div>
-            </div>
-        </div>
-    <script src="/static/vendor/jquery/jquery.min.js"></script>
-    <script src="/static/vendor/popper/popper.min.js"></script>
-    <script src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
-  </body>
+    </div>
+</div>
+<script src="/static/vendor/jquery/jquery.min.js"></script>
+<script src="/static/vendor/popper/popper.min.js"></script>
+<script src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
+</body>
 </html>

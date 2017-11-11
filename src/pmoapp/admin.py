@@ -22,7 +22,7 @@ class AccountAdmin(admin.ModelAdmin):
 
 class UpdateAdmin(admin.ModelAdmin):
     model = CrisisUpdates
-    list_display = ('get_crisisID', 'updates_curInjuries', 'updates_curDeaths', 'updates_curSAF', 'updates_curSCDF', 'updates_curCD')
+    list_display = ('get_crisisID', 'updates_curInjuries', 'updates_curDeaths', 'updates_curSAF', 'updates_curSCDF', 'updates_curSPF')
     def get_crisisID(self, obj):
         return obj.updates_crisisID
     get_crisisID.admin_order_field = 'crisis'  # Allows column order sorting
@@ -34,8 +34,8 @@ class SubCrisisAdmin(admin.ModelAdmin):
 
 class PlanAdmin(admin.ModelAdmin):
     Model = Plan
-    list_display = ('plan_num', 'plan_ID', 'get_crisisID', 'plan_status', 'plan_projResolutionTime', 'plan_projCasualtyRate', 'plan_SAFRecommended', 'plan_CDRecommended', 'plan_SCDFRecommended',
-                    'plan_SAFMaximum', 'plan_CDMaximum', 'plan_SCDFMaximum')
+    list_display = ('plan_num', 'plan_ID', 'get_crisisID', 'plan_status', 'plan_projResolutionTime', 'plan_projCasualtyRate', 'plan_SAFRecommended', 'plan_SPFRecommended', 'plan_SCDFRecommended',
+                    'plan_SAFMaximum', 'plan_SPFMaximum', 'plan_SCDFMaximum')
     def get_crisisID(self, obj):
         return obj.plan_crisisID
     get_crisisID.admin_order_field = 'plan_crisisID'  # Allows column order sorting

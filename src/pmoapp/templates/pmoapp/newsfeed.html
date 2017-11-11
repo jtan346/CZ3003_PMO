@@ -2,27 +2,27 @@
 {% load staticfiles %}
 <html lang="en">
 
-  <head>
+<head>
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <title>PMOSIMS</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>PMOSIMS</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap core CSS -->
+  <link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Custom fonts for this template -->
-    <link href="/static/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <!-- Custom fonts for this template -->
+  <link href="/static/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
-    <!-- Plugin CSS -->
-    <link href="/static/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+  <!-- Plugin CSS -->
+  <link href="/static/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
 
-    <!-- Custom styles for this template -->
-    <link href="/static/vendor/css/sb-admin.css" rel="stylesheet">
-      <style>
+  <!-- Custom styles for this template -->
+  <link href="/static/vendor/css/sb-admin.css" rel="stylesheet">
+  <style>
   #profilePic {
 	margin:10px;
     border-radius: 35%;
@@ -36,242 +36,238 @@
 	}
 </style>
 
-  </head>
+</head>
 
-  <body class="fixed-nav sticky-footer bg-dark" id="page-top">
+<body class="fixed-nav sticky-footer bg-dark" id="page-top">
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
-      <a class="navbar-brand" href="../home">PMOSIMS</a>
-      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarResponsive">
-        <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-            <li>
-                <div class="article-container" style="color:#ffffff; height:120px;">
-                  <div class="article">
-                        <img src="{% static profilePicture %}"  id ="profilePic" alt = "image" width="100px" height="100px"/>
-                  </div>
-                  <div class="article" style="width:118px; padding-top:20px;">
-                        Welcome,<br/>{{accountType}} {{curUser}}
-                  </div>
-                </div>
-          </li>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+  <a class="navbar-brand" href="../home">PMOSIMS</a>
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarResponsive">
+    <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+      <li>
+        <div class="article-container" style="color:#ffffff; height:120px;">
+          <div class="article">
+            <img src="{% static profilePicture %}"  id ="profilePic" alt = "image" width="100px" height="100px"/>
+          </div>
+          <div class="article" style="width:118px; padding-top:20px;">
+            Welcome,<br/>{{accountType}} {{curUser}}
+          </div>
+        </div>
+      </li>
 
-             <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Home">
-            <a class="nav-link" href="../home">
-              <i class="fa fa-fw fa-home"></i>
-              <span class="nav-link-text">
+      <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Home">
+        <a class="nav-link" href="../home">
+          <i class="fa fa-fw fa-home"></i>
+          <span class="nav-link-text">
                 Home</span>
-            </a>
-          </li>
-          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Current Crisis">
-            <a class="nav-link nav-link-collapse" data-toggle="collapse" href="#collapseComponents" data-parent="#exampleAccordion">
-              <i class="fa fa-fw fa-list"></i>
-              <span class="nav-link-text">
+        </a>
+      </li>
+      <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Current Crisis">
+        <a class="nav-link nav-link-collapse" data-toggle="collapse" href="#collapseComponents" data-parent="#exampleAccordion">
+          <i class="fa fa-fw fa-list"></i>
+          <span class="nav-link-text">
                 Current Crisis Reports</span>
-            </a>
-			<!--<ul class="sidenav-second-level collapse" id="collapseComponents">-->
-			<ul class="sidenav-second-level collapse" id="collapseComponents">
+        </a>
+        <!--<ul class="sidenav-second-level collapse" id="collapseComponents">-->
+        <ul class="sidenav-second-level collapse" id="collapseComponents">
 
-			  <!--<li class="currentCrisisItem active">-->
-			 {% if toDisplay %}
-                    {% for plan in toDisplay %}
-                        {% for crisis in ongoingCrisis %}
-                            {% if crisis.crisis_ID == plan.plan_crisisID %}
-                                <li>
-                                    <a href="../report/{{ plan.plan_ID }}">Crisis {{ plan.plan_crisisID }}: {{ crisis.crisis_name|truncatechars:15 }}</a>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                    {% endfor %}
-                {% else %}
-                    <li>
-                        <p>No Ongoing Crisis</p>
-                    </li>
-                {% endif %}
-            </ul>
-          </li>
+          <!--<li class="currentCrisisItem active">-->
+          {% if ongoingCrisis %}
+			{% for crisis in ongoingCrisis %}
+			<li>
+				<a href="../crisis/{{ crisis.crisis_ID }}">Crisis {{ crisis.crisis_ID }}: {{ crisis.crisis_name|truncatechars:15 }}</a>
+			</li>
+			{% endfor %}
+			{% else %}
+			<li>
+				<a>No Ongoing Crisis</a>
+			</li>
+          {% endif %}
+        </ul>
+      </li>
 
-          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Past Reports">
-            <a class="nav-link" href="../history">
-              <i class="fa fa-fw fa-history"></i>
-              <span class="nav-link-text">
+      <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Past Reports">
+        <a class="nav-link" href="../history">
+          <i class="fa fa-fw fa-history"></i>
+          <span class="nav-link-text">
                 Past Reports</span>
-            </a>
-          </li>
-          <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Live News Feed">
-            <a class="nav-link" href="../newsfeed">
-              <i class="fa fa-fw fa-feed"></i>
-              <span class="nav-link-text">
+        </a>
+      </li>
+      <li class="nav-item active" data-toggle="tooltip" data-placement="right" title="Live News Feed">
+        <a class="nav-link" href="../newsfeed">
+          <i class="fa fa-fw fa-feed"></i>
+          <span class="nav-link-text">
                 Live News Feed</span>
-            </a>
-          </li>
-          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live News Feed">
-            <a class="nav-link" href="#">
-              <i class="fa fa-fw fa-feed"></i>
-              <span class="nav-link-text">
+        </a>
+      </li>
+      <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live News Feed">
+        <a class="nav-link" href="#">
+          <i class="fa fa-fw fa-feed"></i>
+          <span class="nav-link-text">
                 CMO Public Broadcast</span>
-            </a>
-          </li>
+        </a>
+      </li>
 
-        </ul>
-        <ul class="navbar-nav sidenav-toggler">
-          <li class="nav-item">
-            <a class="nav-link text-center" id="sidenavToggler">
-              <i class="fa fa-fw fa-angle-left"></i>
-            </a>
-          </li>
-        </ul>
+    </ul>
+    <ul class="navbar-nav sidenav-toggler">
+      <li class="nav-item">
+        <a class="nav-link text-center" id="sidenavToggler">
+          <i class="fa fa-fw fa-angle-left"></i>
+        </a>
+      </li>
+    </ul>
 
-        <!-- End of Sidebar -->
+    <!-- End of Sidebar -->
 
-        <ul class="navbar-nav ml-auto">
-			<li class="nav-item dropdown" id="alertBellNotification">
-					<a class="nav-link dropdown-toggle mr-lg-2" href="" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="updateNotiCount()">
-					  <i class="fa fa-fw fa-bell"></i>
-					  <span class="d-lg-none">Alerts
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item dropdown" id="alertBellNotification">
+        <a class="nav-link dropdown-toggle mr-lg-2" href="" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="updateNotiCount()">
+          <i class="fa fa-fw fa-bell"></i>
+          <span class="d-lg-none">Alerts
 						<span class="badge badge-pill badge-warning">0 New</span>
 					  </span>
-					  <span class="new-indicator text-warning d-none d-lg-block">
+          <span class="new-indicator text-warning d-none d-lg-block">
 						{% if object_list|length > 0 %}
                             <i class="fa fa-fw fa-circle"></i>
                             <span class="number">{{ object_list|length }}</span>
                           {% endif %}
 					  </span>
-					</a>
-					<div class="dropdown-menu" aria-labelledby="alertsDropdown">
-					  <h6 class="dropdown-header">Recent Notifications:</h6>
+        </a>
+        <div class="dropdown-menu" aria-labelledby="alertsDropdown">
+          <h6 class="dropdown-header">Recent Notifications:</h6>
 
-					 <!-- <div class="dropdown-divider"></div>
-					  <a class="dropdown-item" href="Orchard Road.html">
-						<span class="text-success">
-						  <strong>Crisis Over</strong>
-						</span>
-						<span class="small float-right text-muted">11:21 AM</span>
-						<div class="dropdown-message small">Resolved: Bombing Incident at Orchard Road</div>
-					  </a>-->
+          <!-- <div class="dropdown-divider"></div>
+		   <a class="dropdown-item" href="Orchard Road.html">
+			 <span class="text-success">
+			   <strong>Crisis Over</strong>
+			 </span>
+			 <span class="small float-right text-muted">11:21 AM</span>
+			 <div class="dropdown-message small">Resolved: Bombing Incident at Orchard Road</div>
+		   </a>-->
 
-					  <div class="dropdown-divider"></div>
-					  <a class="dropdown-item small" href="">
-						Last Updated: {% now "M. j, Y, h:i a" %}
-					  </a>
-					</div>
-			</li>
-          <li class="nav-item" id="logoutBtn">
-            <a class="nav-link" data-toggle="modal" data-target="#exampleModal">
-              <i class="fa fa-fw fa-sign-out"></i>
-              Logout</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item small" href="">
+            Last Updated: {% now "M. j, Y, h:i a" %}
+          </a>
+        </div>
+      </li>
+      <li class="nav-item" id="logoutBtn">
+        <a class="nav-link" data-toggle="modal" data-target="#exampleModal">
+          <i class="fa fa-fw fa-sign-out"></i>
+          Logout</a>
+      </li>
+    </ul>
+  </div>
+</nav>
 
-    <div class="content-wrapper">
+<div class="content-wrapper">
 
-      <div class="container-fluid">
+  <div class="container-fluid">
 
-        <!-- Breadcrumbs -->
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item">
-            <a href="../home">Home</a>
-          </li>
-          <li class="breadcrumb-item active">Live News Feed</li>
-        </ol>
-		
-		<div class="row">
+    <!-- Breadcrumbs -->
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="../home">Home</a>
+      </li>
+      <li class="breadcrumb-item active">Live News Feed</li>
+    </ol>
 
-          <div class="col-lg-8">
+    <div class="row">
 
-            <!-- Live News Feed -->
-            <div class="card mb-3">
-              <div class="card-header">
-                <!--<i class="fa fa-newspaper-o"></i>-->
-                Live News Feed
-              </div>
-              <div class="card-body">
-                <div class="row">
-                  <div class="col-sm-8 my-auto">
-                    
-					<div class="embed-responsive embed-responsive-16by9" >
-						<iframe width="1903" height="764" src="https://www.youtube.com/embed/B50QaZqVu08" frameborder="0" allowfullscreen></iframe>
-						<!--<iframe class="embed-responsive-item"  id="liveNews" src="https://youtube.com/embed/PfZ46V3ucDE?autoplay=1" frameborder="0" allowfullscreen></iframe>-->
-					</div>
-                  </div>
+      <div class="col-lg-8">
+
+        <!-- Live News Feed -->
+        <div class="card mb-3">
+          <div class="card-header">
+            <!--<i class="fa fa-newspaper-o"></i>-->
+            Live News Feed
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-8 my-auto">
+
+                <div class="embed-responsive embed-responsive-16by9" >
+                  <iframe width="1903" height="764" src="https://www.youtube.com/embed/B50QaZqVu08" frameborder="0" allowfullscreen></iframe>
+                  <!--<iframe class="embed-responsive-item"  id="liveNews" src="https://youtube.com/embed/PfZ46V3ucDE?autoplay=1" frameborder="0" allowfullscreen></iframe>-->
                 </div>
               </div>
             </div>
-            <!-- /Card Columns -->
-
           </div>
-		<div class="col-lg-4" >
-			<div class="card mb-3">
-				<div class="card-header">
-                <i class="fa fa-fw fa-feed"></i>
-                RSS Feed
-              </div>
-				<!-- start feedwind code --> <script type="text/javascript" src="https://feed.mikle.com/js/fw-loader.js" data-fw-param="49348/"></script> <!-- end feedwind code -->
-			</div>
-		</div>
-     
         </div>
+        <!-- /Card Columns -->
 
       </div>
-      <!-- /.container-fluid -->
+      <div class="col-lg-4" >
+        <div class="card mb-3">
+          <div class="card-header">
+            <i class="fa fa-fw fa-feed"></i>
+            RSS Feed
+          </div>
+          <!-- start feedwind code --> <script type="text/javascript" src="https://feed.mikle.com/js/fw-loader.js" data-fw-param="49348/"></script> <!-- end feedwind code -->
+        </div>
+      </div>
 
     </div>
-    <!-- /.content-wrapper -->
 
-    <footer class="sticky-footer">
-      <div class="container">
-        <div class="text-center">
-          <small>PMOSIMS 2017</small>
-        </div>
+  </div>
+  <!-- /.container-fluid -->
+
+</div>
+<!-- /.content-wrapper -->
+
+<footer class="sticky-footer">
+  <div class="container">
+    <div class="text-center">
+      <small>PMOSIMS 2017</small>
+    </div>
+  </div>
+</footer>
+
+<!-- Scroll to Top Button -->
+<a class="scroll-to-top rounded" href="#page-top">
+  <i class="fa fa-angle-up"></i>
+</a>
+
+<!-- Logout Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
-    </footer>
-
-    <!-- Scroll to Top Button -->
-    <a class="scroll-to-top rounded" href="#page-top">
-      <i class="fa fa-angle-up"></i>
-    </a>
-
-    <!-- Logout Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            Select "Logout" below if you are ready to end your current session.
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            <a class="btn btn-primary" href="../logout">Logout</a>
-          </div>
-        </div>
+      <div class="modal-body">
+        Select "Logout" below if you are ready to end your current session.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <a class="btn btn-primary" href="../logout">Logout</a>
       </div>
     </div>
-	
+  </div>
+</div>
 
-    <!-- Bootstrap core JavaScript -->
-    <script src="/static/vendor/jquery/jquery.min.js"></script>
-    <script src="/static/vendor/popper/popper.min.js"></script>
-    <script src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
 
-    <!-- Plugin JavaScript -->
-    <script src="/static/vendor/jquery-easing/jquery.easing.min.js"></script>
-    <script src="/static/vendor/chart.js/Chart.min.js"></script>
-    <script src="/static/vendor/datatables/jquery.dataTables.js"></script>
-    <script src="/static/vendor/datatables/dataTables.bootstrap4.js"></script>
+<!-- Bootstrap core JavaScript -->
+<script src="/static/vendor/jquery/jquery.min.js"></script>
+<script src="/static/vendor/popper/popper.min.js"></script>
+<script src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
 
-    <!-- Custom scripts for this template -->
-    <script src="/static/vendor/js/sb-admin.min.js"></script>
-  <script type="text/javascript">
+<!-- Plugin JavaScript -->
+<script src="/static/vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="/static/vendor/chart.js/Chart.min.js"></script>
+<script src="/static/vendor/datatables/jquery.dataTables.js"></script>
+<script src="/static/vendor/datatables/dataTables.bootstrap4.js"></script>
+
+<!-- Custom scripts for this template -->
+<script src="/static/vendor/js/sb-admin.min.js"></script>
+<script type="text/javascript">
         //For Crisis Updates
         $('#alertBellNotification').load("/notificationBell");
         setInterval(function(){
@@ -317,7 +313,7 @@
 
     </script>
 
-  </body>
+</body>
 
 
 </html>

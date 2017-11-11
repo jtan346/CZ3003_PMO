@@ -1,85 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
+<head>
 
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <title>SB Admin - Start Bootstrap Template</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<title>SB Admin - Start Bootstrap Template</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<!-- Bootstrap core CSS -->
+	<link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Custom fonts for this template -->
-    <link href="/static/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<!-- Custom fonts for this template -->
+	<link href="/static/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
-    <!-- Custom styles for this template -->
-    <link href="/static/css/sb-admin.css" rel="stylesheet">
+	<!-- Custom styles for this template -->
+	<link href="/static/vendor/css/sb-admin.css" rel="stylesheet">
 
-  </head>
+</head>
 
-  <body class="bg-dark">
-   {% csrf_token %}
+<body class="bg-dark">
+{% csrf_token %}
 
-    <div class="container">
+<div class="container">
+	<div class="card card-login mx-auto mt-5">
+		<div class="card-header">
+			PMOSIMS Login
+		</div>
+		<div class="card-body">
+			<div class="text-center mt-4 mb-5">
+				<h4>Welcome, Mr. {{user.last_name}} {{user.first_name}}</h4>
+				<p>A One-Time Password (OTP) has been sent to your registered E-mail address.
+					Please enter your OTP in the space provided.</p>
+			</div>
+			<form>
+				<div class="form-group">
+					<input type="otp" class="form-control" id="otp" placeholder="Enter OTP">
+				</div>
+				<a class="btn btn-primary btn-block" id="otpBtn" onclick="otpAuth()" href="#">Login</a>
+			</form>
+			<div class="text-center">
+				<a class="d-block small mt-3"  href="/resendOTP/">Resend One-Time Password to E-Mail</a>
+			</div>
+		</div>
+	</div>
+</div>
 
-      <div class="card card-login mx-auto mt-5">
-        <div class="card-header">
-          PMOSIMS Login
-        </div>
-        <div class="card-body">
-          <div class="text-center mt-4 mb-5">
-            <h4>Welcome, Mr. {{user.last_name}} {{user.first_name}}</h4>
-            <p>A One-Time Password (OTP) has been sent to your registered E-mail address. Please enter your OTP in the space provided.</p>
-          </div>
-          <form>
-            <div class="form-group">
-              <input type="otp" class="form-control" id="otp" placeholder="Enter OTP">
-            </div>
-            <a class="btn btn-primary btn-block" id="otpBtn" onclick="otpAuth()" href="#">Login</a>
-          </form>
-          <div class="text-center">
-            <a class="d-block small mt-3"  href="/resendOTP/">Resend One-Time Password to E-Mail</a>
-          </div>
-        </div>
-      </div>
-    </div>
+<!-- Bootstrap core JavaScript -->
+<script src="/static/vendor/jquery/jquery.min.js"></script>
+<script src="/static/vendor/popper/popper.min.js"></script>
+<script src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
-    <!-- Bootstrap core JavaScript -->
-    <script src="/static/vendor/jquery/jquery.min.js"></script>
-    <script src="/static/vendor/popper/popper.min.js"></script>
-    <script src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-  </body>
+</body>
 <script>
-     function otpAuth() {
-            var otp = document.getElementById("otp").value;
-             $.ajax({
+	function otpAuth() {
+		var otp = document.getElementById("otp").value;
 
-                type: 'POST', //GET or POST or PUT or DELETE verb
+		$.ajax({
 
-                url: '/otpAuthentication/', // Location of the service
+			type: 'POST', //GET or POST or PUT or DELETE verb
 
-                data: {
-                    'otp' : otp,
-                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
-                }, //Data sent to server
-                success: function (msg) {
-                    //On Successfull service call
-                    location.href="/home"
-                },
-                error: function(msg){
-                     alert("Invalid OTP"); // <- this should run if user is not activated
-                 } // error
+			url: '/otpAuthentication/', // Location of the service
 
-
-            });
-        }
-    </script>
+			data: {
+				'otp' : otp,
+				csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+			}, //Data sent to server
+			success: function (msg) {
+				//On Successfull service call
+				location.href="/home"
+			},
+				error: function(msg){
+				alert("Invalid OTP"); // <- this should run if user is not activated
+			} // error
+		});
+	}
+</script>
 
 </html>

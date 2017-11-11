@@ -246,7 +246,7 @@
 			</li>
      
           <li class="nav-item" id="logoutBtn">
-            <a class="nav-link" data-toggle="modal" data-target="#exampleModal">
+            <a class="nav-link" data-toggle="modal" data-target="#logoutModal">
               <i class="fa fa-fw fa-sign-out"></i>
               Logout</a>
           </li>
@@ -261,7 +261,7 @@
         <!-- Breadcrumbs -->
         <ol class="breadcrumb">
           <li class="breadcrumb-item">
-            <a href="../home">Home</a>
+            <a href="../../home">Home</a>
           </li>
           <li class="breadcrumb-item active">Explosion at Changi Airport Terminal 3</li>
         </ol>
@@ -364,9 +364,9 @@
 					<div class="form-group col-md-2">
 					  <input type="text" class="form-control" id="txtReportedInjuries" value="{{ updateItem.updates_curInjuries }}" readonly>
 					</div>
-					<label for="txtCurCD" class="col-form-label col-md-3 offset-1 text-left" id="lblCurCD">Current CD Utilization:</label>
+					<label for="txtCurSPF" class="col-form-label col-md-3 offset-1 text-left" id="lblCurSPF">Current SPF Utilization:</label>
 					<div class="form-group col-md-2">
-						<input type="text" class="form-control" id="txtCurCD" value="{{ updateItem.updates_curCD }} %" readonly>
+						<input type="text" class="form-control" id="txtCurSPF" value="{{ updateItem.updates_curSPF }} %" readonly>
 					</div>
 				</div>
 
@@ -389,8 +389,7 @@
 				</div>
 			</div>
 			<h4 class="reportHeader"> Crisis Resolution Plan </h4>
-			{% if plan_id > 0 %}
-
+			{% if plan_ID > 0 %}
 				 <div class="form-row">
 					<label for="txtPlanID" class="col-form-label col-md-2">Plan ID/Status:</label>
 					<div class="form-group col-md-3">
@@ -457,13 +456,13 @@
 				</div>
 
 				<div class="form-row">
-					<label for="txtRecommendedCDDeployment" class="col-form-label col-md-3 text-left" id="lblRecommendedCDDeployment">Recommended CD Deployment:</label>
+					<label for="txtRecommendedSPFDeployment" class="col-form-label col-md-3 text-left" id="lblRecommendedSPFDeployment">Recommended SPF Deployment:</label>
 					<div class="form-group col-md-2">
-					  <input type="text" class="form-control" id="txtRecommendedCDDeployment" value="{{ planItem.plan_CDRecommended }} %" readonly>
+					  <input type="text" class="form-control" id="txtRecommendedSPFDeployment" value="{{ planItem.plan_SPFRecommended }} %" readonly>
 					</div>
-					<label for="txtMaximumCDDeployment" class="col-form-label col-md-3 offset-1 text-left" id="lblMaximumCDDeployment">Maximum CD Deployment:</label>
+					<label for="txtMaximumSPFDeployment" class="col-form-label col-md-3 offset-1 text-left" id="lblMaximumSPFDeployment">Maximum SPF Deployment:</label>
 					<div class="form-group col-md-2">
-					  <input type="text" class="form-control" id="txtMaximumCDDeployment" value="{{ planItem.plan_CDMaximum }} %" readonly>
+					  <input type="text" class="form-control" id="txtMaximumSPFDeployment" value="{{ planItem.plan_SPFMaximum }} %" readonly>
 					</div>
 				</div>
 
@@ -495,14 +494,17 @@
 								<div class="form-group" id="dynamicInput">
 
 									<div class="form-row mb-3">
+										{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
+										<button type="button" class="btn btn-default col-md-2 ml-1" id="anotherAgencyBtn" onClick="addInput('dynamicInput');" disabled>Add Agency</button>
+										{% else %}
 										<button type="button" class="btn btn-default col-md-2 ml-1" id="anotherAgencyBtn" onClick="addInput('dynamicInput');">Add Agency</button>
+										{% endif %}
 										<div class="col-md-5 pl-4" id="agencyDdl1">
 											<select id="agencyDdl" class="form-control agencyDdl" name="myInputs[]">
 											</select>
 										</div>
 									</div>
 								</div>
-
 							</div>
 						</div>
 					</div>
@@ -549,14 +551,16 @@
 							{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
 								<button disabled type="submit" class="btn btn-primary col-md-2 offset-5" id="btnSubmit">Submit Comments</button>
 							{% else %}
-								<button type="submit" class="btn btn-primary col-md-2 offset-5" id="btnSubmit">Submit Comments</button>
+					<button type="submit" class="btn btn-primary col-md-2 offset-5" id="btnSubmit"><a class="nav-link" data-toggle="modal" data-target="#afterSubmit">Submit Comments</a></button>
 							{% endif %}
 						{% endif %}
 						{%  if accountType == "PM"  %}
 							{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
 								<button disabled type="submit" class="btn btn-primary col-md-4 offset-4" id="btnPM">Submit Reviewed Report to CMO</button>
 							{% else %}
-								<button type="submit" class="btn btn-primary col-md-4 offset-4" id="btnPM">Submit Reviewed Report to CMO</button>
+								<!--<button type="submit" class="btn btn-primary col-md-4 offset-4" id="btnPM">Submit Reviewed Report to CMO</button>-->
+								<button type="submit" class="btn btn-primary col-md-4 offset-4" id="btnPM"><a class="nav-link" data-toggle="modal" data-target="#pmModal">
+			              Submit Reviewed Report to CMO</a></button>
 							{% endif %}
 						{% endif %}
 				</div>
@@ -564,7 +568,6 @@
 				<div class="mb-5 mt-2">
 					<h4>No plan submitted by CMO for Crisis: {{ crisisItem.crisis_ID }}</h4>
 				</div>
-
 			{% endif %}
 			</form>
 			</section>
@@ -599,9 +602,9 @@
 					  Decision Table for {{ curUser }}
 				  </div>
 				</div>
-<div class="card-body">
-					  <img src="{% static decisionTable %}" alt = "image" width="1080" height="480"/>
-				  </div>
+					<div class="card-body">
+					    <img src="{% static decisionTable %}" alt = "image" width="1080" height="480"/>
+				    </div>
 			</section>
 
 		</div>
@@ -648,17 +651,17 @@
     </a>
 
     <!-- Logout Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Logout Confirmation</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            Select "Logout" below if you are ready to end your current session.
+            Select "Logout" below if you are ready to end your current session with PMOSIMS.
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -667,6 +670,52 @@
         </div>
       </div>
     </div>
+
+    <!-- Submit Modal -->
+    <div class="modal fade" id="pmModal" tabindex="-1" role="dialog" aria-labelledby="pmLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document" style="margin:auto; margin-top:10%; max-width:30%;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="pmLabel">Authorize Submission of Crisis Resolution Plan</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="confirmationText">
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+			{%  if accountType == "PM"  %}
+            <a href="#" class="btn btn-primary" id="pmSubmit" data-toggle="modal" data-target="#" data-dismiss="modal">Submit</a>
+	          {% else %}
+	        <a href="#" class="btn btn-primary" id="pmSubmit" data-toggle="modal" data-target="#afterSubmit" data-dismiss="modal">Submit</a>
+	          {% endif %}
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+     <!--PostSubmission Modal -->
+    <div class="modal fade" id="afterSubmit" tabindex="-1" role="dialog" aria-labelledby="postLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document" style="margin:auto; margin-top:10%; max-width:30%;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="postLabel">Crisis Resolution Plan Review Submitted</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="afterText">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Bootstrap core JavaScript -->
     <script src="/static/vendor/popper/popper.min.js"></script>
     <script src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
@@ -952,7 +1001,7 @@
 				var curDeaths = rawData[i].fields['updates_curDeaths'];
 				var curSAF = rawData[i].fields['updates_curSAF'];
 				var curSCDF = rawData[i].fields['updates_curSCDF'];
-				var curCD = rawData[i].fields['updates_curCD'];
+				var curSPF = rawData[i].fields['updates_curSPF'];
 				var curRadius = rawData[i].fields['updates_curRadius'];
 
 				var jsonContainer = {
@@ -963,7 +1012,7 @@
 					"curDeaths":curDeaths,
 					"curSAF":curSAF,
 					"curSCDF":curSCDF,
-					"curCD":curCD,
+					"curSPF":curSPF,
 					"curRadius":curRadius
 				};
 
@@ -990,6 +1039,8 @@
 				injuriesData.push(curInjuries);
 
 				deathsData.push(curDeaths);
+
+				console.log(injuriesData, deathsData);
 			}
 
 			maxY = maxY*1.2;
@@ -1038,7 +1089,7 @@
 			var PMhasComment = "False";
 
 			var curPlanID = {{planID|safe}};
-
+			var respmsg = document.getElementById('afterText');
 			$('#btnSubmit').click(function() {
 				if(accountType == "MDEF"){
 					var MDEFtxt = $('#txtMDEF').val();
@@ -1057,8 +1108,13 @@
 						data: data,
 						success: function (msg) {
 						  //On Successful service call
-						  alert(accountType+"'s response (Has Comment: "+ MDEFhasComment +") for "+curPlanID+ " has been saved!");
-						}
+						  console.log(accountType+"'s response (Has Comment: "+ MDEFhasComment +") for "+curPlanID+ " has been saved!");
+                          var text = "Dear {{ curUser }}, your review of the Crisis Resolution Plan has been submitted. <br><br>";
+						  text += accountType + "'s response (Has Comment: ";
+						  text += MDEFhasComment + ") for ";
+						  text += curPlanID + " has been saved! <br><br> Thank you and have a nice day!";
+						  respmsg.innerHTML = text;						}
+
 					});
 
 				}else
@@ -1078,7 +1134,12 @@
 						},
 						success: function (msg) {
 						  //On Successful service call
-						  alert(accountType+"'s response (Has Comment: "+ MOHAhasComment +") for "+curPlanID+ " has been saved!");
+						  console.log(accountType+"'s response (Has Comment: "+ MOHAhasComment +") for "+curPlanID+ " has been saved!");
+						  var text = "Dear {{ curUser }}, your review of the Crisis Resolution Plan has been submitted. <br><br>";
+						  text += accountType + "'s response (Has Comment: ";
+						  text += MOHAhasComment + ") for ";
+						  text += curPlanID + " has been saved! <br><br> Thank you and have a nice day!";
+						  respmsg.innerHTML = text;
 						}
 					});
 				}else
@@ -1098,7 +1159,12 @@
 						},
 						success: function (msg) {
 						  //On Successful service call
-						  alert(accountType+"'s response (Has Comment: "+ MOFAhasComment +") for "+curPlanID+ " has been saved!");
+						  console.log(accountType+"'s response (Has Comment: "+ MOFAhasComment +") for "+curPlanID+ " has been saved!");
+						  var text = "Dear {{ curUser }}, your review of the Crisis Resolution Plan has been submitted. <br><br>";
+						  text += accountType + "'s response (Has Comment: ";
+						  text += MOFAhasComment + ") for ";
+						  text += curPlanID + " has been saved! <br><br> Thank you and have a nice day!";
+						  respmsg.innerHTML = text;
 						}
 					});
 				}else
@@ -1118,7 +1184,12 @@
 						},
 						success: function (msg) {
 						  //On Successful service call
-						  alert(accountType+"'s response (Has Comment: "+ DPMhasComment +") for "+curPlanID+ " has been saved!");
+						  console.log(accountType+"'s response (Has Comment: "+ DPMhasComment +") for "+curPlanID+ " has been saved!");
+						  var text = "Dear {{ curUser }}, your review of the Crisis Resolution Plan has been submitted. <br><br>";
+						  text += accountType + "'s response (Has Comment: ";
+						  text += DPMhasComment + ") for ";
+						  text += curPlanID + " has been saved! <br><br> Thank you and have a nice day!";
+						  respmsg.innerHTML = text;
 						}
 					});
 				}
@@ -1128,11 +1199,36 @@
 				}
 			});
 
+			$('#pmSubmit').click(function() {
+				console.log("Submitted");
+				//Submit code here
+				//var afterText = document.getElementById('afterText');
+	            //afterText.innerHTML = "Dear {{ curUser }}, your review of the Crisis Resolution Plan has been submitted. <br><br> Thank you and have a nice day!";
+
+	            $.ajax({
+					type: 'POST', //GET, POST, PUT or DELETE
+					url: '/sendReport/', //Rename! Location of the service
+					data: {
+						'planID': {{ planID }},
+						csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+					},
+					success: function (msg) {
+					  //On Successful service call
+					  //alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
+					  console.log("Sent {{ planItem.plan_ID }} to python");
+					  location.reload();
+					}
+				});
+
+	            console.log("Sent {{ planItem.plan_ID }} to python");
+	            location.reload();
+			});
+
 			$('#btnPM').click(function() {
 				var PMtxt = $('#txtPM').val();
 				console.log(currentApprovals, "HERE");
 				if(PMtxt == "" || PMtxt === undefined) { PMhasComment = "False";} else PMhasComment = "True";
-
+				var confirmationText = document.getElementById('confirmationText');
 				$.ajax({
 					type: 'POST', //GET, POST, PUT or DELETE
 					url: '/saveComments/', //Rename! Location of the service
@@ -1166,27 +1262,42 @@
 
 								if(noReview.length >0)
 								{
-									alert("The following PMO members have not reviewed the plan:");
-									alert(noReview.join("\n"));
+									//alert("The following PMO members have not reviewed the plan:");
+									//alert(noReview.join("\n"));
+									var chkText="{{ curUser }}, are you sure you want to send this CRP to CMO? <br><br>";
+
+									chkText += "The following PMO Members have not reviewed the plan: <br><br>";
+
+									for(var i = 0; i < noReview.length; i++) {
+										chkText += noReview[i] + "<br>";
+									}
+
+									chkText += '<br><br>Please press the "Submit" button below to send the CRP to CMO';
+
+
+									console.log(chkText);
+
+									confirmationText.innerHTML = chkText;
+
 								}else
 								{
 									//Submit to CMO (ready for collection)
-									alert("Report has been sent to CMO!");
+									//alert("Report has been sent to CMO!");
 
-									$.ajax({
-										type: 'POST', //GET, POST, PUT or DELETE
-										url: '/sendReport/', //Rename! Location of the service
-										data: {
-											'planID': {{ planID }},
-											csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
-										},
-										success: function (msg) {
-										  //On Successful service call
-										  //alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
-										  console.log("Sent {{ planItem.plan_ID }} to python");
-										  location.reload();
-										}
-									});
+									var chkText = "{{ curUser }}, are you sure you want to send this CRP to CMO? <br><br>";
+
+									chkText += "All PMO Members have reviewed the CRP for: <br><br>"
+
+									chkText += "Crisis {{ planItem.crisis_ID }}<br>";
+									chkText += "Plan {{ planItem.plan_ID }}<br>";
+									chkText += "{{ crisisItem.crisis_name }}<br><br>";
+
+									chkText += 'Please press the "Submit" button below to send the CRP to CMO';
+
+									console.log(chkText);
+
+									confirmationText.innerHTML = chkText;
+
 								}
 							}
 						});
@@ -1197,6 +1308,7 @@
 
 	  </script>
   <script>
+		
         !function(a){"use strict";a('.navbar-sidenav [data-toggle="tooltip"]').tooltip({template:'<div class="tooltip navbar-sidenav-tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'}),a("#sidenavToggler").click(function(e){e.preventDefault(),a("body").toggleClass("sidenav-toggled"),a(".navbar-sidenav .nav-link-collapse").addClass("collapsed"),a(".navbar-sidenav .sidenav-second-level, .navbar-sidenav .sidenav-third-level").removeClass("show")}),a(".navbar-sidenav .nav-link-collapse").click(function(e){e.preventDefault(),a("body").removeClass("sidenav-toggled")}),a("body.fixed-nav .navbar-sidenav, body.fixed-nav .sidenav-toggler, body.fixed-nav .navbar-collapse").on("mousewheel DOMMouseScroll",function(a){var e=a.originalEvent,t=e.wheelDelta||-e.detail;this.scrollTop+=30*(t<0?1:-1),a.preventDefault()}),a(document).scroll(function(){a(this).scrollTop()>100?a(".scroll-to-top").fadeIn():a(".scroll-to-top").fadeOut()}),a('[data-toggle="tooltip"]').tooltip(),a(document).on("click","a.scroll-to-top",function(e){var t=a(this);a("html, body").stop().animate({scrollTop:a(t.attr("href")).offset().top},1e3,"easeInOutExpo"),e.preventDefault()}),a(document).ready(function(){a("#dataTable").DataTable()})}(jQuery), Chart.defaults.global.defaultFontFamily='-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif',Chart.defaults.global.defaultFontColor="#292b2c",
         ctx=document.getElementById("myAreaChart"),
         myLineChart = new Chart(ctx,{type:"line",
@@ -1251,12 +1363,12 @@
                 },
                 legend:{display:!1}
             }
-            }),
+            })
 
-        ctx=document.getElementById("myBarChart"),
-        myLineChart=new Chart(ctx,{type:"bar",data:{labels:["January","February","March","April","May","June"],datasets:[{label:"Revenue",backgroundColor:"rgba(2,117,216,1)",borderColor:"rgba(2,117,216,1)",data:[4215,5312,6251,7841,9821,14984]}]},options:{scales:{xAxes:[{time:{unit:"month"},gridLines:{display:!1},ticks:{maxTicksLimit:6}}],yAxes:[{ticks:{min:0,max:15e3,maxTicksLimit:5},gridLines:{display:!0}}]},legend:{display:!1}}}),
-        ctx=document.getElementById("myPieChart"),
-        myPieChart=new Chart(ctx,{type:"pie",data:{labels:["Blue","Red","Yellow","Green"],datasets:[{data:[12.21,15.58,11.25,8.32],backgroundColor:["#007bff","#dc3545","#ffc107","#28a745"]}]}});
+        //,ctx=document.getElementById("myBarChart"),
+        //myLineChart=new Chart(ctx,{type:"bar",data:{labels:["January","February","March","April","May","June"],datasets:[{label:"Revenue",backgroundColor:"rgba(2,117,216,1)",borderColor:"rgba(2,117,216,1)",data:[4215,5312,6251,7841,9821,14984]}]},options:{scales:{xAxes:[{time:{unit:"month"},gridLines:{display:!1},ticks:{maxTicksLimit:6}}],yAxes:[{ticks:{min:0,max:15e3,maxTicksLimit:5},gridLines:{display:!0}}]},legend:{display:!1}}}),
+        //ctx=document.getElementById("myPieChart"),
+        //myPieChart=new Chart(ctx,{type:"pie",data:{labels:["Blue","Red","Yellow","Green"],datasets:[{data:[12.21,15.58,11.25,8.32],backgroundColor:["#007bff","#dc3545","#ffc107","#28a745"]}]}});
 
 </script>
 <script type="text/javascript">
@@ -1304,7 +1416,7 @@
         }
 
     </script>
-  <script src="/static/vendor/js/sb-admin.min.js"></script>
+  <!--<script src="/static/vendor/js/sb-admin.min.js"></script>-->
 
       <script type="text/javascript">
         //For Crisis Updates
