@@ -320,7 +320,7 @@
 				</div>-->
 				<label for="txtCrisisDateTime" class="col-form-label col-md-2 text-left">Latest Plan ID/Status:</label>
 				<div class="form-group col-md-3">
-				{% if planID > 0 %}
+				{% if plan_ID > 0 %}
 				  <input type="text" class="form-control" id="txtPlanStatus" value="{{ planItem.plan_ID }} : {{ planItem.plan_status }}" readonly>
 				{% else %}
 				  <input type="text" class="form-control" id="txtPlanStatus" value="No Plan Submitted by CMO" readonly>
@@ -1308,7 +1308,7 @@
 
 	  </script>
   <script>
-		
+
         !function(a){"use strict";a('.navbar-sidenav [data-toggle="tooltip"]').tooltip({template:'<div class="tooltip navbar-sidenav-tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'}),a("#sidenavToggler").click(function(e){e.preventDefault(),a("body").toggleClass("sidenav-toggled"),a(".navbar-sidenav .nav-link-collapse").addClass("collapsed"),a(".navbar-sidenav .sidenav-second-level, .navbar-sidenav .sidenav-third-level").removeClass("show")}),a(".navbar-sidenav .nav-link-collapse").click(function(e){e.preventDefault(),a("body").removeClass("sidenav-toggled")}),a("body.fixed-nav .navbar-sidenav, body.fixed-nav .sidenav-toggler, body.fixed-nav .navbar-collapse").on("mousewheel DOMMouseScroll",function(a){var e=a.originalEvent,t=e.wheelDelta||-e.detail;this.scrollTop+=30*(t<0?1:-1),a.preventDefault()}),a(document).scroll(function(){a(this).scrollTop()>100?a(".scroll-to-top").fadeIn():a(".scroll-to-top").fadeOut()}),a('[data-toggle="tooltip"]').tooltip(),a(document).on("click","a.scroll-to-top",function(e){var t=a(this);a("html, body").stop().animate({scrollTop:a(t.attr("href")).offset().top},1e3,"easeInOutExpo"),e.preventDefault()}),a(document).ready(function(){a("#dataTable").DataTable()})}(jQuery), Chart.defaults.global.defaultFontFamily='-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif',Chart.defaults.global.defaultFontColor="#292b2c",
         ctx=document.getElementById("myAreaChart"),
         myLineChart = new Chart(ctx,{type:"line",
