@@ -74,7 +74,8 @@ def MyCMOApi():
     try:
         url = urllib.request.urlopen('http://172.21.148.168/api/pmo/', timeout=3)
         s = url.read()
-        data = json.loads(s)
+        #data = json.loads(s.decode('utf-8'))
+        data = json.loads(s.decode('utf-8'))
 
         #Crisis Model
         #Missing:
