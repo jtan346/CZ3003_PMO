@@ -48,9 +48,10 @@ class CMOViewSet(viewsets.ModelViewSet):
     serializer_class = CMOSerializer
 
 def startupInits():
-    #initStorage()
+    initStorage()
     MyCMOApi()
-    #initNotifications()
+    initNotifications()
+    print("startupInits")
 
 def initStorage():
     Plan.objects.all().delete()
@@ -58,6 +59,52 @@ def initStorage():
     SubCrisis.objects.all().delete()
     CrisisUpdates.objects.all().delete()
     print("Storage Reset and ready to receive CMO Data.")
+
+def initNotifications():
+    Notifications.objects.all().delete()
+    # ongoingCrisis = Crisis.objects.exclude(crisis_status='Resolved')
+    # if(ongoingCrisis):
+    #     #For each non-Resolved crisis, get all corresponding plans
+    #     for crisis in ongoingCrisis:
+    #         plansInCrisis = Plan.objects.filter(plan_crisisID=crisis.crisis_ID)
+    #         if(plansInCrisis):
+    #             #For each plan in non-Resolved crisis, add into Notification
+    #             for plan in plansInCrisis:
+    #                 newNoti = Notifications(PlanNum=plan.plan_num, PlanID=plan.plan_ID, CrisisID=crisis.crisis_ID, CrisisTitle=crisis.crisis_name, DateTime=plan.plan_sendtime)
+    #                 newNoti.save()
+    #         else:
+    #             print("Crisis " + str(crisis.crisis_ID) + " has no Plans.")
+    # else:
+    #     print("No Notifications Loaded")
+
+    #save all current plans in notification db
+    plans = Plan.objects.all()
+    if(plans):
+        for plan in plans:
+            crisis = Crisis.objects.filter(crisis_ID=plan.plan_crisisID).get()
+            newNoti = Notifications(PlanNum=plan.plan_num, PlanID=plan.plan_ID, CrisisID=crisis.crisis_ID, CrisisTitle=crisis.crisis_name, DateTime=plan.plan_sendtime)
+            newNoti.save()
+    noti = Notifications.objects.all()
+    print("initNotifications: There are currently " + str(noti.count()) + " Notifications")
+
+def MyCMOListener():
+    #If numNotifications > numPlans (ongoing), means CMO post me something
+    curPlans = Plan.objects.all()
+    curNotis = Notifications.objects.all()
+
+    if(curNotis.count() > curPlans.count()):
+        #call mycmoapi to pull new plan into db
+        MyCMOApi()
+        print("MyCMOListener activated")
+    else:
+        print("MyCMOListener not activated. No. of Plans (" + str(curPlans.count()) + "), No. of Notifications ("+str(curNotis.count())+")")
+
+# PlanNum = models.IntegerField()  # Autoincrement
+# PlanID = models.IntegerField()
+# CrisisID = models.IntegerField()
+# CrisisTitle = models.CharField(max_length=500, null=True, blank=True)
+# DateTime = models.DateTimeField(null=True, blank=True)
+
 
 def MyCMOApi():
     warnings.simplefilter("ignore", RuntimeWarning)
@@ -118,13 +165,13 @@ def MyCMOApi():
                         newSubCrisis = SubCrisis(sc_ID=sc_id,crisis_ID=data[i]['id'], crisis_type=sc_type, latitude=sc_latitude, longitude=sc_longitude, radius=sc_radius,datetime=sc_datetime,description=sc_description)
                         #newSubCrisis.save()
                         testSubCrisis = SubCrisis.objects.filter(crisis_ID=data[i]['id'], sc_ID=sc_id)
-                        if (testSubCrisis):
+                        if not testSubCrisis:
                             # print(testSubCrisis)
-                            testSubCrisis.delete()
+                            #testSubCrisis.delete()
                             newSubCrisis.save()
                         else:
-                            print(newSubCrisis)
-                            newSubCrisis.save()
+                            print("SubCrisis "+ str(testSubCrisis.sc_ID) +" already exists.")
+                            #newSubCrisis.save()
                 else:
                     print("No SubCrisis for Crisis: " + str(crisis_id))
 
@@ -133,13 +180,13 @@ def MyCMOApi():
                 newCrisis = Crisis(crisis_ID=crisis_id, crisis_name=crisis_name, crisis_description=concatDescription, crisis_datetime=data[i]['crisisreport_set'][0]['datetime'],crisis_status=crisis_status)
                 #newCrisis.save()
                 testCrisis = Crisis.objects.filter(crisis_ID=crisis_id)
-                if(testCrisis):
+                if not testCrisis:
                     # print(testCrisis)
-                    testCrisis.delete()
+                    #testCrisis.delete()
                     newCrisis.save()
                 else:
-                    print(newCrisis)
-                    newCrisis.save()
+                    print("Crisis "+ str(testCrisis.crisis_ID) +" already exists.")
+                    #newCrisis.save()
 
                 #Plan Model
                 #Missing:
@@ -201,13 +248,13 @@ def MyCMOApi():
                         newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_description=plan_description, plan_status=plan_status, plan_receipt=datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF)
                         #newPlan.save()
                         testPlan = Plan.objects.filter(plan_ID=plan_id)
-                        if(testPlan):
+                        if not testPlan:
                             # print(testPlan)
-                            testPlan.delete()
+                            # testPlan.delete()
                             newPlan.save()
                         else:
-                            print(newPlan)
-                            newPlan.save()
+                            print("Plan "+ str(testPlan.plan_ID) +" already exists")
+                            #newPlan.save()
                 else:
                     print("No Plan for Crisis: " + str(crisis_id))
 
@@ -225,7 +272,7 @@ def MyCMOApi():
                         # print(data[i]['efupdate_set'][l]['totalDeaths']) #updates_curDeaths
                         # print(data[i]['efupdate_set'][l]['duration']) #??
                         # print(data[i]['efupdate_set'][l]['description'])#updates_description
-
+                        stat_id = data[i]['efupdate_set'][l]['id']
                         stat_datetime = data[i]['efupdate_set'][l]['datetime']  # updates_datetime
                         stat_radius = data[i]['efupdate_set'][l]['affectedRadius']  # ??
                         stat_injured = data[i]['efupdate_set'][l]['totalInjured']  # updates_curInjuries
@@ -247,9 +294,10 @@ def MyCMOApi():
                                     curSPF = force['utilization']
                                 elif (force['name'] == "SCDF"):
                                     curSCDF = force['utilization']
-
+                            newStat = CrisisUpdates(id=stat_id, updates_crisisID=crisis_id, updates_datetime=stat_datetime, updates_curInjuries=stat_injured, updates_curDeaths=stat_deaths, updates_curSAF=curSAF, updates_curSPF=curSPF, updates_curSCDF=curSCDF, updates_description=stat_description)
+                        else:
+                            newStat = CrisisUpdates(id=stat_id, updates_crisisID=crisis_id, updates_datetime=stat_datetime, updates_curInjuries = 0, updates_curDeaths = 0, updates_curSAF = 0, updates_curSPF = 0, updates_curSCDF = 0, updates_description=stat_description)
                         #Fix: updates_datetime=stat_datetime
-                        newStat = CrisisUpdates(updates_crisisID=crisis_id, updates_datetime=stat_datetime, updates_curInjuries=stat_injured, updates_curDeaths=stat_deaths, updates_curSAF=curSAF, updates_curSPF=curSPF, updates_curSCDF=curSCDF, updates_description=stat_description)
                         newStat.save()
                         #print(newStat)
                         # testStat = CrisisUpdates.filter(updates_crisisID=crisis_id, updates_datetime=stat_datetime)
@@ -259,7 +307,9 @@ def MyCMOApi():
                         # else:
                         #     newStat.save()
                 else:
-                    print("No Statistics for Crisis: " + str(crisis_id))
+                    newStat = CrisisUpdates(id=stat_id, updates_crisisID=crisis_id, updates_datetime=datetime.now(),updates_curInjuries=0, updates_curDeaths=0, updates_curSAF=0,updates_curSPF=0, updates_curSCDF=0, updates_description=stat_description)
+                    newStat.save()
+                    print("No Statistics for Crisis: " + str(crisis_id)+". Creating filler data.")
         else:
             print("No Crisis/Data from CMO")
     except HTTPError as e:
@@ -336,7 +386,8 @@ def login_check(session):
 def home(request):
     if not login_check(request.session):
         return redirect('/otplogout')
-    MyCMOApi()
+    #MyCMOApi()
+    MyCMOListener()
     template = loader.get_template('pmoapp/home.html')
 #Process Account/Session
     updateTime = datetime.now()
@@ -490,7 +541,7 @@ def crisis(request, crisis_id):
     if CrisisUpdates.objects.filter(updates_crisisID=crisisItem.crisis_ID):
         updateItem = CrisisUpdates.objects.filter(updates_crisisID=crisisItem.crisis_ID).latest('updates_datetime')
     else:
-        baseUpdate = CrisisUpdates(updates_crisisID=crisisItem.crisis_ID, updates_datetime=updateTime, updates_curInjuries = 0, updates_curDeaths = 0, updates_curSAF = 0, updates_curSPF = 0, updates_curSCDF = 0)
+        baseUpdate = CrisisUpdates(updates_crisisID=crisisItem.crisis_ID, updates_datetime=updateTime, updates_curInjuries = 0, updates_curDeaths = 0, updates_curSAF = 0, updates_curSPF = 0, updates_curSCDF = 0, updates_description="")
         baseUpdate.save()
 
     crisisList = Crisis.objects.exclude(crisis_status='Resolved')
@@ -695,19 +746,27 @@ def sendReport(request):
 
         #Change http when we have
 
-        r = requests.post('http://172.21.148.168/api/auth/', data={
-            'PlanID': curPlanID,
-            'Comments': concatComments,
-            'PlanStatus': reportStatus
-        })
+
+        try:
+            r = requests.post('http://172.21.148.168/api/auth/', data={
+                'PlanID': curPlanID,
+                'Comments': concatComments,
+                'PlanStatus': reportStatus
+            })
+        except HTTPError as e:
+            print('Error code: ', e.code)
+        except URLError as e:
+            # do something
+            print('Reason: ', e.reason)
+        else:
+            # do something
+            print('Plan sent to CMO successfully!')
 
         print(r.status_code)
 
         print(curPlanID)
         print(concatComments)
         print(reportStatus)
-
-
 
         #Change the status of report to pending cmo fortesting
         if(reportStatus == True):
