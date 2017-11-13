@@ -371,7 +371,7 @@ def otp(request):
     loggedin = request.session['Loggedin'] = False
     curnumNotifications = Notifications.objects.count()
     request.session['NumNotifications'] = curnumNotifications
-    #send_mail(subject, str(OTP), from_email, to_email, fail_silently=False)
+    send_mail(subject, str(OTP), from_email, to_email, fail_silently=False)
     print(str(OTP))
     return render(request, 'pmoapp/authotp.html', {})
 
