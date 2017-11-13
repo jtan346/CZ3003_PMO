@@ -853,7 +853,6 @@ class crisisUpdates(ListView):
         }
         return context
 
-
 class graphUpdates(ListView):
     template_name='pmoapp/CrisisGUI/graphUpdates.html'
     find_id=""
@@ -898,14 +897,12 @@ class notificationBellUpdate(ListView):
         }
         return context
 
-
 def updateNotiCount(request):
     curNotifications = Notifications.objects.all()
     curNotiCount = curNotifications.count()
     request.session['NumNotifications'] = curNotiCount
     print(request.session['NumNotifications'])
     return HttpResponse('')
-
 
 def newsfeed(request):
     if not login_check(request.session):
