@@ -321,7 +321,7 @@
 				<label for="txtCrisisDateTime" class="col-form-label col-md-2 text-left">Latest Plan ID/Status:</label>
 				<div class="form-group col-md-3">
 				{% if plan_ID > 0 %}
-				  <input type="text" class="form-control" id="txtPlanStatus" value="{{ planItem.plan_ID }} : {{ planItem.plan_status }}" readonly>
+				  <input type="text" class="form-control" id="txtPlanStatus" value="{{ planItem.plan_num }} : {{ planItem.plan_status }}" readonly>
 				{% else %}
 				  <input type="text" class="form-control" id="txtPlanStatus" value="No Plan Submitted by CMO" readonly>
 				{% endif %}
@@ -393,14 +393,19 @@
 				 <div class="form-row">
 					<label for="txtPlanID" class="col-form-label col-md-2">Plan ID/Status:</label>
 					<div class="form-group col-md-3">
-					  <input type="text" class="form-control" id="txtPlanID" value="{{ planItem.plan_ID }}: {{ planItem.plan_status }}" readonly>
+					  <input type="text" class="form-control" id="txtPlanID" value="{{ planItem.plan_num }}: {{ planItem.plan_status }}" readonly>
 					</div>
 					 <label for="txtPlanReceipt" class="col-form-label col-md-2 offset-1 text-left">Plan Receipt:</label>
 					<div class="form-group col-md-3">
 					  <input type="text" class="form-control" id="txtPlanReceipt" value="{{ planItem.plan_receipt }}" readonly>
 					</div>
 				  </div>
-
+					<div class="form-row">
+					<label for="txtplanType" class="col-form-label col-md-2 text-left" id="lblplanType">Plan Type:</label>
+					<div class="form-group col-md-3">
+					  <input type="text" class="form-control" id="txtplanType" value="{{ planItem.plan_type }}" readonly>
+					</div>
+				</div>
 				   <div class="form-group">
 					<label for="txtPlanDescription">Plan Description:</label>
 					<textarea class="form-control col-md-11" id="txtPlanDescription" rows="5" readonly>{{ planItem.plan_description }}</textarea>

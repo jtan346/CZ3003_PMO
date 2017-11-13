@@ -46,7 +46,6 @@ class Crisis(models.Model):
     crisis_name = models.CharField(max_length=500)
     crisis_description = models.TextField(null=True, blank=True)
     crisis_datetime = models.DateTimeField() #Initial 911
-    #crisis_address = models.CharField(max_length=50) #Sub with CrisisReports
     crisis_status = models.CharField(max_length=50)  # Enum: Ongoing, Cleaning-Up, Resolved
     crisis_extAgencies = models.ManyToManyField(ExternalAgency, through='ApproveAgency', null=True)
     class Meta: #For naming convention in django/admin
@@ -114,7 +113,8 @@ class Plan(models.Model):
     #     validators=[MinValueValidator(0)]
     # )  # In Metres: 1,234
     plan_projCasualtyRate = models.DecimalField(max_digits=5, decimal_places=2)  # Default: 0.0, min; 0.0, max: 100.0
-    plan_projResolutionTime = models.DurationField(default=datetime.timedelta, null=True, blank=True)
+    plan_projResolutionTime = models.TextField(blank=True, null=True)
+    #plan_projResolutionTime = models.DurationField(default=datetime.timedelta, null=True, blank=True)
     #plan_projETAResolution = models.DecimalField(max_digits=4, decimal_places=1)  # In hours: 0.5
     plan_SAFRecommended = models.DecimalField(max_digits=5, decimal_places=2)  # Default: 0.0, min; 0.0, max: 100.0
     plan_SPFRecommended = models.DecimalField(max_digits=5, decimal_places=2)  # Default: 0.0, min; 0.0, max: 100.0
@@ -122,6 +122,8 @@ class Plan(models.Model):
     plan_SAFMaximum = models.DecimalField(max_digits=5, decimal_places=2)  # Default: 0.0, min; 0.0, max: 100.0
     plan_SPFMaximum = models.DecimalField(max_digits=5, decimal_places=2)  # Default: 0.0, min; 0.0, max: 100.0
     plan_SCDFMaximum = models.DecimalField(max_digits=5, decimal_places=2)  # Default: 0.0, min; 0.0, max: 100.0
+    plan_comments = models.TextField(blank=True, null=True) #comments pulled from CMO
+    plan_type = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return str(self.plan_ID)

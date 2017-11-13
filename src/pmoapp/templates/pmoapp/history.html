@@ -198,19 +198,19 @@
 						<tbody>
 						{% if toDisplay %}
 						{% for plan in toDisplay %}
-						{% for crisis in allCrisis %}
-						{% if crisis.crisis_ID == plan.plan_crisisID %}
-						<tr>
-							<!--<td>{{ plan.crisis_ID }}</td>-->
-							<td>Crisis: {{ plan.plan_crisisID }} - Plan: {{ plan.plan_ID }}</td>
-							<td><a href="/report/{{ plan.plan_ID }}">{{ crisis.crisis_name }}</a></td>
-							<td>{{ crisis.crisis_datetime }}</td>
-							<td>{{ plan.plan_ID }}</td>
-							<td>{{ plan.plan_receipt }}</td>
-							<td>{{ plan.plan_status }}</td>
-						</tr>
-						{% endif %}
-						{% endfor %}
+							{% for crisis in allCrisis %}
+							{% if crisis.crisis_ID == plan.plan_crisisID %}
+							<tr>
+								<!--<td>{{ plan.crisis_ID }}</td>-->
+								<td>Crisis: {{ plan.plan_crisisID }} - Plan: {{ plan.plan_num }}</td>
+								<td><a href="/report/{{ plan.plan_ID }}">{{ crisis.crisis_name }}</a></td>
+								<td>{{ crisis.crisis_datetime }}</td>
+								<td>{{ plan.plan_ID }}</td>
+								<td>{{ plan.plan_receipt }}</td>
+								<td>{{ plan.plan_status }}</td>
+							</tr>
+							{% endif %}
+							{% endfor %}
 						{% endfor %}
 						{% else %}
 						<tr><td>Singapore is safe!</td></tr>

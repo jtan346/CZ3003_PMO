@@ -7,9 +7,11 @@ from django.views.generic.list import ListView
 from .models import *
 from datetime import datetime
 from django.core import serializers
-#import requests
+import requests
 import json
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, viewsets, status, generics
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
 from .serializer import PlanSerializer,EvalPlanSerializer,TestSerializer ,CMOSerializer
 from random import randint
 from django.conf import settings
@@ -42,10 +44,21 @@ class TestViewSet(viewsets.ModelViewSet):
     queryset = testmyfuckingapi.objects.all()
     serializer_class = TestSerializer
 
-class CMOViewSet(viewsets.ModelViewSet):
-    lookup_field = 'planID'
-    queryset = Notifications.objects.all()
-    serializer_class = CMOSerializer
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny,))
+def cmoapi(Request):
+    if(Request.method == "POST"):
+        serializer = CMOSerializer(data=Request.data)
+        print(serializers)
+        print(Request.data)
+        if(serializer.is_valid()):
+            rawData=serializer.data
+            incData = Notifications(PlanNum=rawData['PlanNum'], PlanID=rawData['PlanID'], CrisisID=rawData['CrisisID'], CrisisTitle=rawData['CrisisTitle'], DateTime=rawData['DateTime'])
+            incData.save()
+            return Response(serializer.data, status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(status.HTTP_400_BAD_REQUEST)
 
 def startupInits():
     initStorage()
@@ -144,14 +157,6 @@ def MyCMOApi():
                 #Missing: None. All accounted
                 if(data[i]['crisisreport_set']):
                     for j in range(0, len(data[i]['crisisreport_set'])):
-                        # print(data[i]['crisisreport_set'][j]['id'])  #sc_ID
-                        # print(data[i]['crisisreport_set'][j]['description'])  #description
-                        # print(data[i]['crisisreport_set'][j]['datetime'])  #datetime
-                        # print(data[i]['crisisreport_set'][j]['latitude'])  #latitude
-                        # print(data[i]['crisisreport_set'][j]['longitude'])  #longitude
-                        # print(data[i]['crisisreport_set'][j]['radius'])  #radius
-                        # print(data[i]['crisisreport_set'][j]['crisisType'])  #crisis_type
-
                         sc_id = data[i]['crisisreport_set'][j]['id']  # sc_ID
                         sc_description = data[i]['crisisreport_set'][j]['description']  # description
                         sc_datetime = data[i]['crisisreport_set'][j]['datetime']  # datetime TO FIX
@@ -170,7 +175,7 @@ def MyCMOApi():
                             #testSubCrisis.delete()
                             newSubCrisis.save()
                         else:
-                            print("SubCrisis "+ str(testSubCrisis.sc_ID) +" already exists.")
+                            print("SubCrisis already exists.")
                             #newSubCrisis.save()
                 else:
                     print("No SubCrisis for Crisis: " + str(crisis_id))
@@ -185,7 +190,7 @@ def MyCMOApi():
                     #testCrisis.delete()
                     newCrisis.save()
                 else:
-                    print("Crisis "+ str(testCrisis.crisis_ID) +" already exists.")
+                    print("Crisis already exists.")
                     #newCrisis.save()
 
                 #Plan Model
@@ -201,22 +206,16 @@ def MyCMOApi():
                 # - plan_SCDFMaximum
                 if(data[i]['actionplan_set']):
                     for k in range(0, len(data[i]['actionplan_set'])):
-                        # print(data[i]['actionplan_set'][k]['id']) #plan_num *IMPORTANT
-                        # print(data[i]['actionplan_set'][k]['plan_number']) #plan_ID *PK IMPORTANT
-                        # print(data[i]['actionplan_set'][k]['description']) #plan_description
-                        # print(data[i]['actionplan_set'][k]['status']) #plan_status: ENUM
-                        # print(data[i]['actionplan_set'][k]['resolution_time']) #plan_projResolutionTime
-                        # print(data[i]['actionplan_set'][k]['projected_casualties']) #plan_projCasualtyRate
-                        # print(data[i]['actionplan_set'][k]['type']) #??
-
                         plan_id = data[i]['actionplan_set'][k]['id']  # plan_num *IMPORTANT
                         plan_num = data[i]['actionplan_set'][k]['plan_number']  # plan_ID *PK IMPORTANT
                         plan_description = data[i]['actionplan_set'][k]['description']  # plan_description
-                        plan_status = data[i]['actionplan_set'][k]['status']  # plan_status: ENUM
+                        #plan_status = data[i]['actionplan_set'][k]['status']  # plan_status: ENUM
                         plan_projtime = data[i]['actionplan_set'][k]['resolution_time']  # plan_projResolutionTime
                         plan_projcasualty = data[i]['actionplan_set'][k]['projected_casualties']  # plan_projCasualtyRate
                         plan_type = data[i]['actionplan_set'][k]['type']  # ??
                         plan_senttime = data[i]['actionplan_set'][k]['outgoing_time']
+                        #plan_author = data[i]['actionplan_set'][k]['author']
+                        #plan_comments = data[i]['actionplan_set'][k]['comment']
 
                         #buffer input
                         maxSAF = 0
@@ -239,22 +238,52 @@ def MyCMOApi():
                                     maxSCDF = force['max']
                                     recSCDF = force['recommended']
 
-                        #translate the status..
+                        #translate the status.. awaitingPMOapproval, rejected (reject by cmo and pmo) and pmoapproval
                         if(data[i]['actionplan_set'][k]['status'] == "PMOApproved"):
                             plan_status = "Approved"
-                        #elif(data[i]['actionplan_set'][k]['status'] == "PMOApproved")
-
-                        #plan_projResolutionTime=plan_projtime
-                        newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_description=plan_description, plan_status=plan_status, plan_receipt=datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF)
-                        #newPlan.save()
-                        testPlan = Plan.objects.filter(plan_ID=plan_id)
-                        if not testPlan:
-                            # print(testPlan)
-                            # testPlan.delete()
-                            newPlan.save()
+                            if (data[i]['actionplan_set'][k]['comment']):
+                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=data[i]['actionplan_set'][k]['comment']['text'])
+                            else:
+                                fillercomment = "No comments for: Crisis " + str(crisis_id) + " - Plan " + str(plan_num)
+                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=fillercomment)
+                            testPlan = Plan.objects.filter(plan_ID=plan_id)
+                            if not testPlan:
+                                newPlan.save()
+                                print("Plan saved: " + str(plan_id) + " " + str(plan_status))
+                            else:
+                                print("Plan already exists")
+                        elif(data[i]['actionplan_set'][k]['status'] == "PMORequest"):
+                            plan_status = "Pending PMO"
+                            if (data[i]['actionplan_set'][k]['comment']):
+                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=data[i]['actionplan_set'][k]['comment']['text'])
+                            else:
+                                fillercomment = "No comments for: Crisis " + str(crisis_id) + " - Plan " + str(plan_num)
+                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=fillercomment)
+                            testPlan = Plan.objects.filter(plan_ID=plan_id)
+                            if not testPlan:
+                                newPlan.save()
+                                print("Plan saved: " + str(plan_id) + " " + str(plan_status))
+                            else:
+                                print("Plan already exists")
+                        elif data[i]['actionplan_set'][k]['status'] == "Rejected":
+                            #Rejected validation done at CMO Side      and data[i]['actionplan_set'][k]['author'] == "PMO"
+                            #I rejected
+                            plan_status = "Pending CMO"
+                            if (data[i]['actionplan_set'][k]['comment']):
+                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=data[i]['actionplan_set'][k]['comment']['text'])
+                            else:
+                                fillercomment = "No comments for: Crisis " + str(crisis_id) + " - Plan " + str(plan_num)
+                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=fillercomment)
+                            testPlan = Plan.objects.filter(plan_ID=plan_id)
+                            if not testPlan:
+                                newPlan.save()
+                                print("Plan saved: " + str(plan_id) + " " + str(plan_status))
+                            else:
+                                print("Plan already exists")
                         else:
-                            print("Plan "+ str(testPlan.plan_ID) +" already exists")
-                            #newPlan.save()
+                            #disregard plan
+                            #plan_status = "Throw"
+                            print("Plan is Thrown.")
                 else:
                     print("No Plan for Crisis: " + str(crisis_id))
 
@@ -266,12 +295,6 @@ def MyCMOApi():
                 # - updates_curSCDF
                 if(data[i]['efupdate_set']):
                     for l in range(0, len(data[i]['efupdate_set'])):
-                        # print(data[i]['efupdate_set'][l]['datetime']) #updates_datetime
-                        # print(data[i]['efupdate_set'][l]['affectedRadius'])#??
-                        # print(data[i]['efupdate_set'][l]['totalInjured']) #updates_curInjuries
-                        # print(data[i]['efupdate_set'][l]['totalDeaths']) #updates_curDeaths
-                        # print(data[i]['efupdate_set'][l]['duration']) #??
-                        # print(data[i]['efupdate_set'][l]['description'])#updates_description
                         stat_id = data[i]['efupdate_set'][l]['id']
                         stat_datetime = data[i]['efupdate_set'][l]['datetime']  # updates_datetime
                         stat_radius = data[i]['efupdate_set'][l]['affectedRadius']  # ??
@@ -298,13 +321,14 @@ def MyCMOApi():
                         else:
                             newStat = CrisisUpdates(id=stat_id, updates_crisisID=crisis_id, updates_datetime=stat_datetime, updates_curInjuries = 0, updates_curDeaths = 0, updates_curSAF = 0, updates_curSPF = 0, updates_curSCDF = 0, updates_description=stat_description)
                         #Fix: updates_datetime=stat_datetime
-                        newStat.save()
+                        #newStat.save()
                         #print(newStat)
-                        # testStat = CrisisUpdates.filter(updates_crisisID=crisis_id, updates_datetime=stat_datetime)
-                        # if(testStat):
+                        testStat = CrisisUpdates.objects.filter(id=stat_id)
+                        if not (testStat):
                         #     testStat.delete()
-                        #     newStat.save()
-                        # else:
+                            newStat.save()
+                        else:
+                            print("Stat already exists")
                         #     newStat.save()
                 else:
                     newStat = CrisisUpdates(id=stat_id, updates_crisisID=crisis_id, updates_datetime=datetime.now(),updates_curInjuries=0, updates_curDeaths=0, updates_curSAF=0,updates_curSPF=0, updates_curSCDF=0, updates_description=stat_description)
@@ -409,8 +433,11 @@ def home(request):
     #Code to receive, process and insert into my database.
 
 #Process Crisis/Plans
-    crisisList = Crisis.objects.exclude(crisis_status='Resolved')
+    crisisList = Crisis.objects.exclude(crisis_status='Resolved').order_by('crisis_ID')
+    for crisis in crisisList:
+        print(crisis)
     toDisplay = []
+    planIDS = []
     for crisis in crisisList:
         plansInCrisis = Plan.objects.filter(plan_crisisID=crisis.crisis_ID)
         if plansInCrisis:
@@ -419,8 +446,10 @@ def home(request):
                 if(plan.plan_ID > max.plan_ID):
                     max = plan
             toDisplay.append(max)
+            planIDS.append(max.plan_crisisID)
 
-    #print(crisisList)
+    # print(crisisList)
+    # print(toDisplay)
 
     context = {
         'toDisplay': toDisplay,
@@ -428,6 +457,7 @@ def home(request):
         'updateTime': updateTime,
         'accountType': accountType,
         'curUser': curUser,
+        'planIDs': planIDS,
         # 'crisisID': json.dumps(crisisItem.crisis_ID),
         'curName': json.dumps(curUser),
         'profilePicture': profilePicture,
@@ -459,16 +489,17 @@ def history(request):
     allPlans = Plan.objects.all()
     ongoingPlanList = []
     ongoingCrisisList = Crisis.objects.exclude(crisis_status='Resolved')
-    toDisplay2 = []
+
     for index, crisis in enumerate(ongoingCrisisList):
+        #print(index, crisis)
         plansInCrisis = Plan.objects.filter(plan_crisisID=crisis.crisis_ID)
         if(plansInCrisis):
             max = plansInCrisis[0]
-            for plan in plansInCrisis:
+            for index2, plan in enumerate(plansInCrisis):
+                #print(index2, plan)
                 if (plan.plan_ID > max.plan_ID):
                     max = plan
-                    ongoingPlanList.append(plansInCrisis[index-1])
-            toDisplay2.append(max)
+                    ongoingPlanList.append(plansInCrisis[index2-1])
 
 # Get all plans where Crisis status = Resolved
     historicalCrisisList = Crisis.objects.filter(crisis_status='Resolved')
@@ -489,7 +520,7 @@ def history(request):
     allCrisis = Crisis.objects.all()
     context = {
         'toDisplay': toDisplay,
-        'toDisplay2': toDisplay2,
+        #'toDisplay2': toDisplay2,
         'ongoingCrisis': ongoingCrisisList,
         'updateTime': updateTime,
         'allCrisis': allCrisis,
@@ -692,6 +723,7 @@ def report(request, plan_id):
 
     print("open")
     print(crisisItem.crisis_status)
+    print(planItem.plan_comments)
     print("closed")
 
     context = {
@@ -724,7 +756,6 @@ def report(request, plan_id):
     }
     return HttpResponse(template.render(context, request))
 
-
 def sendReport(request):
     if request.POST:
         curPlanID = request.POST['planID']
@@ -735,7 +766,9 @@ def sendReport(request):
         concatComments = ""
         if(allComments):
             for n in allComments:
-                concatComments += str(n.eval_userID.user_type) + ": " + str(n.eval_text) + " <br> "
+                concatComments += str(n.eval_userID.user_type) + ": " + str(n.eval_text) + " \r\n"
+
+        print(concatComments)
 
         #2. Status
 
@@ -746,13 +779,17 @@ def sendReport(request):
 
         #Change http when we have
 
-
         try:
-            r = requests.post('http://172.21.148.168/api/auth/', data={
+            requests.post('http://172.21.148.168/api/auth/', data={
                 'PlanID': curPlanID,
                 'Comments': concatComments,
                 'PlanStatus': reportStatus
             })
+            print("Report Sent")
+            print(curPlanID)
+            print(concatComments)
+            print(reportStatus)
+
         except HTTPError as e:
             print('Error code: ', e.code)
         except URLError as e:
@@ -762,14 +799,15 @@ def sendReport(request):
             # do something
             print('Plan sent to CMO successfully!')
 
-        print(r.status_code)
+        # print(r.status_code)
+        # print(curPlanID)
+        # print(concatComments)
+        # print(reportStatus)
 
-        print(curPlanID)
-        print(concatComments)
-        print(reportStatus)
+        #update plan_comments in comments box.
 
-        #Change the status of report to pending cmo fortesting
-        if(reportStatus == True):
+        # Change the status of report to pending cmo fortesting
+        if (reportStatus == True):
             Plan.objects.filter(plan_ID=curPlanID).update(plan_status="Approved")
             Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.now())
         else:
@@ -820,6 +858,7 @@ def saveComment(request):
         else:
             testDuplicate[0].delete()
             eval_entry.save()
+
     return HttpResponse('')
 
 def getComments(request, userType, plan_id):

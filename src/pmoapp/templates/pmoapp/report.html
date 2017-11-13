@@ -321,7 +321,7 @@
 				<label for="txtCrisisDateTime" class="col-form-label col-md-2 text-left">Latest Plan ID/Status:</label>
 				<div class="form-group col-md-3">
 				{% if plan_ID > 0 %}
-				  <input type="text" class="form-control" id="txtPlanStatus" value="{{ planItem.plan_ID }} : {{ planItem.plan_status }}" readonly>
+				  <input type="text" class="form-control" id="txtPlanStatus" value="{{ planItem.plan_num }} : {{ planItem.plan_status }}" readonly>
 				{% else %}
 				  <input type="text" class="form-control" id="txtPlanStatus" value="No Plan Submitted by CMO" readonly>
 				{% endif %}
@@ -389,7 +389,6 @@
 				</div>
 			</div>
 			<h4 class="reportHeader"> Crisis Resolution Plan </h4>
-			{% if plan_ID > 0 %}
 				 <div class="form-row">
 					<label for="txtPlanID" class="col-form-label col-md-2">Plan ID/Status:</label>
 					<div class="form-group col-md-3">
@@ -400,6 +399,12 @@
 					  <input type="text" class="form-control" id="txtPlanReceipt" value="{{ planItem.plan_receipt }}" readonly>
 					</div>
 				  </div>
+				<div class="form-row">
+					<label for="txtplanType" class="col-form-label col-md-2 text-left" id="lblplanType">Plan Type:</label>
+					<div class="form-group col-md-3">
+					  <input type="text" class="form-control" id="txtplanType" value="{{ planItem.plan_type }}" readonly>
+					</div>
+				</div>
 
 				   <div class="form-group">
 					<label for="txtPlanDescription">Plan Description:</label>
@@ -420,12 +425,7 @@
 					  <input type="text" class="form-control" id="txtProjectedCasualties" value="{{ planItem.plan_projCasualtyRate }} %" readonly>
 					</div>
 				</div>
-				<!--<div class="form-row">
-					<label for="txtProjectedCrisisResolution" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisResolution">Est. Resolution Time:</label>
-					<div class="form-group col-md-3">
-					  <input type="text" class="form-control" id="txtProjectedCrisisResolution" value="{{ planItem.plan_projResolutionTime }}" readonly>
-					</div>
-				</div>-->
+
 
 				<h5 class="reportSubheader mb-3"> EF Deployment Details </h5>
 				<div class="form-row">
@@ -467,108 +467,8 @@
 				</div>
 
 				<h4 class="reportHeader"> Review of Crisis Report </h4>
-				<h5 class="reportHeader pb-4"> Your Comments and Approvals</h5>
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="card-header" id="reportPanel{{ curAccount.user_type }}" data-toggle="collapse" href="#filterPanel{{ curAccount.user_type }}" data-parent="#exampleAccordion">
-								<i class="fa fa-check-square" id="tickCross{{ curAccount.user_type }}"></i>
-								{{ curAccount.appointment }}
-							<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel4">
-								<i class="fa fa-chevron-right" id="panelArrow{{ curAccount.user_type }}"></i>
-							</span>
-						</div>
-					</div>
-					<div class="card-body" id="reportPanelBody{{ curAccount.user_type }}">
-						<div id="filterPanel{{ curAccount.user_type }}" class="panel-collapse panel-collapse collapse">
-							<div class="panel-body">
-								<h5 class="reportHeader" style="padding-top:5px;"> Comments:</h5>
-								<div class="reportReview">
-									{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
-									<textarea disabled class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{% if c.eval_text %}{{ c.eval_text }}{% endif %}{% endfor %}</textarea>
-									{% else %}
-									<textarea class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{% if c.eval_text %}{{ c.eval_text }}{% endif %}{% endfor %}</textarea>
-									{% endif %}
-								</div>
-								<h5 class="reportHeader">Authorization of External Agencies:</h5>
-
-								<div class="form-group" id="dynamicInput">
-
-									<div class="form-row mb-3">
-										{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
-										<button type="button" class="btn btn-default col-md-2 ml-1" id="anotherAgencyBtn" onClick="addInput('dynamicInput');" disabled>Add Agency</button>
-										{% else %}
-										<button type="button" class="btn btn-default col-md-2 ml-1" id="anotherAgencyBtn" onClick="addInput('dynamicInput');">Add Agency</button>
-										{% endif %}
-										<div class="col-md-5 pl-4" id="agencyDdl1">
-											<select id="agencyDdl" class="form-control agencyDdl" name="myInputs[]">
-											</select>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<h5 class="reportHeader pb-4"> Comments and Approvals from other Ministers </h5>
-				<div id="commentUpdates">
-					{% for a in allAccounts %}
-						{% if a.user_type != accountType %} <!--PM-->
-							<div class="panel panel-default">
-								<div class="panel-heading">
-									<div class="card-header" id="reportPanel{{ a.user_type }}" data-toggle="collapse" href="#filterPanel{{ a.user_type }}" data-parent="#exampleAccordion">
-											<i class="fa fa-check-square" id="tickCross{{ a.user_type }}"></i>
-											{{ a.appointment }}
-										<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel{{ a.user_type }}">
-											<i class="fa fa-chevron-right" id="panelArrow{{ a.user_type }}"></i>
-										</span>
-									</div>
-								</div>
-								<div class="card-body" id="reportPanelBody{{ a.user_type }}">
-									<div id="filterPanel{{ a.user_type }}" class="panel-collapse panel-collapse collapse">
-										<div class="panel-body">
-											<div class="reportReview">
-												<!--<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ submittedUsers }}</textarea>-->
-												{% if a.user_type not in submittedUsers %}
-												<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ a.appointment }}: {{ a.name }} has not reviewed the Plan: {{ planItem.plan_ID}} (pid: {{ planItem.plan_ID }}).</textarea>
-												{% else %}
-													{% for c in allComments %}
-														{% if a.user_type == c.eval_userID.user_type %}
-															<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{% if c.eval_hasComment %}{{ c.eval_text }}{% else %}{{ a.appointment }}: {{ a.name }} has reviewed, and does not have any further comments for the Plan: {{ planItem.plan_ID}} (pid: {{ planItem.plan_ID }}).{% endif %}	</textarea>
-														{% endif %}
-													{% endfor %}
-												{% endif %}
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						{% endif %}
-					{% endfor %}
-				</div>
-				{% csrf_token %}
-				<div class="form-row mb-5">
-						{% if accountType != "PM" %}
-							{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
-								<button disabled type="submit" class="btn btn-primary col-md-2 offset-5" id="btnSubmit">Submit Comments</button>
-							{% else %}
-					<button type="submit" class="btn btn-primary col-md-2 offset-5" id="btnSubmit"><a class="nav-link" data-toggle="modal" data-target="#afterSubmit">Submit Comments</a></button>
-							{% endif %}
-						{% endif %}
-						{%  if accountType == "PM"  %}
-							{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
-								<button disabled type="submit" class="btn btn-primary col-md-4 offset-4" id="btnPM">Submit Reviewed Report to CMO</button>
-							{% else %}
-								<!--<button type="submit" class="btn btn-primary col-md-4 offset-4" id="btnPM">Submit Reviewed Report to CMO</button>-->
-								<button type="submit" class="btn btn-primary col-md-4 offset-4" id="btnPM"><a class="nav-link" data-toggle="modal" data-target="#pmModal">
-			              Submit Reviewed Report to CMO</a></button>
-							{% endif %}
-						{% endif %}
-				</div>
-			{% else %}
-				<div class="mb-5 mt-2">
-					<h4>No plan submitted by CMO for Crisis: {{ crisisItem.crisis_ID }}</h4>
-				</div>
-			{% endif %}
+				<h5 class="reportHeader pb-2">PMO Comments (Crisis {{ crisisItem.crisis_ID }} - Plan {{ planItem.plan_num }})</h5>
+				<textarea disabled class="form-control mb-2" id="txt{{ curAccount.user_type }}" rows="10">{{ planItem.plan_comments }}</textarea>
 			</form>
 			</section>
 

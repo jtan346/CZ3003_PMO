@@ -15,10 +15,12 @@ router2.register(r'eval_planID',EvalPlanViewSet)
 router3 = routers.SimpleRouter()
 router3.register(r'PlanID',TestViewSet)
 router4 = routers.SimpleRouter()
-router4.register(r'planID',CMOViewSet)
+# router4.register(r'planID',CMOViewSet)
+#router4.register(r'planID', cmoapi)
 
 urlpatterns = [ #pylint: disable=invalid-name
     #url(r'^$', login, name='login'),
+    url(r'^api/cmoapi/',cmoapi),
     url(r'^$', auth_views.login, {'template_name': 'pmoapp/login.html'}, name='login'),
     url(r'^login/$', auth_views.login, {'template_name': 'pmoapp/login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, name='logout'),
@@ -52,7 +54,6 @@ urlpatterns = [ #pylint: disable=invalid-name
     url(r'^getComments/(?P<userType>[\w-]+)/(?P<plan_id>[\w-]+)/$', getComments),
 
     #url(r'^admin/', admin.site.urls),
-
 ]
 
 #pseudo startup-class

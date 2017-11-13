@@ -228,45 +228,47 @@
                             </thead>
                             <tbody>
                             {% if ongoingCrisis %}
-                            {% for crisis in ongoingCrisis %}
-                            {% if toDisplay %}
-                            <!--have plans for some-->
-                            {% for plan in toDisplay %}
-                            {% if crisis.crisis_ID == plan.plan_crisisID %}
-                            <!--if this crisis has plan-->
-                            <tr>
-                                <td>Crisis: {{ plan.plan_crisisID }} - Plan: {{ plan.plan_ID }}</td>
-                                <!--<td><a href="/report/{{ plan.plan_ID }}">{{ crisis.crisis_name }}</a></td>-->
-                                <td><a href="/crisis/{{ plan.plan_crisisID }}">{{ crisis.crisis_name }}</a></td>
-                                <td>{{ crisis.crisis_datetime }}</td>
-                                <!--<td>{{ plan.plan_ID }}</td>-->
-                                <td>{{ plan.plan_receipt }}</td>
-                                <td>{{ plan.plan_status }}</td>
-                            </tr>
+                                {% for crisis in ongoingCrisis|dictsort:"crisis_ID" %}
+                                    {% if toDisplay %}
+                                    <!--have plans for some-->
+                                        {% if crisis.crisis_ID in planIDs %}
+                                            {% for plan in toDisplay %}
+                                                {% if crisis.crisis_ID == plan.plan_crisisID %}
+                                                <!--if this crisis has plan-->
+                                                <tr>
+                                                    <td>Crisis: {{ plan.plan_crisisID }} - Plan: {{ plan.plan_num }} ({{ plan.plan_ID }})</td>
+                                                    <!--<td><a href="/report/{{ plan.plan_ID }}">{{ crisis.crisis_name }}</a></td>-->
+                                                    <td><a href="/crisis/{{ plan.plan_crisisID }}">{{ crisis.crisis_name }}</a></td>
+                                                    <td>{{ crisis.crisis_datetime }}</td>
+                                                    <!--<td>{{ plan.plan_ID }}</td>-->
+                                                    <td>{{ plan.plan_receipt }}</td>
+                                                    <td>{{ plan.plan_status }}</td>
+                                                </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td>Crisis: {{ crisis.crisis_ID }} - Plan: None</td>
+                                                <!--<td><a href="/report/{{ plan.plan_ID }}">{{ crisis.crisis_name }}</a></td>-->
+                                                <td><a href="/crisis/{{ crisis.crisis_ID }}">{{ crisis.crisis_name }}</a></td>
+                                                <td>{{ crisis.crisis_datetime }}</td>
+                                                <!--<td>{{ plan.plan_ID }}</td>-->
+                                                <td colspan="2">No Plan Received</td>
+                                            </tr>
+                                        {% endif %}
+                                    {% else %}
+                                    <!--no plans at all-->
+                                    <tr>
+                                        <td>Crisis: {{ crisis.crisis_ID }} - Plan: None</td>
+                                        <td><a href="/crisis/{{ crisis.crisis_ID }}">{{ crisis.crisis_name }}</a></td>
+                                        <td>{{ crisis.crisis_datetime }}</td>
+                                        <!--<td>{{ plan.plan_ID }}</td>-->
+                                        <td colspan="2">No Plan Received</td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
                             {% else %}
-                            <!--if this crisis has no plan-->
-                            <tr>
-                                <td>Crisis: {{ crisis.crisis_ID }} - Plan: None</td>
-                                <td><a href="/crisis/{{ crisis.crisis_ID }}">{{ crisis.crisis_name }}</a></td>
-                                <td>{{ crisis.crisis_datetime }}</td>
-                                <!--<td>{{ plan.plan_ID }}</td>-->
-                                <td colspan="2">No plan Received</td>
-                            </tr>
-                            {% endif %}
-                            {% endfor %}
-                            {% else %}
-                            <!--no plans at all-->
-                            <tr>
-                                <td>Crisis: {{ crisis.crisis_ID }} - Plan: None</td>
-                                <td><a href="/crisis/{{ crisis.crisis_ID }}">{{ crisis.crisis_name }}</a></td>
-                                <td>{{ crisis.crisis_datetime }}</td>
-                                <!--<td>{{ plan.plan_ID }}</td>-->
-                                <td colspan="2">No plan Received</td>
-                            </tr>
-                            {% endif %}
-                            {% endfor %}
-                            {% else %}
-                            <tr><td colspan="5">Singapore is safe!</td></tr>
+                                <tr><td colspan="5">Singapore is safe!</td></tr>
                             {% endif %}
                             </tbody>
                         </table>
