@@ -21,6 +21,7 @@ import urllib
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 import warnings
+import datetime
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
@@ -142,7 +143,7 @@ def MyCMOApi():
                         #plan_status = data[i]['actionplan_set'][k]['status']  # plan_status: Needs Translation
                         plan_projtime = data[i]['actionplan_set'][k]['resolution_time']  # plan_projResolutionTime
                         plan_projcasualty = data[i]['actionplan_set'][k]['projected_casualties']  # plan_projCasualtyRate
-                        plan_type = data[i]['actionplan_set'][k]['type']  # ??
+                        plan_type = data[i]['actionplan_set'][k]['type']  # included
                         plan_senttime = data[i]['actionplan_set'][k]['outgoing_time']
 
                         #buffer input
@@ -170,10 +171,10 @@ def MyCMOApi():
                         if(data[i]['actionplan_set'][k]['status'] == "PMOApproved"):
                             plan_status = "Approved"
                             if (data[i]['actionplan_set'][k]['comment']):
-                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=data[i]['actionplan_set'][k]['comment']['text'])
+                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=data[i]['actionplan_set'][k]['comment']['text'])
                             else:
                                 fillercomment = "No comments for: Crisis " + str(crisis_id) + " - Plan " + str(plan_num)
-                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=fillercomment)
+                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=fillercomment)
                             testPlan = Plan.objects.filter(plan_ID=plan_id)
                             if not testPlan:
                                 newPlan.save()
@@ -184,10 +185,10 @@ def MyCMOApi():
                         elif(data[i]['actionplan_set'][k]['status'] == "PMORequest"):
                             plan_status = "Pending PMO"
                             if (data[i]['actionplan_set'][k]['comment']):
-                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=data[i]['actionplan_set'][k]['comment']['text'])
+                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=data[i]['actionplan_set'][k]['comment']['text'])
                             else:
                                 fillercomment = "No comments for: Crisis " + str(crisis_id) + " - Plan " + str(plan_num)
-                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=fillercomment)
+                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=fillercomment)
                             testPlan = Plan.objects.filter(plan_ID=plan_id)
                             if not testPlan:
                                 newPlan.save()
@@ -200,10 +201,10 @@ def MyCMOApi():
                             #I rejected
                             plan_status = "Pending CMO"
                             if (data[i]['actionplan_set'][k]['comment']):
-                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=data[i]['actionplan_set'][k]['comment']['text'])
+                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=data[i]['actionplan_set'][k]['comment']['text'])
                             else:
                                 fillercomment = "No comments for: Crisis " + str(crisis_id) + " - Plan " + str(plan_num)
-                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=fillercomment)
+                                newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status, plan_receipt=datetime.datetime.now(), plan_sendtime=plan_senttime, plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF, plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF, plan_comments=fillercomment)
                             testPlan = Plan.objects.filter(plan_ID=plan_id)
                             if not testPlan:
                                 newPlan.save()
@@ -229,12 +230,17 @@ def MyCMOApi():
                         stat_injured = data[i]['efupdate_set'][l]['totalInjured']  # updates_curInjuries
                         stat_deaths = data[i]['efupdate_set'][l]['totalDeaths']  # updates_curDeaths
                         stat_duration = data[i]['efupdate_set'][l]['duration']  # ??
-                        stat_description = data[i]['efupdate_set'][l]['description']  #?? updates_description
+                        # stat_description = data[i]['efupdate_set'][l]['description']  #?? updates_description
 
                         # buffer input
                         curSAF = 0
                         curSPF = 0
                         curSCDF = 0
+
+                        if(data[i]['efupdate_set'][l]['description']):
+                            stat_description=data[i]['efupdate_set'][l]['description']
+                        else:
+                            stat_description="No description for crisis at: "+str(stat_datetime)
 
                         if (data[i]['efupdate_set'][l]['forceutilization_set']):
                             plan_forces = data[i]['efupdate_set'][l]['forceutilization_set']
@@ -256,7 +262,7 @@ def MyCMOApi():
                             print("Stat already exists")
 
                 else:
-                    newStat = CrisisUpdates(updates_crisisID=crisis_id, updates_datetime=datetime.now(),updates_curInjuries=0, updates_curDeaths=0, updates_curSAF=0,updates_curSPF=0, updates_curSCDF=0, updates_description="")
+                    newStat = CrisisUpdates(updates_crisisID=crisis_id, updates_datetime=datetime.datetime.now(),updates_curInjuries=0, updates_curDeaths=0, updates_curSAF=0,updates_curSPF=0, updates_curSCDF=0, updates_description="")
                     newStat.save()
                     print("No Statistics for Crisis: " + str(crisis_id)+". Creating filler data.")
         else:
@@ -332,7 +338,7 @@ def home(request):
     MyCMOListener()
     template = loader.get_template('pmoapp/HomeGUI/home.html')
 #Process Account/Session
-    updateTime = datetime.now()
+    updateTime = datetime.datetime.now()
     curUsername = request.user
     curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
     accountType = curAccount.user_type
@@ -381,7 +387,7 @@ def history(request):
 
     #Get user info
 
-    updateTime = datetime.now()
+    updateTime = datetime.datetime.now()
     curUsername = request.user
     curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
     accountType = curAccount.user_type
@@ -436,7 +442,7 @@ def crisis(request, crisis_id):
         return redirect('/otplogout')
 
     template = loader.get_template('pmoapp/CrisisGUI/crisis.html')
-    updateTime = datetime.now()
+    updateTime = datetime.datetime.now()
     curUsername = request.user
     curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
     curUserType = curAccount.user_type
@@ -468,7 +474,6 @@ def crisis(request, crisis_id):
         planItem = maxi
         plan_id = maxi.plan_ID
 
-
     if CrisisUpdates.objects.filter(updates_crisisID=crisisItem.crisis_ID):
         updateItem = CrisisUpdates.objects.filter(updates_crisisID=crisisItem.crisis_ID).latest('updates_datetime')
     else:
@@ -488,6 +493,11 @@ def crisis(request, crisis_id):
             toDisplay.append(max)
 
     graphUpdateList = CrisisUpdates.objects.filter(updates_crisisID=crisisItem.crisis_ID)
+
+    #display update comments:
+    allUpdates = []
+    if(CrisisUpdates.objects.filter(updates_crisisID=crisisItem.crisis_ID)):
+        allUpdates = CrisisUpdates.objects.filter(updates_crisisID=crisisItem.crisis_ID)
 
     #test to see if there is a comment by this minister yet
 
@@ -526,6 +536,7 @@ def crisis(request, crisis_id):
 
     context = {
         'planItem': planItem,
+        'allUpdates': allUpdates,
         'curAgencies': serializers.serialize('json', curAgencies),
         'profilePicture': profilePicture,
         'decisionTable': decisionTable,
@@ -558,7 +569,7 @@ def report(request, plan_id):
         return redirect('/otplogout')
 
     template = loader.get_template('pmoapp/CrisisGUI/report.html')
-    updateTime = datetime.now()
+    updateTime = datetime.datetime.now()
     curUsername = request.user
     curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
     curUserType = curAccount.user_type
@@ -628,6 +639,10 @@ def report(request, plan_id):
     else:
         curAgencies = []
 
+    allUpdates = []
+    if (CrisisUpdates.objects.filter(updates_crisisID=crisisItem.crisis_ID)):
+        allUpdates = CrisisUpdates.objects.filter(updates_crisisID=crisisItem.crisis_ID)
+
     print("open")
     print(crisisItem.crisis_status)
     print(planItem.plan_comments)
@@ -635,6 +650,7 @@ def report(request, plan_id):
 
     context = {
         'planItem': planItem,
+        'allUpdates': allUpdates,
         'profilePicture': profilePicture,
         'decisionTable': decisionTable,
         'ongoingCrisis': crisisList,
@@ -713,10 +729,10 @@ def sendReport(request):
         # Change the status of report to pending cmo fortesting
         if (reportStatus == True):
             Plan.objects.filter(plan_ID=curPlanID).update(plan_status="Approved")
-            Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.now())
+            Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.datetime.now())
         else:
             Plan.objects.filter(plan_ID=curPlanID).update(plan_status="Pending CMO")
-            Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.now())
+            Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.datetime.now())
 
     return HttpResponse('')
 
@@ -825,6 +841,18 @@ class crisisUpdates(ListView):
         if(CrisisUpdates.objects.filter(updates_crisisID=find_id)):
             updateItem = CrisisUpdates.objects.filter(updates_crisisID=find_id).latest('updates_datetime')
         return updateItem
+    def get_context_data(self, **kwargs):
+        find_id = self.kwargs['slug']
+        allUpdates = CrisisUpdates.objects.filter(updates_crisisID=find_id)
+        updateItem = []
+        if (CrisisUpdates.objects.filter(updates_crisisID=find_id)):
+            updateItem = CrisisUpdates.objects.filter(updates_crisisID=find_id).latest('updates_datetime')
+        context = {
+            'allUpdates': allUpdates,
+            'updateItem': updateItem
+        }
+        return context
+
 
 class graphUpdates(ListView):
     template_name='pmoapp/CrisisGUI/graphUpdates.html'
@@ -884,7 +912,7 @@ def newsfeed(request):
         return redirect('/otplogout')
     template=loader.get_template('pmoapp/NewsfeedGUI/newsfeed.html')
 
-    updateTime = datetime.now()
+    updateTime = datetime.datetime.now()
     curUsername = request.user
     curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
     accountType = curAccount.user_type

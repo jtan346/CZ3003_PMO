@@ -385,6 +385,11 @@
 						<input type="text" class="form-control" id="txtCurSCDF" value="{{ updateItem.updates_curSCDF}} %" readonly>
 					</div>
 				</div>
+				<div class="form-group">
+					<label for="txtUpdateDescription">Crisis Update Descriptions:</label>
+					<textarea class="form-control col-md-11" id="txtUpdateDescription" rows="5" readonly>{% if allUpdates %}{% for item in allUpdates %}{{ item.updates_description|linenumbers }}{% endfor %}{% endif %}
+					</textarea>
+				</div>
 				<div class="form-row">
 					<!--<label for="txtThreatLevel" class="col-form-label col-md-2 text-left" id="lblThreatLevel">Threat Level:</label>
 					<div class="form-group col-md-2">
@@ -398,9 +403,9 @@
 					<div class="form-group col-md-3">
 					  <input type="text" class="form-control" id="txtPlanID" value="{{ planItem.plan_num }}: {{ planItem.plan_status }}" readonly>
 					</div>
-					 <label for="txtPlanReceipt" class="col-form-label col-md-2 offset-1 text-left">Plan Receipt:</label>
+					 <label for="txtPlanDispatched" class="col-form-label col-md-2 offset-1 text-left">Plan Dispatched:</label>
 					<div class="form-group col-md-3">
-					  <input type="text" class="form-control" id="txtPlanReceipt" value="{{ planItem.plan_receipt }}" readonly>
+					  <input type="text" class="form-control" id="txtPlanDispatched" value="{{ planItem.plan_sendtime }}" readonly>
 					</div>
 				  </div>
 				<div class="form-row">
@@ -408,12 +413,13 @@
 					<div class="form-group col-md-3">
 					  <input type="text" class="form-control" id="txtplanType" value="{{ planItem.plan_type }}" readonly>
 					</div>
+					<label for="txtPlanReceipt" class="col-form-label col-md-2 offset-1 text-left">Plan Receipt:</label>
+					<div class="form-group col-md-3">
+					  <input type="text" class="form-control" id="txtPlanReceipt" value="{{ planItem.plan_receipt }}" readonly>
+					</div>
 				</div>
 
-				   <div class="form-group">
-					<label for="txtPlanDescription">Plan Description:</label>
-					<textarea class="form-control col-md-11" id="txtPlanDescription" rows="5" readonly>{{ planItem.plan_description }}</textarea>
-				  </div>
+
 
 				<div class="form-row">
 					<!--<label for="txtProjectedCrisisRadius" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisRadius">Projected Crisis Radius:</label>
@@ -429,7 +435,10 @@
 					  <input type="text" class="form-control" id="txtProjectedCasualties" value="{{ planItem.plan_projCasualtyRate }} %" readonly>
 					</div>
 				</div>
-
+					<div class="form-group">
+					<label for="txtPlanDescription">Plan Description:</label>
+					<textarea class="form-control col-md-11" id="txtPlanDescription" rows="5" readonly>{{ planItem.plan_description }}</textarea>
+				  </div>
 
 				<h5 class="reportSubheader mb-3"> EF Deployment Details </h5>
 				<div class="form-row">

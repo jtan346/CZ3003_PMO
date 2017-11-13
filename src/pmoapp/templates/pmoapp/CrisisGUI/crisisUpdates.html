@@ -5,22 +5,22 @@
 <div class="form-row">
     <label for="txtReportedDeaths" class="col-form-label col-md-2 text-left" id="lblReportedDeaths">Reported Deaths:</label>
     <div class="form-group col-md-2">
-      <input type="text" class="form-control" id="txtReportedDeaths" value="{{ object_list.updates_curDeaths }}" readonly>
+      <input type="text" class="form-control" id="txtReportedDeaths" value="{{ updateItem.updates_curDeaths }}" readonly>
     </div>
     <label for="txtCurSAF" class="col-form-label col-md-3 offset-1 text-left" id="lblCurSAF">Current SAF Utilization:</label>
     <div class="form-group col-md-2">
-      <input type="text" class="form-control" id="txtCurSAF" value="{{ object_list.updates_curSAF }} %" readonly>
+      <input type="text" class="form-control" id="txtCurSAF" value="{{ updateItem.updates_curSAF }} %" readonly>
     </div>
 </div>
 
 <div class="form-row">
     <label for="txtReportedInjuries" class="col-form-label col-md-2 text-left" id="lblReportedInjuries">Reported Injuries:</label>
     <div class="form-group col-md-2">
-      <input type="text" class="form-control" id="txtReportedInjuries" value="{{ object_list.updates_curInjuries }}" readonly>
+      <input type="text" class="form-control" id="txtReportedInjuries" value="{{ updateItem.updates_curInjuries }}" readonly>
     </div>
     <label for="txtCurSPF" class="col-form-label col-md-3 offset-1 text-left" id="lblCurSPF">Current SPF Utilization:</label>
     <div class="form-group col-md-2">
-        <input type="text" class="form-control" id="txtCurSPF" value="{{ object_list.updates_curSPF }} %" readonly>
+        <input type="text" class="form-control" id="txtCurSPF" value="{{ updateItem.updates_curSPF }} %" readonly>
     </div>
 </div>
 
@@ -32,8 +32,13 @@
     </div>-->
     <label for="txtCurSCDF" class="col-form-label col-md-3 offset-5 text-left" id="lblCurSCDF">Current SCDF Utilization:</label>
     <div class="form-group col-md-2">
-        <input type="text" class="form-control" id="txtCurSCDF" value="{{ object_list.updates_curSCDF}} %" readonly>
+        <input type="text" class="form-control" id="txtCurSCDF" value="{{ updateItem.updates_curSCDF}} %" readonly>
     </div>
+</div>
+<div class="form-group">
+	<label for="txtUpdateDescription">Crisis Update Descriptions:</label>
+	<textarea class="form-control col-md-11" id="txtUpdateDescription" rows="5" readonly>{% if allUpdates %}{% for item in allUpdates %}{{ item.updates_description|linenumbers }}{% endfor %}{% endif %}
+	</textarea>
 </div>
 <div class="form-row">
     <!--<label for="txtThreatLevel" class="col-form-label col-md-2 text-left" id="lblThreatLevel">Threat Level:</label>
