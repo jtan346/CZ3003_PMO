@@ -132,7 +132,7 @@ def MyCMOApi():
 
     # with urllib.request.urlopen('http://172.21.148.168/api/pmo/') as url:
     try:
-        url = urllib.request.urlopen('http://172.21.148.168/api/pmo/', timeout=5)
+        url = urllib.request.urlopen('http://172.21.148.168/api/pmo/', timeout=3)
         s = url.read()
         #data = json.loads(s.decode('utf-8'))
         data = json.loads(s.decode('utf-8'))
@@ -354,13 +354,13 @@ def MyCMOApi():
 #     #set timer to call the api can change to value of 60 current set to 1 min
 
 def login(request):
-    return render(request, 'pmoapp/LoginGUI/login.html', {})
+    return render(request, 'pmoapp/login.html', {})
 
 def logout(request):
-    return render(request, 'pmoapp/LoginGUI/logout.html', {})
+    return render(request, 'pmoapp/logout.html', {})
 
 def otplogout(request):
-    return render(request, 'pmoapp/LoginGUI/otplogout.html', {})
+    return render(request, 'pmoapp/otplogout.html', {})
 
 def otp(request):
     subject = 'OTP'
@@ -375,7 +375,7 @@ def otp(request):
     send_mail(subject, email_text, from_email, to_email, fail_silently=False)
     # send_mail(subject, str(OTP), from_email, to_email, fail_silently=False)
     print(str(OTP))
-    return render(request, 'pmoapp/LoginGUI/authotp.html', {})
+    return render(request, 'pmoapp/authotp.html', {})
 
 def resendOTP(request):
     del request.session['OTP']
@@ -385,7 +385,7 @@ def resendOTP(request):
     OTP = request.session['OTP'] = randint(10000000, 99999999)
     email_text = str(request.user) + ": " + str(OTP)
     send_mail(subject, email_text, from_email, to_email, fail_silently=False)
-    return render(request, 'pmoapp/LoginGUI/authotp.html', {})
+    return render(request, 'pmoapp/authotp.html', {})
 
 def otpAuthentication(request):
     if request.POST:
@@ -414,7 +414,7 @@ def home(request):
         return redirect('/otplogout')
     #MyCMOApi()
     MyCMOListener()
-    template = loader.get_template('pmoapp/HomeGUI/home.html')
+    template = loader.get_template('pmoapp/home.html')
 #Process Account/Session
     updateTime = datetime.now()
     curUsername = request.user
@@ -450,6 +450,9 @@ def home(request):
             toDisplay.append(max)
             planIDS.append(max.plan_crisisID)
 
+    # print(crisisList)
+    # print(toDisplay)
+
     context = {
         'toDisplay': toDisplay,
         'ongoingCrisis': crisisList,
@@ -467,7 +470,7 @@ def history(request):
     if not login_check(request.session):
         return redirect('/otplogout')
 
-    template = loader.get_template('pmoapp/HistoricalGUI/history.html')
+    template = loader.get_template('pmoapp/history.html')
 
 #Get user info
 
@@ -533,7 +536,7 @@ def crisis(request, crisis_id):
     if not login_check(request.session):
         return redirect('/otplogout')
 
-    template = loader.get_template('pmoapp/CrisisGUI/crisis.html')
+    template = loader.get_template('pmoapp/crisis.html')
     updateTime = datetime.now()
     curUsername = request.user
     curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
@@ -591,15 +594,8 @@ def crisis(request, crisis_id):
     #test to see if there is a comment by this minister yet
 
     if(plan_id != -1):
-        if (EvalPlan.objects.filter(eval_planID__plan_ID=plan_id)):
-            allComments = EvalPlan.objects.filter(eval_planID__plan_ID=plan_id)
-        else:
-            allComments = []
-
-        if (EvalPlan.objects.filter(eval_planID__plan_ID=plan_id, eval_userID__user_type=curUserType)):
-            myComments = EvalPlan.objects.filter(eval_planID__plan_ID=plan_id, eval_userID__user_type=curUserType)
-        else:
-            myComments = []
+        allComments = EvalPlan.objects.filter(eval_planID__plan_ID=plan_id)
+        myComments = EvalPlan.objects.filter(eval_planID__plan_ID=plan_id, eval_userID__user_type=curUserType)
 
         submittedUsers = []
         for c in allComments:
@@ -617,13 +613,10 @@ def crisis(request, crisis_id):
 
     myAgencies = ExternalAgency.objects.filter(agency_approver__user_type=curUserType)
 
-
     if(ApproveAgency.objects.filter(approve_approver__user_type=curUserType, approve_crisis__crisis_ID=crisis_id)):
         curAgencies = ApproveAgency.objects.filter(approve_approver__user_type=curUserType, approve_crisis__crisis_ID=crisis_id)
     else:
         curAgencies = []
-
-    # print(curAgencies)
 
     # print("open")
     # print(crisis_id)
@@ -665,7 +658,7 @@ def report(request, plan_id):
     if not login_check(request.session):
         return redirect('/otplogout')
 
-    template = loader.get_template('pmoapp/CrisisGUI/report.html')
+    template = loader.get_template('pmoapp/report.html')
     updateTime = datetime.now()
     curUsername = request.user
     curAccount = Account.objects.filter(username=curUsername).get()  # in session or something
@@ -710,15 +703,8 @@ def report(request, plan_id):
     graphUpdateList = CrisisUpdates.objects.filter(updates_crisisID=crisisItem.crisis_ID)
 
     # test to see if there is a comment by this minister yet
-    if (EvalPlan.objects.filter(eval_planID__plan_ID=plan_id)):
-        allComments = EvalPlan.objects.filter(eval_planID__plan_ID=plan_id)
-    else:
-        allComments = []
-
-    if(EvalPlan.objects.filter(eval_planID__plan_ID=plan_id, eval_userID__user_type=curUserType)):
-        myComments = EvalPlan.objects.filter(eval_planID__plan_ID=plan_id, eval_userID__user_type=curUserType)
-    else:
-        myComments = []
+    allComments = EvalPlan.objects.filter(eval_planID__plan_ID=plan_id)
+    myComments = EvalPlan.objects.filter(eval_planID__plan_ID=plan_id, eval_userID__user_type=curUserType)
 
     submittedUsers = []
     for c in allComments:
@@ -904,7 +890,7 @@ def getComments(request, userType, plan_id):
     return HttpResponse(json.dumps(context))
 
 class commentUpdates(ListView):
-    template_name = 'pmoapp/CrisisGUI/commentUpdates.html'
+    template_name = 'pmoapp/commentUpdates.html'
     find_id = ""
 
     def get_queryset(self):
@@ -937,7 +923,7 @@ class commentUpdates(ListView):
         return context
 
 class crisisUpdates(ListView):
-    template_name = 'pmoapp/CrisisGUI/crisisUpdates.html'
+    template_name = 'pmoapp/crisisUpdates.html'
     findID=""
     def get_queryset(self):
         find_id = self.kwargs['slug']
@@ -947,7 +933,7 @@ class crisisUpdates(ListView):
         return updateItem
 
 class graphUpdates(ListView):
-    template_name='pmoapp/CrisisGUI/graphUpdates.html'
+    template_name='pmoapp/graphUpdates.html'
     find_id=""
     def get_queryset(self):
         find_id = self.kwargs['slug']
@@ -962,26 +948,41 @@ class graphUpdates(ListView):
         return context
 
 class notificationBellUpdate(ListView):
-    template_name = 'pmoapp/HomeGUI/notificationBell.html'
+    template_name = 'pmoapp/notificationBell.html'
     def get_queryset(self):
+        curNotifications = Notifications.objects.all()
         lastfive = Notifications.objects.all().order_by('-id')[:5]
         lastfive1 = reversed(lastfive)
         return lastfive1
 
     def get_context_data(self, **kwargs):
-       #if have notifications
+        # for key in self.request.session.keys():
+        #     print key
+
+        #if no notifications
         if(Notifications.objects.all()):
             curNotifications1 = Notifications.objects.all()
             curCount = curNotifications1.count()
             lastfive = Notifications.objects.all().order_by('-id')[:5]
             lastfive1 = reversed(lastfive)
         else:
-            curCount = 0
-            lastfive1 = []
             curNotifications1 = []
+            lastfive1 = []
+            curCount = 0
 
+        #Session: User's total read noti
+        #From db: Total noti
+
+        # print "User read:"
+        # print sessionNotiCount
         sessionNotiCount = self.request.session['NumNotifications']
         leftNotiCount = curCount-sessionNotiCount
+
+        # print "From DB"
+        # print curCount
+        #
+        # print "Bell no. of new:"
+        # print leftNotiCount
 
         context = {
             'sessionNotiCount': sessionNotiCount, #No. of User's Currently Read Notifications
@@ -1007,7 +1008,7 @@ def updateNotiCount(request):
 def newsfeed(request):
     if not login_check(request.session):
         return redirect('/otplogout')
-    template=loader.get_template('pmoapp/NewsfeedGUI/newsfeed.html')
+    template=loader.get_template('pmoapp/newsfeed.html')
 
     updateTime = datetime.now()
     curUsername = request.user
@@ -1050,5 +1051,38 @@ def newsfeed(request):
         'profilePicture': profilePicture,
         # 'crisisID': json.dumps(crisisItem.crisis_ID),
         'curName': json.dumps(curUser)
+    }
+    return HttpResponse(template.render(context, request))
+
+#def testinginsertdb(Request):
+    #newAccount = Account(username="benji", password="12345", emailAddress="benjamintanjb@gmail.com", user_type="PM")
+    #newAccount.save()
+    #return HttpResponse("IT SAVED " + str(newAccount.username))
+
+def test(request, plan_id):
+    template = loader.get_template('pmoapp/test.html')
+
+    planItem = Plan.objects.filter(plan_ID=plan_id).get()
+    crisisItem = planItem.plan_crisisID
+    crisisItem2 = planItem.plan_crisisID.crisis_ID
+
+    # d1 = planItem.plan_projResolutionTime
+    # d2 = crisisItem.crisis_dateTime
+    # FMT = '%H:%M:%S'
+    # tdelta = datetime.strptime(d1, FMT) - datetime.strptime(d2, FMT)
+
+    updateItem = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=crisisItem2).latest('updates_datetime')
+    graphUpdateList = CrisisUpdates.objects.filter(updates_crisisID__crisis_ID=crisisItem.crisis_ID)
+
+    # for item in planItem:
+    #     planCrisisID = item.plan_crisisID
+
+    context = {
+        'planItem': planItem,
+        'crisisItem': crisisItem,
+        'crisisItem2': crisisItem2,
+        'jsonCrisis': serializers.serialize('json', graphUpdateList),
+        'updateItem': updateItem,
+        # 'tdelta': tdelta
     }
     return HttpResponse(template.render(context, request))

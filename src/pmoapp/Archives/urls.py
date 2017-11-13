@@ -21,8 +21,8 @@ from rest_framework import routers
 urlpatterns = [ #pylint: disable=invalid-name
     #url(r'^$', login, name='login'),
     url(r'^api/cmoapi/', CMOSerializer),
-    url(r'^$', auth_views.login, {'template_name': 'pmoapp/LoginGUI/login.html'}, name='login'),
-    url(r'^login/$', auth_views.login, {'template_name': 'pmoapp/LoginGUI/login.html'}, name='login'),
+    url(r'^$', auth_views.login, {'template_name': 'pmoapp/login.html'}, name='login'),
+    url(r'^login/$', auth_views.login, {'template_name': 'pmoapp/login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, name='logout'),
     url(r'^logout2/$', logout, name='logout2'),
     url(r'^otplogout', otplogout, name='otplogout'),
@@ -35,6 +35,8 @@ urlpatterns = [ #pylint: disable=invalid-name
     url(r'^newsfeed', newsfeed, name='newsfeed'),
     url(r'^notificationBell', notificationBellUpdate.as_view(), name='notificationBell'),
     url(r'^history', history, name='history'),
+    #url(r'^test', test, name='test'),
+    url(r'^test/(?P<plan_id>[0-9]{8})$', test, name='test'),
     url(r'^crisisUpdates/(?P<slug>[\w-]+)/$', crisisUpdates.as_view()), #slug=crisisID
     url(r'^graphUpdates/(?P<slug>[\w-]+)/$', graphUpdates.as_view()),
     url(r'^commentUpdates/(?P<slug>[\w-]+)/$', commentUpdates.as_view()),

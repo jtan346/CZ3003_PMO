@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en" ng-app="chatApp">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>PMOSIMS</title>
+	<!-- Chat Function -->
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.0/angular.min.js"></script>
+	      <script src="/static/vendor/jquery/jquery.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.6.4/firebase.js"></script>
+	      <script>
+		// This will be generated in the firebase console
+		var config = {
+			apiKey: "AIzaSyCGfibas_wVxOWSR-uqewBTLtYdcbwW37k",
+			authDomain: "testapp-f3e73.firebaseapp.com",
+			databaseURL: "https://testapp-f3e73.firebaseio.com",
+			projectId: "testapp-f3e73",
+			storageBucket: "testapp-f3e73.appspot.com",
+			messagingSenderId: "300550730836"
+	  	};
+    	firebase.initializeApp(config);
+    </script>
+    <script text="text/javascript">
+		var channel = {{ crisisID|safe }};
+		var sender = {{ curName|safe }};
+		var rawData = {{ jsonCrisis|safe }};
+		var accountType = "{{ accountType|safe }}";
+		var jsonComments = {{ jsonComments|safe }};
+
+		//if(jsonComments.length >0) console.log(jsonComments); else console.log("No comments for this plan");
+	</script>
+	<script src="/static/js/FirebaseManager.js"></script>
+	  <script type="text/javascript">
+	  var map;
+    var initMap = function(){
+        map = new google.maps.Map(document.getElementById("map"),{
+            zoom: 12,
+            center: new google.maps.LatLng(1.42000000, 103.65),
+            mapTypeId: 'roadmap'
+        });
+
+        var icon_loc = '../../static/images/map/';
+        var icons = {
+            Hostage: icon_loc + "Terrorism.png",
+            Bombing:icon_loc + "Bombing.png",
+            Riot: icon_loc + "Riot.png",
+            Fire: icon_loc + "Fire.png",
+            Hijacking: icon_loc + "Hijacking.png",
+            Kidnapping: icon_loc + "Kidnapping.png",
+            Natural_Disasters: icon_loc + "NaturalDisaster.png",
+            Radiological: icon_loc + "Biohazard.png"
+        };
+
+        {% if allSubCrisis %}
+        {% for report in allSubCrisis %}
+        var lat = {{report.latitude}}, long = {{report.longitude}};
+        var cent = new google.maps.LatLng(lat,long);
+        var radius = {{ report.radius }};
+
+
+        var image = {
+            url: icons['{{ report.crisis_type }}'],
+            //size: new google.maps.Size(100, 100),
+            // The origin for this image is (0, 0).
+            origin: new google.maps.Point(0, 0),
+            // The anchor with respect to the Lat and Long
+            anchor: new google.maps.Point(30, 30)
+        };
+
+        var crisisCircle = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35,
+            map: map,
+            center: cent,
+            radius: radius,//in metres (cannot use the loc, wierdly causes the radius to become super big
+        });
+
+        var marker = new google.maps.Marker({
+            position: cent,
+            icon: image,
+            map:map
+        });
+
+        {% endfor %}
+        {% endif %}
+    }
+    $(document).ready(function(){
+    	window.setTimeout( function(){
+
+    		google.maps.event.trigger(map, 'resize');
+    	}, 2000);
+    });
+
+</script>
+	  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDDacnVEtNIWnbMCw_QI94kynm0_ytIalQ&callback=initMap"
+        type="text/javascript"></script>
+
+	  <!--<script src="/static/js/mygraph.js"></script>-->
+    <script src="https://cdn.firebase.com/libs/angularfire/2.2.0/angularfire.min.js"></script>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom fonts for this template -->
+    <link href="/static/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <!-- Plugin CSS -->
+    <link href="/static/vendor/datatables/dataTables.bootstrap4.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="/static/vendor/css/sb-admin.css" rel="stylesheet">
+	  <style>
+  #profilePic {
+	margin:10px;
+    border-radius: 35%;
+  }
+  .article {
+	  float: left;
+	}
+
+	.article:nth-child(odd) {
+	  clear: left;
+	}
+</style>
+  </head>
+  <body class="fixed-nav sticky-footer bg-dark" id="page-top">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+      <a class="navbar-brand" href="../../home">PMOSIMS</a>
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+			<li>
+                <div class="article-container" style="color:#ffffff; height:120px;">
+                  <div class="article">
+                        <img src="{% static profilePicture %}"  id ="profilePic" alt = "image" width="100px" height="100px"/>
+                  </div>
+                  <div class="article" style="width:118px; padding-top:20px;">
+                        Welcome,<br/>{{accountType}} {{curUser}}
+                  </div>
+                </div>
+          </li>
+
+             <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Home">
+            <a class="nav-link" href="../../home">
+              <i class="fa fa-fw fa-home"></i>
+              <span class="nav-link-text">
+                Home</span>
+            </a>
+          </li>
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Current Crisis">
+            <a class="nav-link nav-link-collapse" data-toggle="collapse" href="#collapseComponents" data-parent="#exampleAccordion">
+              <i class="fa fa-fw fa-list"></i>
+              <span class="nav-link-text">
+                Current Crisis Reports</span>
+            </a>
+			<!--<ul class="sidenav-second-level collapse" id="collapseComponents">-->
+			<ul class="sidenav-second-level show" id="collapseComponents">
+                {% if ongoingCrisis %}
+                    {% for c in ongoingCrisis %}
+                        {% if c.crisis_ID|stringformat:"i" == crisis_ID %}
+                            <li class="active">
+                                <a href="../../crisis/{{ c.crisis_ID }}">Crisis {{ c.crisis_ID }}: {{ c.crisis_name|truncatechars:15 }}</a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="../../crisis/{{ c.crisis_ID }}">Crisis {{ c.crisis_ID }}: {{ c.crisis_name|truncatechars:15 }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <li>
+                        <p>No Ongoing Crisis</p>
+                    </li>
+                {% endif %}
+            </ul>
+          </li>
+	
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Past Reports">
+            <a class="nav-link" href="../../history">
+              <i class="fa fa-fw fa-history"></i>
+              <span class="nav-link-text">
+                Past Reports</span>
+            </a>
+          </li>
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live News Feed">
+            <a class="nav-link" href="../../newsfeed">
+              <i class="fa fa-fw fa-feed"></i>
+              <span class="nav-link-text">
+                Live News Feed</span>
+            </a>
+          </li>
+		  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live News Feed">
+            <a class="nav-link" href="../../#">
+              <i class="fa fa-fw fa-feed"></i>
+              <span class="nav-link-text">
+                CMO Public Broadcast</span>
+            </a>
+          </li>
+
+        </ul>
+        <ul class="navbar-nav sidenav-toggler">
+          <li class="nav-item">
+            <a class="nav-link text-center" id="sidenavToggler">
+              <i class="fa fa-fw fa-angle-left"></i>
+            </a>
+          </li>
+        </ul>
+
+        <!-- End of Sidebar -->
+
+        <ul class="navbar-nav ml-auto">
+			<li class="nav-item dropdown" id="alertBellNotification">
+					<a class="nav-link dropdown-toggle mr-lg-2" href="" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="updateNotiCount()">
+					  <i class="fa fa-fw fa-bell"></i>
+					  <span class="d-lg-none">Alerts
+						<span class="badge badge-pill badge-warning">0 New</span>
+					  </span>
+					  <span class="new-indicator text-warning d-none d-lg-block">
+						{% if object_list|length > 0 %}
+                            <i class="fa fa-fw fa-circle"></i>
+                            <span class="number">{{ object_list|length }}</span>
+                          {% endif %}
+					  </span>
+					</a>
+					<div class="dropdown-menu" aria-labelledby="alertsDropdown">
+					  <h6 class="dropdown-header">Recent Notifications:</h6>
+
+					 <!-- <div class="dropdown-divider"></div>
+					  <a class="dropdown-item" href="Orchard Road.html">
+						<span class="text-success">
+						  <strong>Crisis Over</strong>
+						</span>
+						<span class="small float-right text-muted">11:21 AM</span>
+						<div class="dropdown-message small">Resolved: Bombing Incident at Orchard Road</div>
+					  </a>-->
+
+					  <div class="dropdown-divider"></div>
+					  <a class="dropdown-item small" href="">
+						Last Updated: {% now "M. j, Y, h:i a" %}
+					  </a>
+					</div>
+			</li>
+     
+          <li class="nav-item" id="logoutBtn">
+            <a class="nav-link" data-toggle="modal" data-target="#logoutModal">
+              <i class="fa fa-fw fa-sign-out"></i>
+              Logout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="content-wrapper">
+
+      <div class="container-fluid">
+
+        <!-- Breadcrumbs -->
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="../../home">Home</a>
+          </li>
+          <li class="breadcrumb-item active">Explosion at Changi Airport Terminal 3</li>
+        </ol>
+
+
+        <!-- Example Tables Card -->
+		  <div class="form-row">
+        <div class="card mb-1 col-md-9" style="padding-right:0px;padding-left:0px;">
+          <div class="card-header">
+            <!--<i class="fa fa-tv"></i>-->
+            Explosion at Changi Airport Terminal 3
+			<i id="statusLabel">{{ planItem.plan_status }}
+			</i>
+          </div>
+		  
+		  <div class="tab_container">
+			<input id="tab1" type="radio" name="tabs" checked>
+			<label class= "tab" for="tab1"><span>Report</span></label>
+
+			<input id="tab2" type="radio" name="tabs">
+			<label class= "tab" for="tab2"><span>Dashboard</span></label>
+
+			<input id="tab3" type="radio" name="tabs">
+			<label class= "tab" for="tab3"><span>Google Maps</span></label>
+
+			 <input id="tab4" type="radio" name="tabs">
+			<label class= "tab" for="tab4"><span>Decision Table</span></label>
+
+			<section id="content1" class="tab-content">
+			<form>
+                <h4 class="reportHeader"> Crisis Details </h4>
+				<div class="form-row">
+					<label for="txtCrisisName" class="col-form-label col-md-2 text-left">Crisis Title:</label>
+					<div class="form-group col-md-9">
+					  <input type="text" class="form-control" id="txtCrisisName" value='{{ crisisItem.crisis_name }}' readonly>
+					</div>
+				</div>
+				<div class="form-row">
+				<!--<label for="txtCrisisID" class="col-form-label col-md-2 text-left">Crisis ID:</label>
+				<div class="form-group col-md-3">
+				  <input type="text" class="form-control" id="txtCrisisID" value='{{ crisisItem.crisis_ID }}' readonly>
+				</div>-->
+				<label for="txtCurPlanID" class="col-form-label col-md-2 text-left">Crisis ID/Status:</label>
+				<div class="form-group col-md-3">
+				  <input type="text" class="form-control" id="txtCurPlanID" value="{{ crisisItem.crisis_ID }} : {{ crisisItem.crisis_status }}" readonly>
+				</div>
+				<label for="txtCrisisDateTime" class="col-form-label col-md-3 text-right">Crisis Reported Date/Time:</label>
+				<div class="form-group col-md-3">
+				  <input type="text" class="form-control" id="txtCrisisDateTime" value="{{ crisisItem.crisis_datetime }}" readonly>
+				</div>
+              </div>
+			<div class="form-row">
+				<!--<label for="txtLatestPlanID" class="col-form-label col-md-2 text-left">Latest Plan ID:</label>
+				<div class="form-group col-md-3">
+				  <input type="text" class="form-control" id="txtLatestPlanID" value='{{ planItem.plan_ID }}' readonly>
+				</div>-->
+				<label for="txtCrisisDateTime" class="col-form-label col-md-2 text-left">Latest Plan ID/Status:</label>
+				<div class="form-group col-md-3">
+				{% if plan_ID > 0 %}
+				  <input type="text" class="form-control" id="txtPlanStatus" value="{{ planItem.plan_num }} : {{ planItem.plan_status }}" readonly>
+				{% else %}
+				  <input type="text" class="form-control" id="txtPlanStatus" value="No Plan Submitted by CMO" readonly>
+				{% endif %}
+				</div>
+              </div>
+
+				<div class="form-row">
+				<!--<label for="txtCrisisAddr" class="col-form-label col-md-2 text-left">Crisis Address:</label>
+				<div class="form-group col-md-3">
+				  <input type="text" class="form-control" id="txtCrisisAddr" value='{{ crisisItem.crisis_address }}' readonly>
+				</div>-->
+
+              </div>
+			  
+			   <div class="form-group">
+				<label for="txtCrisisDescription">Crisis Description:</label>
+				<textarea class="form-control col-md-11" id="txtCrisisDescription" rows="5" readonly>{{ crisisItem.crisis_description }}
+				</textarea>
+			  </div>
+			  
+			<h4 class="reportHeader"> Current Crisis Statistics</h4>
+			<div id="crisisUpdates">
+				<div class="form-row">
+					<h6 class="col-form-label text-left bottom-buffer bold italic">Last Updated: {{updateItem.updates_datetime}}</h6>
+				</div>
+
+				<div class="form-row">
+					<label for="txtReportedDeaths" class="col-form-label col-md-2 text-left" id="lblReportedDeaths">Reported Deaths:</label>
+					<div class="form-group col-md-2">
+					  <input type="text" class="form-control" id="txtReportedDeaths" value="{{ updateItem.updates_curDeaths }}" readonly>
+					</div>
+					<label for="txtCurSAF" class="col-form-label col-md-3 offset-1 text-left" id="lblCurSAF">Current SAF Utilization:</label>
+					<div class="form-group col-md-2">
+					  <input type="text" class="form-control" id="txtCurSAF" value="{{ updateItem.updates_curSAF }} %" readonly>
+					</div>
+				</div>
+
+				<div class="form-row">
+					<label for="txtReportedInjuries" class="col-form-label col-md-2 text-left" id="lblReportedInjuries">Reported Injuries:</label>
+					<div class="form-group col-md-2">
+					  <input type="text" class="form-control" id="txtReportedInjuries" value="{{ updateItem.updates_curInjuries }}" readonly>
+					</div>
+					<label for="txtCurSPF" class="col-form-label col-md-3 offset-1 text-left" id="lblCurSPF">Current SPF Utilization:</label>
+					<div class="form-group col-md-2">
+						<input type="text" class="form-control" id="txtCurSPF" value="{{ updateItem.updates_curSPF }} %" readonly>
+					</div>
+				</div>
+
+				<div class="form-row">
+
+					<!--<label for="txtAffectedRadius" class="col-form-label col-md-2 text-left" id="lblAffectedRadius">Affected Radius:</label>
+					<div class="form-group col-md-2">
+					  <input type="text" class="form-control" id="txtAffectedRadius" value="{{ updateItem.updates_curRadius }} m" readonly>
+					</div>-->
+					<label for="txtCurSCDF" class="col-form-label col-md-3 offset-5 text-left" id="lblCurSCDF">Current SCDF Utilization:</label>
+					<div class="form-group col-md-2">
+						<input type="text" class="form-control" id="txtCurSCDF" value="{{ updateItem.updates_curSCDF}} %" readonly>
+					</div>
+				</div>
+				<div class="form-row">
+					<!--<label for="txtThreatLevel" class="col-form-label col-md-2 text-left" id="lblThreatLevel">Threat Level:</label>
+					<div class="form-group col-md-2">
+						<input type="text" class="form-control" id="txtThreatLevel" value="{{ updateItem.updates_curThreatLevel }}" readonly>
+					</div>-->
+				</div>
+			</div>
+			<h4 class="reportHeader"> Crisis Resolution Plan </h4>
+			{% if plan_ID > 0 %}
+				 <div class="form-row">
+					<label for="txtPlanID" class="col-form-label col-md-2">Plan ID/Status:</label>
+					<div class="form-group col-md-3">
+					  <input type="text" class="form-control" id="txtPlanID" value="{{ planItem.plan_num }}: {{ planItem.plan_status }}" readonly>
+					</div>
+					 <label for="txtPlanReceipt" class="col-form-label col-md-2 offset-1 text-left">Plan Receipt:</label>
+					<div class="form-group col-md-3">
+					  <input type="text" class="form-control" id="txtPlanReceipt" value="{{ planItem.plan_receipt }}" readonly>
+					</div>
+				  </div>
+					<div class="form-row">
+					<label for="txtplanType" class="col-form-label col-md-2 text-left" id="lblplanType">Plan Type:</label>
+					<div class="form-group col-md-3">
+					  <input type="text" class="form-control" id="txtplanType" value="{{ planItem.plan_type }}" readonly>
+					</div>
+				</div>
+				   <div class="form-group">
+					<label for="txtPlanDescription">Plan Description:</label>
+					<textarea class="form-control col-md-11" id="txtPlanDescription" rows="5" readonly>{{ planItem.plan_description }}</textarea>
+				  </div>
+
+				<div class="form-row">
+					<!--<label for="txtProjectedCrisisRadius" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisRadius">Projected Crisis Radius:</label>
+					<div class="form-group col-md-3">
+					  <input type="text" class="form-control" id="txtProjectedCrisisRadius" value="{{ planItem.plan_projRadius }} m" readonly>
+					</div>-->
+					<label for="txtProjectedCrisisResolution" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisResolution">Est. Resolution Time:</label>
+					<div class="form-group col-md-3">
+					  <input type="text" class="form-control" id="txtProjectedCrisisResolution" value="{{ planItem.plan_projResolutionTime }}" readonly>
+					</div>
+					<label for="txtProjectedCasualties" class="col-form-label col-md-2 offset-1 text-left" id="lblProjectedCasualties">Projected Casualties:</label>
+					<div class="form-group col-md-3">
+					  <input type="text" class="form-control" id="txtProjectedCasualties" value="{{ planItem.plan_projCasualtyRate }} %" readonly>
+					</div>
+				</div>
+				<!--<div class="form-row">
+					<label for="txtProjectedCrisisResolution" class="col-form-label col-md-2 text-left" id="lblProjectedCrisisResolution">Est. Resolution Time:</label>
+					<div class="form-group col-md-3">
+					  <input type="text" class="form-control" id="txtProjectedCrisisResolution" value="{{ planItem.plan_projResolutionTime }}" readonly>
+					</div>
+				</div>-->
+
+				<h5 class="reportSubheader mb-3"> EF Deployment Details </h5>
+				<div class="form-row">
+					<div class="col-form-label col-md-3">
+						<label for="txtRecommendedSAFDeployment" class="text-left" id="lblRecommendedSAFDeployment">Recommended SAF Deployment:</label>
+					</div>
+					<div class="form-group col-md-2">
+					  <input type="text" class="form-control" id="txtRecommendedSAFDeployment" value="{{ planItem.plan_SAFRecommended }} %" readonly>
+					</div>
+					<div class="col-form-label col-md-3 offset-1">
+						<label for="txtMaximumSAFDeployment" class="text-left" id="lblMaximumSAFDeployment">Maximum SAF Deployment:</label>
+					</div>
+					<div class="form-group col-md-2">
+					  <input type="text" class="form-control" id="txtMaximumSAFDeployment" value="{{ planItem.plan_SAFMaximum }} %" readonly>
+					</div>
+
+				</div>
+
+				<div class="form-row">
+					<label for="txtRecommendedSCDFDeployment" class="col-form-label col-md-3 text-left" id="lblRecommendedSCDFDeployment">Recommended SCDF Deployment:</label>
+					<div class="form-group col-md-2">
+					  <input type="text" class="form-control" id="txtRecommendedSCDFDeployment" value="{{ planItem.plan_SCDFRecommended }} %" readonly>
+					</div>
+					<label for="txtMaximumSCDFDeployment" class="col-form-label col-md-3 offset-1 text-left" id="lblMaximumSCDFDeployment">Maximum SCDF Deployment:</label>
+					<div class="form-group col-md-2">
+					  <input type="text" class="form-control" id="txtMaximumSCDFDeployment" value="{{ planItem.plan_SCDFMaximum }} %" readonly>
+					</div>
+				</div>
+
+				<div class="form-row">
+					<label for="txtRecommendedSPFDeployment" class="col-form-label col-md-3 text-left" id="lblRecommendedSPFDeployment">Recommended SPF Deployment:</label>
+					<div class="form-group col-md-2">
+					  <input type="text" class="form-control" id="txtRecommendedSPFDeployment" value="{{ planItem.plan_SPFRecommended }} %" readonly>
+					</div>
+					<label for="txtMaximumSPFDeployment" class="col-form-label col-md-3 offset-1 text-left" id="lblMaximumSPFDeployment">Maximum SPF Deployment:</label>
+					<div class="form-group col-md-2">
+					  <input type="text" class="form-control" id="txtMaximumSPFDeployment" value="{{ planItem.plan_SPFMaximum }} %" readonly>
+					</div>
+				</div>
+
+				<h4 class="reportHeader"> Review of Crisis Report </h4>
+				<h5 class="reportHeader pb-4"> Your Comments and Approvals</h5>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<div class="card-header" id="reportPanel{{ curAccount.user_type }}" data-toggle="collapse" href="#filterPanel{{ curAccount.user_type }}" data-parent="#exampleAccordion">
+								<i class="fa fa-check-square" id="tickCross{{ curAccount.user_type }}"></i>
+								{{ curAccount.appointment }}
+							<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel4">
+								<i class="fa fa-chevron-right" id="panelArrow{{ curAccount.user_type }}"></i>
+							</span>
+						</div>
+					</div>
+					<div class="card-body" id="reportPanelBody{{ curAccount.user_type }}">
+						<div id="filterPanel{{ curAccount.user_type }}" class="panel-collapse panel-collapse collapse">
+							<div class="panel-body">
+								<h5 class="reportHeader" style="padding-top:5px;"> Comments:</h5>
+								<div class="reportReview">
+									{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
+									<textarea disabled class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{% if c.eval_text %}{{ c.eval_text }}{% endif %}{% endfor %}</textarea>
+									{% else %}
+									<textarea class="form-control" id="txt{{ curAccount.user_type }}" rows="10">{% for c in myComments %}{% if c.eval_text %}{{ c.eval_text }}{% endif %}{% endfor %}</textarea>
+									{% endif %}
+								</div>
+								<h5 class="reportHeader">Authorization of External Agencies:</h5>
+
+								<div class="form-group" id="dynamicInput">
+
+									<div class="form-row mb-3">
+										{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
+										<button type="button" class="btn btn-default col-md-2 ml-1" id="anotherAgencyBtn" onClick="addInput('dynamicInput');" disabled>Add Agency</button>
+										{% else %}
+										<button type="button" class="btn btn-default col-md-2 ml-1" id="anotherAgencyBtn" onClick="addInput('dynamicInput');">Add Agency</button>
+										{% endif %}
+										<div class="col-md-5 pl-4" id="agencyDdl1">
+											<select id="agencyDdl" class="form-control agencyDdl" name="myInputs[]">
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<h5 class="reportHeader pb-4"> Comments and Approvals from other Ministers </h5>
+				<div id="commentUpdates">
+					{% for a in allAccounts %}
+						{% if a.user_type != accountType %} <!--PM-->
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<div class="card-header" id="reportPanel{{ a.user_type }}" data-toggle="collapse" href="#filterPanel{{ a.user_type }}" data-parent="#exampleAccordion">
+											<i class="fa fa-check-square" id="tickCross{{ a.user_type }}"></i>
+											{{ a.appointment }}
+										<span class="pull-right panel-collapse-clickable" data-toggle="collapse" data-parent="#accordion" href="#filterPanel{{ a.user_type }}">
+											<i class="fa fa-chevron-right" id="panelArrow{{ a.user_type }}"></i>
+										</span>
+									</div>
+								</div>
+								<div class="card-body" id="reportPanelBody{{ a.user_type }}">
+									<div id="filterPanel{{ a.user_type }}" class="panel-collapse panel-collapse collapse">
+										<div class="panel-body">
+											<div class="reportReview">
+												<!--<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ submittedUsers }}</textarea>-->
+												{% if a.user_type not in submittedUsers %}
+												<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{{ a.appointment }}: {{ a.name }} has not reviewed the Plan: {{ planItem.plan_ID}} (pid: {{ planItem.plan_ID }}).</textarea>
+												{% else %}
+													{% for c in allComments %}
+														{% if a.user_type == c.eval_userID.user_type %}
+															<textarea disabled class="form-control" id="txt{{ a.user_type }}" rows="10">{% if c.eval_hasComment %}{{ c.eval_text }}{% else %}{{ a.appointment }}: {{ a.name }} has reviewed, and does not have any further comments for the Plan: {{ planItem.plan_ID}} (pid: {{ planItem.plan_ID }}).{% endif %}	</textarea>
+														{% endif %}
+													{% endfor %}
+												{% endif %}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						{% endif %}
+					{% endfor %}
+				</div>
+				{% csrf_token %}
+				<div class="form-row mb-5">
+						{% if accountType != "PM" %}
+							{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
+								<button disabled type="submit" class="btn btn-primary col-md-2 offset-5" id="btnSubmit">Submit Comments</button>
+							{% else %}
+					<button type="submit" class="btn btn-primary col-md-2 offset-5" id="btnSubmit"><a class="nav-link" data-toggle="modal" data-target="#afterSubmit">Submit Comments</a></button>
+							{% endif %}
+						{% endif %}
+						{%  if accountType == "PM"  %}
+							{% if planItem.plan_status == "Pending CMO" or planItem.plan_status == "Approved" %}
+								<button disabled type="submit" class="btn btn-primary col-md-4 offset-4" id="btnPM">Submit Reviewed Report to CMO</button>
+							{% else %}
+								<!--<button type="submit" class="btn btn-primary col-md-4 offset-4" id="btnPM">Submit Reviewed Report to CMO</button>-->
+								<button type="submit" class="btn btn-primary col-md-4 offset-4" id="btnPM"><a class="nav-link" data-toggle="modal" data-target="#pmModal">
+			              Submit Reviewed Report to CMO</a></button>
+							{% endif %}
+						{% endif %}
+				</div>
+			{% else %}
+				<div class="mb-5 mt-2">
+					<h4>No plan submitted by CMO for Crisis: {{ crisisItem.crisis_ID }}</h4>
+				</div>
+			{% endif %}
+			</form>
+			</section>
+
+			<!-- Area Chart Example -->
+			<section id="content2" class="tab-content">
+			  <div class="card mb-3" id="dashboard">
+				 <div class="card-header">
+					  <!--<i class="fa fa-area-chart"></i>-->
+					  Dashboard  -  Last Updated: {{updateItem.updates_datetime}}
+				  </div>
+				  <div class="card-body">
+					  <canvas id="myAreaChart" width="100%" height="30"></canvas>
+				  </div>
+			  </div>
+			</section>
+
+			<section id="content3" class="tab-content">
+				<div class="card mb-3" id="testing">
+                    <div class="card-header">
+					  <!--<i class="fa fa-area-chart"></i>-->
+					  Crisis Map
+				  </div>
+					 <div id="map" class="x_content" style="height:50vh;"></div>
+				</div>
+			</section>
+
+			  <section id="content4" class="tab-content">
+				<div class="card mb-3" id="decisiontable">
+                    <div class="card-header">
+					  <!--<i class="fa fa-area-chart"></i>-->
+					  Decision Table for {{ curUser }}
+				  </div>
+				</div>
+					<div class="card-body">
+					    <img src="{% static decisionTable %}" alt = "image" width="1080" height="480"/>
+				    </div>
+			</section>
+
+		</div>
+
+        </div>
+			<div class="card mb-1 col-md-3" ng-controller="ChatController" id="myDiv" style="padding-left:0px; padding-right:0px; margin-left:5px; -ms-flex:0 0 25%;flex:0 0 25%;max-width:calc(25% - 5px);">
+				  <div class="card-header">
+					<!--<i class="fa fa-comments-o"></i>-->
+					CMO Messenger - Crisis ID: {{crisisItem.crisis_ID}}
+				  </div>
+				  <div class="card-body" style="overflow-x: hidden; overflow-y:scroll; min-height:60vh; max-height:64vh;">
+					<!--<p ng-repeat="m in messages">{{ m.messages }}- </p>-->
+					  <div>
+					  <p ng-repeat="m in fbmessages"> {% verbatim %}{{m.date | date:'short'}} - {{m.sender}}: <br> {{m.message}}{% endverbatim %}</p>
+					<!--{% for item in m %}{{ item }}{% endfor %}-->
+					</div>
+				  </div>
+				<div class="form-row">
+					<div class="form-group col-md-9" style="margin-left:5px; max-width:calc(75% - 5px); padding-top:5px;">
+						<input type="text" id = "txtFBMsgs" class="form-control" placeholder="Message here..." ng-model="messageText" onkeydown = "if (event.keyCode == 13) document.getElementById('sendBtn').click()">
+					</div>
+					<div class="form-group col-md-3" style="max-width:calc(25% - 5px);" >
+						<button type="submit" class="btn btn-primary btn-block" id="sendBtn" ng-click="send()">Send</button>
+					</div>
+				</div>
+			</div>
+      </div>
+	      <!-- /.container-fluid -->
+	</div>
+    </div>
+    <!-- /.content-wrapper -->
+
+    <footer class="sticky-footer">
+      <div class="container">
+        <div class="text-center">
+          <small>PMOSIMS 2017</small>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fa fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Logout Confirmation</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Select "Logout" below if you are ready to end your current session with PMOSIMS.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <a class="btn btn-primary" href="../../logout2">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Modal -->
+    <div class="modal fade" id="pmModal" tabindex="-1" role="dialog" aria-labelledby="pmLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document" style="margin:auto; margin-top:10%; max-width:30%;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="pmLabel">Authorize Submission of Crisis Resolution Plan</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="confirmationText">
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+			{%  if accountType == "PM"  %}
+            <a href="#" class="btn btn-primary" id="pmSubmit" data-toggle="modal" data-target="#" data-dismiss="modal">Approve</a>
+            <a href="#" class="btn btn-primary" id="pmReject" data-toggle="modal" data-target="#" data-dismiss="modal">Reject</a>
+	          {% else %}
+	        <a href="#" class="btn btn-primary" id="pmSubmit" data-toggle="modal" data-target="#afterSubmit" data-dismiss="modal">Submit</a>
+	          {% endif %}
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+     <!--PostSubmission Modal -->
+    <div class="modal fade" id="afterSubmit" tabindex="-1" role="dialog" aria-labelledby="postLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document" style="margin:auto; margin-top:10%; max-width:30%;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="postLabel">Crisis Resolution Plan Review Submitted</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="afterText">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="/static/vendor/popper/popper.min.js"></script>
+    <script src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="/static/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="/static/vendor/chart.js/Chart.min.js"></script>
+    <script src="/static/vendor/datatables/jquery.dataTables.js"></script>
+    <script src="/static/vendor/datatables/dataTables.bootstrap4.js"></script>
+
+    <!-- Custom scripts for this template -->
+    <!--<script src="/static/js/sb-admin.min.js"></script>-->
+	<script src="/static/vendor/js/report-panel.js"></script>
+	<script text="text/javascript">
+	if({{ planID }} > 0)
+	{
+		//Agencies Variables
+
+		var myAgencies = {{ myAgencies|safe }};
+		//var myApprovedAgencies = {{ approvedAgencies|safe }};
+		var counter = 1; //start with 1
+		var rowId = 1; //same as counter
+
+		//console.log(myAgencies);
+
+		var approvedAgencies = [];
+
+		//Get all unapproved agencies
+
+		//Fake data:
+		//var currentApprovals = ["SGS", "MAS"]
+		var currentApprovals = [];
+		var recApprovals = {{ curAgencies|safe }}
+		if(recApprovals.length>0){
+			for(var i = 0; i < recApprovals.length; i++) {
+				currentApprovals.push(recApprovals[i].fields['approve_agency']);
+			}
+		}
+
+		console.log("HELLO",currentApprovals);
+
+		var naAgencies = [];
+
+		for(var i = 0; i < myAgencies.length; i++) {
+			var found = false;
+			//for(var j = 0; j < myApprovedAgencies.length; j++) {
+				//if(myAgencies[i].pk == myApprovedAgencies[j].pk) {
+
+			for (var j = 0; j < currentApprovals.length; j++) {
+				//console.log(myAgencies[i].pk, currentApprovals[j]);
+				if(myAgencies[i].pk == currentApprovals[j]) {
+					found = true;
+					approvedAgencies.push(myAgencies[i]);
+				}
+			}
+			if(!found)
+				naAgencies.push(myAgencies[i]);
+		}
+
+		console.log(approvedAgencies);
+		console.log(naAgencies);
+
+		//PopulateDdl initial
+
+		var ddl = document.getElementById('agencyDdl');
+
+		ddl.innerHTML = "<option value =''>Select Agency</option>";
+
+		for(var i = 0; i < naAgencies.length; i++) {
+			ddl.innerHTML += "<option id=ddl"+naAgencies[i].pk+" value ="+naAgencies[i].pk+'>'+naAgencies[i].fields.agency_name+"</option>";
+		}
+
+		//populate initial selected stuffs
+
+		initialpushs();
+
+		var crisisStatus = {{ crisisStatus|safe }};
+
+		function initialpushs() {
+			for(var i = 0; i < approvedAgencies.length; i++) {
+
+				 var agencyRow = '\'agencyRow' + (rowId + 1) + "\'";
+				 var removeInput = 'onclick=\'removeInput(" + agencyRow + ");\'';
+
+				  var newdiv = document.createElement('div');
+				  newdiv.className = "form-row col-md-12 pl-1 mb-2";
+				  //newdiv.id = "agencyRow" + (rowId + 1);
+					newdiv.id = approvedAgencies[i].pk;
+
+				  var newdiv1 = document.createElement('div');
+				  if(crisisStatus != 'Resolved') {
+				        newdiv1.innerHTML = "<button type='button' class='btn btn-default removeButton' id='agencyRemove1' onClick='removeInput(&quot;" + approvedAgencies[i].pk + "&quot;);'><i class='fa fa-minus'></i></button>";
+					}
+					else {
+						newdiv1.innerHTML = "<button disabled type='button' class='btn btn-default removeButton' id='agencyRemove1' onClick='removeInput(&quot;" + approvedAgencies[i].pk + "&quot;);'><i class='fa fa-minus'></i></button>";
+
+					}
+				  var newdiv2 = document.createElement("label");
+				  newdiv2.className = "col-form-label col-md-1 text-right mr-3 ml-5";
+				  newdiv2.innerHTML = "Agency:";
+
+				  var newdiv3 = document.createElement("input");
+				  newdiv3.type = 'text';
+				  newdiv3.className = 'col-md-5 ml-3 pl-3 form-control';
+				  newdiv3.readOnly=true;
+				  newdiv3.value = approvedAgencies[i].pk + ": "+ approvedAgencies[i].fields.agency_name;
+
+				  var newdiv4 = document.createElement("label");
+				  newdiv4.className = "col-form-label col-md-2 text-right";
+				  newdiv4.innerHTML = "Agency POC:";
+
+				  var newdiv5 = document.createElement("input");
+				  newdiv5.type = 'text';
+				  newdiv5.className = 'col-md-2 ml-3 pl-3 form-control';
+				  newdiv5.readOnly=true;
+				  newdiv5.value = approvedAgencies[i].fields.agency_poc;
+
+				  newdiv.appendChild(newdiv1);
+				  newdiv.appendChild(newdiv2);
+				  newdiv.appendChild(newdiv3);
+				  newdiv.appendChild(newdiv4);
+				  newdiv.appendChild(newdiv5);
+
+				  document.getElementById('dynamicInput').appendChild(newdiv);
+
+				  counter++;
+				  rowId++;
+
+				console.log(counter, rowId);
+			}
+		}
+
+		function removeInput(divName){
+			var element = document.getElementById(divName);
+
+			for(var i = 0; i < myAgencies.length; i++) {
+				if(divName == myAgencies[i].pk)
+					naAgencies.push(myAgencies[i]);
+			}
+
+			//remove from currentapprovals
+
+			for(var i = 0; i < currentApprovals.length; i++) {
+				if(divName == currentApprovals[i])
+					currentApprovals.splice(i,1);
+			}
+
+			console.log(naAgencies, "added ", divName ," to ddl");
+			console.log(currentApprovals, "removed ", divName ," from current approvals");
+
+			element.outerHTML = "";
+			delete element;
+			counter--;
+			rowId--;
+
+			ddl.options.length = 0;
+
+			//Display all unapproved agencies in ddl
+
+			ddl.innerHTML = "<option value =''>Select Agency</option>";
+			for(var i = 0; i < naAgencies.length; i++) {
+				ddl.innerHTML += "<option id=ddl"+naAgencies[i].pk+" value ="+naAgencies[i].pk+'>'+naAgencies[i].fields.agency_name+"</option>";
+			}
+		}
+
+		function addInput(divName){
+			 if (naAgencies.length == 0)  {
+				  alert("You have no more Agencies to approve!");
+			 }else
+			 if(document.getElementById('agencyDdl').value != "") {
+			 	console.log(document.getElementById('agencyDdl').value);
+
+			 	currentApprovals.push(document.getElementById('agencyDdl').value);
+				console.log(currentApprovals, "added to currentApprovals");
+
+			 	naAgencies = [];
+
+			 	for(var i = 0; i < myAgencies.length; i++) {
+					var found = false;
+																				//for(var j = 0; j < myApprovedAgencies.length; j++) {
+																					//if(myAgencies[i].pk == myApprovedAgencies[j].pk) {
+					for (var j = 0; j < currentApprovals.length; j++) {
+						if(myAgencies[i].pk == currentApprovals[j]) {
+							found = true;
+						}
+					}
+					if(!found)
+						/*var found2 = false;
+						for(var k = 0; k < naAgencies.length; k++)
+							console.log(myAgencies[i].pk);
+							if(naAgencies[k].pk == myAgencies[i].pk)
+								found2 = true;
+						if(!found2)*/
+						naAgencies.push(myAgencies[i]);
+				}
+
+				//New Row
+
+				var agencyName;
+				var agencyPOC;
+
+				for(var i = 0; i < myAgencies.length; i++) {
+					if(ddl.value == myAgencies[i].pk) {
+						agencyName = myAgencies[i].fields.agency_name;
+						agencyPOC = myAgencies[i].fields.agency_poc;
+					}
+				}
+
+				 var agencyRow = '\'agencyRow' + (rowId + 1) + "\'";
+				 var removeInput = 'onclick=\'removeInput(" + agencyRow + ");\'';
+
+				  var newdiv = document.createElement('div');
+				  newdiv.className = "form-row col-md-12 pl-1 mb-2";
+				  //newdiv.id = "agencyRow" + (rowId + 1);
+					newdiv.id = ddl.value;
+
+				  var newdiv1 = document.createElement('div');
+				  newdiv1.innerHTML = "<button type='button' class='btn btn-default removeButton' id='agencyRemove1' onClick='removeInput(&quot;" + ddl.value + "&quot;);'><i class='fa fa-minus'></i></button>";
+
+				  var newdiv2 = document.createElement("label");
+				  newdiv2.className = "col-form-label col-md-1 text-right mr-3 ml-5";
+				  newdiv2.innerHTML = "Agency:";
+
+				  var newdiv3 = document.createElement("input");
+				  newdiv3.type = 'text';
+				  newdiv3.className = 'col-md-5 ml-3 pl-3 form-control';
+				  newdiv3.readOnly=true;
+				  newdiv3.value = ddl.value + ": "+ agencyName;
+
+				  var newdiv4 = document.createElement("label");
+				  newdiv4.className = "col-form-label col-md-2 text-right";
+				  newdiv4.innerHTML = "Agency POC:";
+
+				  var newdiv5 = document.createElement("input");
+				  newdiv5.type = 'text';
+				  newdiv5.className = 'col-md-2 ml-3 pl-3 form-control';
+				  newdiv5.readOnly=true;
+				  newdiv5.value = agencyPOC;
+
+				  newdiv.appendChild(newdiv1);
+				  newdiv.appendChild(newdiv2);
+				  newdiv.appendChild(newdiv3);
+				  newdiv.appendChild(newdiv4);
+				  newdiv.appendChild(newdiv5);
+
+
+				  document.getElementById(divName).appendChild(newdiv);
+
+				  counter++;
+				  rowId++;
+
+				console.log(counter, rowId);
+
+				//Remove all current agencies in ddl
+
+				ddl.options.length = 0;
+
+				//Display all unapproved agencies in ddl
+
+				ddl.innerHTML = "<option value =''>Select Agency</option>";
+				for(var i = 0; i < naAgencies.length; i++) {
+					ddl.innerHTML += "<option id=ddl"+naAgencies[i].pk+" value ="+naAgencies[i].pk+'>'+naAgencies[i].fields.agency_name+"</option>";
+				}
+
+				console.log(naAgencies);
+			 }else{
+			 	console.log("please select something bitch");
+			 	console.log(naAgencies);
+			 }
+		}
+	}
+
+	</script>
+	<!--<div class="form-row col-md-12 pl-1 mb-2" id="agencyRow1">
+		<button type="button" class="btn btn-default removeButton" id="agencyRemove1" onClick="removeInput(&quot;agencyRow1&quot;);"><i class="fa fa-minus"></i></button>
+		<label for="txtTesting" class="col-form-label col-md-1 text-right mr-3 ml-5" id="lblTesting">Agency:</label>
+		<div class="col-md-5 ml-3">
+		  <input type="text" class="form-control" id="txtTesting" value="ADF: Army Defence Force" readonly>
+		</div>
+
+		<label for="txtTesting2" class="col-form-label col-md-2 text-right" id="lblTesting2">Agency POC:</label>
+		<div class="col-md-2 ml-3">
+		  <input type="text" class="form-control" id="txtTesting2" value="Agent ADF" readonly>
+		</div>
+	</div>-->
+	<script text="text/javascript">
+			var graphData = [];
+			var labelData = [];
+			var injuriesData = [];
+			var deathsData = [];
+			var maxY = 0;
+			var delDate = 32;
+
+			for(var i = 0; i < rawData.length; i++) {
+				var pk = rawData[i].pk;
+				var crisisID = rawData[i].fields['updates_crisisID'];
+				var datetime = rawData[i].fields['updates_datetime'];
+				var curInjuries = rawData[i].fields['updates_curInjuries'];
+				var curDeaths = rawData[i].fields['updates_curDeaths'];
+				var curSAF = rawData[i].fields['updates_curSAF'];
+				var curSCDF = rawData[i].fields['updates_curSCDF'];
+				var curSPF = rawData[i].fields['updates_curSPF'];
+				var curRadius = rawData[i].fields['updates_curRadius'];
+
+				var jsonContainer = {
+					"pk":pk,
+					"crisisID":crisisID,
+					"datetime":datetime,
+					"curInjuries":curInjuries,
+					"curDeaths":curDeaths,
+					"curSAF":curSAF,
+					"curSCDF":curSCDF,
+					"curSPF":curSPF,
+					"curRadius":curRadius
+				};
+
+				if(curDeaths > maxY) maxY = curDeaths;
+				if(curInjuries > maxY) maxY = curInjuries;
+
+				graphData.push(jsonContainer);
+
+				var selDate = new Date(datetime);
+				var b = selDate.getDate();
+
+				if(delDate != b) {
+					var n = selDate.toLocaleString();
+					labelData.push(n);
+				}
+				else {
+					var n = selDate.toLocaleTimeString();
+					labelData.push(n);
+				}
+
+				var a = new Date(datetime);
+				delDate = a.getDate();
+
+				injuriesData.push(curInjuries);
+
+				deathsData.push(curDeaths);
+
+				console.log(injuriesData, deathsData);
+			}
+
+			maxY = maxY*1.2;
+			var tickWidth = maxY/5;
+		</script>
+	  <script text="text/javascript">
+		//For Crisis Updates
+		setInterval(function(){
+			$('#crisisUpdates').load("/crisisUpdates/{{crisisItem.crisis_ID}}");
+			console.log("HELLO");
+		},10000);
+
+		//For Graph Update
+		setInterval(function(){
+			$('#dashboard').load("/graphUpdates/{{crisisItem.crisis_ID}}");
+			//$("[data-toggle='toggle']").bootstrapToggle('destroy');
+			//$("[data-toggle='toggle']").bootstrapToggle();
+		},30000);
+
+		if({{ planID }} > 0)
+		{
+			//For Comments Updates
+			setInterval(function(){
+				var curPlanID ={{planID|safe}};
+				$('#commentUpdates').load("/commentUpdates/{{curAccount.user_type}}-"+curPlanID);
+			},15000);
+
+			$('#tab3').on('click', function() {
+				window.setTimeout( function(){
+					console.log("test");
+					google.maps.event.trigger(map, 'resize');
+			}, 500);
+			});
+
+			//For Report submission
+			/*var MDEFtxt = "empty";
+			var MOHAtxt = "empty";
+			var MOFAtxt = "empty";
+			var DPMtxt = "empty";
+			var PMtxt = "empty";*/
+
+			var MDEFhasComment = "False";
+			var MOHAhasComment = "False";
+			var MOFAhasComment = "False";
+			var DPMhasComment = "False";
+			var PMhasComment = "False";
+
+			var curPlanID = {{planID|safe}};
+			var respmsg = document.getElementById('afterText');
+			$('#btnSubmit').click(function() {
+				if(accountType == "MDEF"){
+					var MDEFtxt = $('#txtMDEF').val();
+					if(MDEFtxt == "" || MDEFtxt === undefined){ MDEFhasComment = "False";} else MDEFhasComment = "True";
+					var data = {
+							'planID': curPlanID,
+							'accType': accountType,
+							'commentTxt': MDEFtxt,
+							'hasComment': MDEFhasComment,
+							'myApprovals[]': currentApprovals,
+							csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+						};
+
+					$.ajax({
+						type: 'POST', //GET, POST, PUT or DELETE
+						url: '/saveComments/', //Rename! Location of the service
+						data: data,
+						success: function (msg) {
+						  //On Successful service call
+						  console.log(accountType+"'s response (Has Comment: "+ MDEFhasComment +") for "+curPlanID+ " has been saved!");
+                          var text = "Dear {{ curUser }}, your review of the Crisis Resolution Plan has been submitted. <br><br>";
+						  text += accountType + "'s response (Has Comment: ";
+						  text += MDEFhasComment + ") for ";
+						  text += curPlanID + " has been saved! <br><br> Thank you and have a nice day!";
+						  respmsg.innerHTML = text;						}
+
+					});
+
+				}else
+				if(accountType == "MOHA"){
+					var MOHAtxt = $('#txtMOHA').val();
+					if(MOHAtxt == "" || MOHAtxt === undefined) { MOHAhasComment = "False";} else MOHAhasComment = "True";
+
+					$.ajax({
+						type: 'POST', //GET, POST, PUT or DELETE
+						url: '/saveComments/', //Rename! Location of the service
+						data: {
+							'planID': curPlanID,
+							'accType': accountType,
+							'commentTxt': MOHAtxt,
+							'hasComment': MOHAhasComment,
+							'myApprovals[]': currentApprovals,
+							csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+						},
+						success: function (msg) {
+						  //On Successful service call
+						  console.log(accountType+"'s response (Has Comment: "+ MOHAhasComment +") for "+curPlanID+ " has been saved!");
+						  var text = "Dear {{ curUser }}, your review of the Crisis Resolution Plan has been submitted. <br><br>";
+						  text += accountType + "'s response (Has Comment: ";
+						  text += MOHAhasComment + ") for ";
+						  text += curPlanID + " has been saved! <br><br> Thank you and have a nice day!";
+						  respmsg.innerHTML = text;
+						}
+					});
+				}else
+				if(accountType == "MOFA"){
+					var MOFAtxt = $('#txtMOFA').val();
+					if(MOFAtxt == "" || MOFAtxt === undefined) { MOFAhasComment = "False";} else MOFAhasComment = "True";
+					/*ref = firebase.database().ref().child('2').child('CMO-PMO');
+					channel = 2;
+					$("#myDiv").load(location.href+" #myDiv>*","");
+					initChat();
+					console.log("here");
+					console.log(ref);*/
+					$.ajax({
+						type: 'POST', //GET, POST, PUT or DELETE
+						url: '/saveComments/', //Rename! Location of the service
+						data: {
+							'planID': curPlanID,
+							'accType': accountType,
+							'commentTxt': MOFAtxt,
+							'hasComment': MOFAhasComment,
+							'myApprovals[]': currentApprovals,
+							csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+						},
+						success: function (msg) {
+						  //On Successful service call
+						  console.log(accountType+"'s response (Has Comment: "+ MOFAhasComment +") for "+curPlanID+ " has been saved!");
+						  var text = "Dear {{ curUser }}, your review of the Crisis Resolution Plan has been submitted. <br><br>";
+						  text += accountType + "'s response (Has Comment: ";
+						  text += MOFAhasComment + ") for ";
+						  text += curPlanID + " has been saved! <br><br> Thank you and have a nice day!";
+						  respmsg.innerHTML = text;
+						}
+					});
+				}else
+				if(accountType == "DPM"){
+					var DPMtxt = $('#txtDPM').val();
+					if(DPMtxt == "" || DPMtxt === undefined) { DPMhasComment = "False";} else DPMhasComment = "True";
+
+					$.ajax({
+						type: 'POST', //GET, POST, PUT or DELETE
+						url: '/saveComments/', //Rename! Location of the service
+						data: {
+							'planID': curPlanID,
+							'accType': accountType,
+							'commentTxt': DPMtxt,
+							'hasComment': DPMhasComment,
+							'myApprovals[]': currentApprovals,
+							csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+						},
+						success: function (msg) {
+						  //On Successful service call
+						  console.log(accountType+"'s response (Has Comment: "+ DPMhasComment +") for "+curPlanID+ " has been saved!");
+						  var text = "Dear {{ curUser }}, your review of the Crisis Resolution Plan has been submitted. <br><br>";
+						  text += accountType + "'s response (Has Comment: ";
+						  text += DPMhasComment + ") for ";
+						  text += curPlanID + " has been saved! <br><br> Thank you and have a nice day!";
+						  respmsg.innerHTML = text;
+						}
+					});
+				}
+				else
+				{
+					console.log(accountType);
+				}
+			});
+
+			$('#pmSubmit').click(function() {
+				console.log("Submitted");
+				//Submit code here
+				//var afterText = document.getElementById('afterText');
+	            //afterText.innerHTML = "Dear {{ curUser }}, your review of the Crisis Resolution Plan has been submitted. <br><br> Thank you and have a nice day!";
+
+	            $.ajax({
+					type: 'POST', //GET, POST, PUT or DELETE
+					url: '/sendReport/', //Rename! Location of the service
+					data: {
+						'planID': {{ planID }},
+						'planAction': "Approve",
+						csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+					},
+					success: function (msg) {
+					  //On Successful service call
+					  //alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
+					  console.log("Sent {{ planItem.plan_ID }} to python");
+					  location.reload();
+					}
+				});
+
+	            console.log("Sent {{ planItem.plan_ID }} to python");
+	            location.reload();
+			});
+
+			$('#pmReject').click(function() {
+				console.log("Submitted");
+				//Submit code here
+				//var afterText = document.getElementById('afterText');
+	            //afterText.innerHTML = "Dear {{ curUser }}, your review of the Crisis Resolution Plan has been submitted. <br><br> Thank you and have a nice day!";
+
+	            $.ajax({
+					type: 'POST', //GET, POST, PUT or DELETE
+					url: '/sendReport/', //Rename! Location of the service
+					data: {
+						'planID': {{ planID }},
+						'planAction': "Reject",
+						csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+					},
+					success: function (msg) {
+					  //On Successful service call
+					  //alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
+					  console.log("Sent {{ planItem.plan_ID }} to python");
+					  location.reload();
+					}
+				});
+
+	            console.log("Sent {{ planItem.plan_ID }} to python");
+	            location.reload();
+			});
+
+			$('#btnPM').click(function() {
+				var PMtxt = $('#txtPM').val();
+				console.log(currentApprovals, "HERE");
+				if(PMtxt == "" || PMtxt === undefined) { PMhasComment = "False";} else PMhasComment = "True";
+				var confirmationText = document.getElementById('confirmationText');
+				$.ajax({
+					type: 'POST', //GET, POST, PUT or DELETE
+					url: '/saveComments/', //Rename! Location of the service
+					data: {
+						'planID': curPlanID,
+						'accType': accountType,
+						'commentTxt': PMtxt,
+						'hasComment': PMhasComment,
+						'myApprovals[]': currentApprovals,
+						csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+					},
+					success: function (msg) {
+					  //On Successful service call
+					  //alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
+					  console.log(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
+
+						var checkMinisters;
+						var allMinisters = [];
+						var unMinisters = [];
+
+						{% for c in allAccounts %} allMinisters.push("{{c.user_type}}"); {% endfor %}
+
+						$.ajax({
+							type: 'GET', //GET, POST, PUT or DELETE
+							url: '/getComments/{{curAccount.user_type}}/{{planItem.plan_ID}}', //Rename! Location of the service
+							success: function(data) {
+								console.log(data);
+								var test = JSON.parse(data);
+								var noReview = test['noReviewYet']
+								console.log(noReview);
+
+								if(noReview.length >0)
+								{
+									//alert("The following PMO members have not reviewed the plan:");
+									//alert(noReview.join("\n"));
+									var chkText="{{ curUser }}, are you sure you want to send this CRP to CMO? <br><br>";
+
+									chkText += "The following PMO Members have not reviewed the plan: <br><br>";
+
+									for(var i = 0; i < noReview.length; i++) {
+										chkText += noReview[i] + "<br>";
+									}
+
+									chkText += '<br><br>Please press the "Submit" button below to send the CRP to CMO';
+
+
+									console.log(chkText);
+
+									confirmationText.innerHTML = chkText;
+
+								}else
+								{
+									//Submit to CMO (ready for collection)
+									//alert("Report has been sent to CMO!");
+
+									var chkText = "{{ curUser }}, are you sure you want to send this CRP to CMO? <br><br>";
+
+									chkText += "All PMO Members have reviewed the CRP for: <br><br>"
+
+									chkText += "Crisis {{ planItem.crisis_ID }}<br>";
+									chkText += "Plan {{ planItem.plan_ID }}<br>";
+									chkText += "{{ crisisItem.crisis_name }}<br><br>";
+
+									chkText += 'Please press the "Submit" button below to send the CRP to CMO';
+
+									console.log(chkText);
+
+									confirmationText.innerHTML = chkText;
+
+								}
+							}
+						});
+					}
+				});
+			});
+		}
+
+	  </script>
+  <script>
+		
+        !function(a){"use strict";a('.navbar-sidenav [data-toggle="tooltip"]').tooltip({template:'<div class="tooltip navbar-sidenav-tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'}),a("#sidenavToggler").click(function(e){e.preventDefault(),a("body").toggleClass("sidenav-toggled"),a(".navbar-sidenav .nav-link-collapse").addClass("collapsed"),a(".navbar-sidenav .sidenav-second-level, .navbar-sidenav .sidenav-third-level").removeClass("show")}),a(".navbar-sidenav .nav-link-collapse").click(function(e){e.preventDefault(),a("body").removeClass("sidenav-toggled")}),a("body.fixed-nav .navbar-sidenav, body.fixed-nav .sidenav-toggler, body.fixed-nav .navbar-collapse").on("mousewheel DOMMouseScroll",function(a){var e=a.originalEvent,t=e.wheelDelta||-e.detail;this.scrollTop+=30*(t<0?1:-1),a.preventDefault()}),a(document).scroll(function(){a(this).scrollTop()>100?a(".scroll-to-top").fadeIn():a(".scroll-to-top").fadeOut()}),a('[data-toggle="tooltip"]').tooltip(),a(document).on("click","a.scroll-to-top",function(e){var t=a(this);a("html, body").stop().animate({scrollTop:a(t.attr("href")).offset().top},1e3,"easeInOutExpo"),e.preventDefault()}),a(document).ready(function(){a("#dataTable").DataTable()})}(jQuery), Chart.defaults.global.defaultFontFamily='-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif',Chart.defaults.global.defaultFontColor="#292b2c",
+        ctx=document.getElementById("myAreaChart"),
+        myLineChart = new Chart(ctx,{type:"line",
+            data:{
+                labels:labelData,
+                datasets:[
+                    {
+                        label:"Current Injuries",
+                        data:injuriesData,
+                        lineTension:.3,
+                        backgroundColor:"rgba(2,117,216,0.2)",
+                        borderColor:"rgba(2,117,216,1)",
+                        pointRadius:5,
+                        pointBackgroundColor:"rgba(2,117,216,1)",
+                        pointBorderColor:"rgba(255,255,255,0.8)",
+                        pointHoverRadius:5,
+                        pointHoverBackgroundColor:"rgba(2,117,216,1)",
+                        pointHitRadius:20,
+                        pointBorderWidth:2
+                    },
+                    {
+                        label:"Current Deaths",
+                        data:deathsData,
+                        lineTension:.3,
+                        backgroundColor:"rgb(255, 104, 100)",
+                        borderColor:"rgb(255, 6, 0)",
+                        pointRadius:5,
+                        pointBackgroundColor:"rgb(255, 6, 0)",
+                        pointBorderColor:"rgba(255,255,255,0.8)",
+                        pointHoverRadius:5,
+                        pointHoverBackgroundColor:"rgb(255, 6, 0)",
+                        pointHitRadius:20,
+                        pointBorderWidth:2
+                    }
+                ]
+            },
+            options:{
+                scales:{
+                    xAxes:[
+                        {
+                            time:{unit:"time"},
+                            gridLines:{display:!1},
+                            ticks:{min:labelData.length}
+                        }
+                    ],
+                    yAxes:[
+                        {
+                            ticks:{min:0,max:maxY,maxTicksLimit:20},
+                            gridLines:{color:"rgba(0, 0, 0, .125)"}
+                        }
+                    ]
+                },
+                legend:{display:!1}
+            }
+            })
+
+        //,ctx=document.getElementById("myBarChart"),
+        //myLineChart=new Chart(ctx,{type:"bar",data:{labels:["January","February","March","April","May","June"],datasets:[{label:"Revenue",backgroundColor:"rgba(2,117,216,1)",borderColor:"rgba(2,117,216,1)",data:[4215,5312,6251,7841,9821,14984]}]},options:{scales:{xAxes:[{time:{unit:"month"},gridLines:{display:!1},ticks:{maxTicksLimit:6}}],yAxes:[{ticks:{min:0,max:15e3,maxTicksLimit:5},gridLines:{display:!0}}]},legend:{display:!1}}}),
+        //ctx=document.getElementById("myPieChart"),
+        //myPieChart=new Chart(ctx,{type:"pie",data:{labels:["Blue","Red","Yellow","Green"],datasets:[{data:[12.21,15.58,11.25,8.32],backgroundColor:["#007bff","#dc3545","#ffc107","#28a745"]}]}});
+
+</script>
+<script type="text/javascript">
+        //For Crisis Updates
+        $('#alertBellNotification').load("/notificationBell");
+        setInterval(function(){
+            $('#alertBellNotification').load("/notificationBell");
+            //console.log("HELLO");
+        },10000);
+
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        //Passing the CSRF Token with every ajax call
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                var csrfToken = getCookie('csrftoken');
+                xhr.setRequestHeader("X-CSRFToken", csrfToken);
+            }
+        });
+
+        function updateNotiCount() {
+
+            $.ajax({
+                type: 'POST', //GET, POST, PUT or DELETE
+                url: '/updateNotiCount/',
+                data: { },
+                success: function (msg) {
+                  console.log("notification bell updated");
+                }
+            });
+        }
+
+    </script>
+  <!--<script src="/static/vendor/js/sb-admin.min.js"></script>-->
+
+      <script type="text/javascript">
+        //For Crisis Updates
+        $('#alertBellNotification').load("/notificationBell");
+        setInterval(function(){
+            $('#alertBellNotification').load("/notificationBell");
+            //console.log("HELLO");
+        },10000);
+
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        //Passing the CSRF Token with every ajax call
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                var csrfToken = getCookie('csrftoken');
+                xhr.setRequestHeader("X-CSRFToken", csrfToken);
+            }
+        });
+
+        function updateNotiCount() {
+
+            $.ajax({
+                type: 'POST', //GET, POST, PUT or DELETE
+                url: '/updateNotiCount/',
+                data: { },
+                success: function (msg) {
+                  console.log("notification bell updated");
+                }
+            });
+        }
+
+    </script>
+
+  </body>
+
+</html>

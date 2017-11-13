@@ -1,0 +1,46 @@
+<script type="text/javascript">
+    function updateNotiCount() {
+            console.log("{{outstandingCount}}");
+            $.ajax({
+                    type: 'POST', //GET, POST, PUT or DELETE
+                    url: '/updateNotiCount/',
+                    data: { },
+                    success: function (msg) {
+                      //On Successful service call
+                      //alert(accountType+"'s response (Has Comment: "+ MOHAhasComment +") for "+curPlanID+ " has been saved!");
+                      console.log("Notifications Loaded");
+                    }
+                    //csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+            });
+        }
+</script>
+
+<a class="nav-link dropdown-toggle mr-lg-2" href="#" id="alertsDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="updateNotiCount()">
+      <i class="fa fa-fw fa-bell"></i>
+      <span class="d-lg-none">Alerts
+            <span class="badge badge-pill badge-warning" id="change1">{{ outstandingCount }} New</span>
+      </span>
+      <span class="new-indicator text-warning d-none d-lg-block">
+          {% if outstandingCount > 0 %}
+            <i class="fa fa-fw fa-circle"></i>
+            <span class="number" id="change2">{{ outstandingCount }}</span>
+          {% endif %}
+      </span>
+</a>
+<div class="dropdown-menu" aria-labelledby="alertsDropdown">
+  <h6 class="dropdown-header">Recent Notifications:</h6>
+  {% for noti in curNotification %}
+    <div class="dropdown-divider"></div>
+      <a class="dropdown-item" href="../../crisis/{{ noti.CrisisID }}">
+        <span class="text-danger">
+          <strong>New Report from CMO</strong>
+        </span>
+        <span class="small float-right text-muted">{{ noti.DateTime|time:"h:i a" }} </span>
+        <div class="dropdown-message small">Crisis: {{ noti.CrisisTitle }}</div>
+      </a>
+  {% endfor %}
+  <div class="dropdown-divider"></div>
+    <a class="dropdown-item small" href="">
+		Last Updated: {% now "M. j, Y, h:i a" %}
+    </a>
+</div>

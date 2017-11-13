@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>PMOSIMS</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="/static/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <!--<link href="/static/css/sb-admin.css" rel="stylesheet">-->
+    <style type ="text/css">
+        input {
+            display: block;
+            width: 100%;
+            padding: .5rem .75rem;
+            font-size: 1rem;
+            line-height: 1.25;
+            color: #151515;
+            background-color: #fff;
+            background-image: none;
+            background-clip: padding-box;
+            border: 1px solid rgba(0,0,0,.15);
+            border-radius: .25rem;
+            transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        }
+    </style>
+
+  </head>
+    <body class="bg-dark">
+        <div class="container">
+            <div class="card card-login mx-auto mt-5" style="max-width: 25rem;">
+                <div class="card-header">
+                    PMOSIMS Logout
+                </div>
+                <div class="card-body">
+                    Thank you for using PMOSIMS. Have a nice day.<br>
+                    Redirecting to login page in <span class="c" id="5"></span>
+                    <meta http-equiv="refresh" content="5;url=/logout/">
+                </div>
+            </div>
+        </div>
+    <script src="/static/vendor/jquery/jquery.min.js"></script>
+    <script src="/static/vendor/popper/popper.min.js"></script>
+    <script src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
+  </body>
+  <script>
+function c()
+{
+    var n=$('.c').attr('id');
+    var c=n;
+    $('.c').text(c);
+    setInterval(function()
+    {
+        c--;
+        if(c>=0)
+        {
+            $('.c').text(c);
+        }
+        if(c==0)
+        {
+            $('.c').text(n);
+        }
+    },1000);
+}
+
+// Start
+c();
+
+// Loop
+setInterval(function()
+{
+    c();
+},5000);
+</script>
+</html>
