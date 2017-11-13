@@ -144,10 +144,10 @@ class EvalPlan(models.Model): #Comments by Ministers
     class Meta:
         unique_together = ["eval_planID", "eval_userID"]
 
-class testmyfuckingapi(models.Model):
-    PlanID = models.IntegerField()
-    Comments = models.CharField(max_length=5000, null=True, blank=True)
-    PlanStatus = models.CharField(max_length=500, null=True, blank=True)
+# class testmyfuckingapi(models.Model):
+#     PlanID = models.IntegerField()
+#     Comments = models.CharField(max_length=5000, null=True, blank=True)
+#     PlanStatus = models.CharField(max_length=500, null=True, blank=True)
 
 class Notifications(models.Model):
     PlanNum = models.IntegerField() #Autoincrement

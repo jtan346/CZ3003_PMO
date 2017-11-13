@@ -12,7 +12,8 @@ import json
 from rest_framework import permissions, viewsets, status, generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from .serializer import PlanSerializer,EvalPlanSerializer,TestSerializer ,CMOSerializer
+from .serializer import *
+# from .serializer import PlanSerializer,EvalPlanSerializer,TestSerializer ,CMOSerializer
 from random import randint
 from django.conf import settings
 from django.core.mail import send_mail
@@ -28,25 +29,25 @@ import warnings
 # from django.db.models import Max
 # #from django.test import Client
 # import operator
-
-class PlanViewSet(viewsets.ModelViewSet):
-    lookup_field = 'plan_ID'
-    queryset = Plan.objects.all()
-    serializer_class = PlanSerializer
-
-class EvalPlanViewSet(viewsets.ModelViewSet):
-    lookup_field = 'eval_planID'
-    queryset = EvalPlan.objects.all()
-    serializer_class = EvalPlanSerializer
-
-class TestViewSet(viewsets.ModelViewSet):
-    lookup_field = 'PlanID'
-    queryset = testmyfuckingapi.objects.all()
-    serializer_class = TestSerializer
+#
+# class PlanViewSet(viewsets.ModelViewSet):
+#     lookup_field = 'plan_ID'
+#     queryset = Plan.objects.all()
+#     serializer_class = PlanSerializer
+#
+# class EvalPlanViewSet(viewsets.ModelViewSet):
+#     lookup_field = 'eval_planID'
+#     queryset = EvalPlan.objects.all()
+#     serializer_class = EvalPlanSerializer
+#
+# class TestViewSet(viewsets.ModelViewSet):
+#     lookup_field = 'PlanID'
+#     queryset = testmyfuckingapi.objects.all()
+#     serializer_class = TestSerializer
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
-def cmoapi(Request):
+def CMOSerializer(Request):
     if(Request.method == "POST"):
         serializer = CMOSerializer(data=Request.data)
         print(serializers)
@@ -59,7 +60,7 @@ def cmoapi(Request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(status.HTTP_400_BAD_REQUEST)
 
-def startupInits():
+def startupInitializer():
     initStorage()
     MyCMOApi()
     initNotifications()
