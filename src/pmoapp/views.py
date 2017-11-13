@@ -330,7 +330,7 @@ def MyCMOApi():
                             print("Stat already exists")
                         #     newStat.save()
                 else:
-                    newStat = CrisisUpdates(id=stat_id, updates_crisisID=crisis_id, updates_datetime=datetime.now(),updates_curInjuries=0, updates_curDeaths=0, updates_curSAF=0,updates_curSPF=0, updates_curSCDF=0, updates_description=stat_description)
+                    newStat = CrisisUpdates(updates_crisisID=crisis_id, updates_datetime=datetime.now(),updates_curInjuries=0, updates_curDeaths=0, updates_curSAF=0,updates_curSPF=0, updates_curSCDF=0, updates_description="")
                     newStat.save()
                     print("No Statistics for Crisis: " + str(crisis_id)+". Creating filler data.")
         else:
@@ -760,6 +760,7 @@ def report(request, plan_id):
 def sendReport(request):
     if request.POST:
         curPlanID = request.POST['planID']
+        action = request.POST['planAction']
         #1. Comments
 
         allComments = EvalPlan.objects.filter(eval_planID=curPlanID) #Will return 5 objects
@@ -774,9 +775,16 @@ def sendReport(request):
         #2. Status
 
         reportStatus = True
-        for n in allComments:
-            if(n.eval_hasComment):
-                reportStatus = False
+
+        # Status based on comment
+        # for n in allComments:
+        #     if(n.eval_hasComment):
+        #         reportStatus = False
+
+        if(action == "Approve"):
+            reportStatus = True
+        elif(action == "Reject"):
+            reportStatus = False
 
         #Change http when we have
 

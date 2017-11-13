@@ -696,7 +696,8 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
 			{%  if accountType == "PM"  %}
-            <a href="#" class="btn btn-primary" id="pmSubmit" data-toggle="modal" data-target="#" data-dismiss="modal">Submit</a>
+            <a href="#" class="btn btn-primary" id="pmSubmit" data-toggle="modal" data-target="#" data-dismiss="modal">Approve</a>
+            <a href="#" class="btn btn-primary" id="pmReject" data-toggle="modal" data-target="#" data-dismiss="modal">Reject</a>
 	          {% else %}
 	        <a href="#" class="btn btn-primary" id="pmSubmit" data-toggle="modal" data-target="#afterSubmit" data-dismiss="modal">Submit</a>
 	          {% endif %}
@@ -1244,6 +1245,33 @@
 					url: '/sendReport/', //Rename! Location of the service
 					data: {
 						'planID': {{ planID }},
+						'planAction': "Approve",
+						csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+					},
+					success: function (msg) {
+					  //On Successful service call
+					  //alert(accountType+"'s response (Has Comment: "+ PMhasComment +") for "+curPlanID+ " has been saved!");
+					  console.log("Sent {{ planItem.plan_ID }} to python");
+					  location.reload();
+					}
+				});
+
+	            console.log("Sent {{ planItem.plan_ID }} to python");
+	            location.reload();
+			});
+
+			$('#pmReject').click(function() {
+				console.log("Submitted");
+				//Submit code here
+				//var afterText = document.getElementById('afterText');
+	            //afterText.innerHTML = "Dear {{ curUser }}, your review of the Crisis Resolution Plan has been submitted. <br><br> Thank you and have a nice day!";
+
+	            $.ajax({
+					type: 'POST', //GET, POST, PUT or DELETE
+					url: '/sendReport/', //Rename! Location of the service
+					data: {
+						'planID': {{ planID }},
+						'planAction': "Reject",
 						csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
 					},
 					success: function (msg) {
