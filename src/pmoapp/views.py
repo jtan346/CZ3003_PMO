@@ -57,7 +57,6 @@ def cmoapi(Request):
             incData.save()
             return Response(serializer.data, status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     return Response(status.HTTP_400_BAD_REQUEST)
 
 def startupInits():
@@ -371,7 +370,9 @@ def otp(request):
     loggedin = request.session['Loggedin'] = False
     curnumNotifications = Notifications.objects.count()
     request.session['NumNotifications'] = curnumNotifications
-    send_mail(subject, str(OTP), from_email, to_email, fail_silently=False)
+    email_text = str(request.user) + ": " +str(OTP)
+    send_mail(subject, email_text, from_email, to_email, fail_silently=False)
+    # send_mail(subject, str(OTP), from_email, to_email, fail_silently=False)
     print(str(OTP))
     return render(request, 'pmoapp/authotp.html', {})
 
@@ -381,8 +382,8 @@ def resendOTP(request):
     from_email = settings.EMAIL_HOST_USER
     to_email = [from_email]
     OTP = request.session['OTP'] = randint(10000000, 99999999)
-    send_mail(subject, str(OTP), from_email, to_email, fail_silently=False)
-    print(str(OTP))
+    email_text = str(request.user) + ": " + str(OTP)
+    send_mail(subject, email_text, from_email, to_email, fail_silently=False)
     return render(request, 'pmoapp/authotp.html', {})
 
 def otpAuthentication(request):
@@ -941,7 +942,9 @@ class notificationBellUpdate(ListView):
     template_name = 'pmoapp/notificationBell.html'
     def get_queryset(self):
         curNotifications = Notifications.objects.all()
-        return curNotifications
+        lastfive = Notifications.objects.all().order_by('-id')[:5]
+        lastfive1 = reversed(lastfive)
+        return lastfive1
 
     def get_context_data(self, **kwargs):
         # for key in self.request.session.keys():
@@ -950,7 +953,8 @@ class notificationBellUpdate(ListView):
         curNotifications1 = Notifications.objects.all()
         curCount = curNotifications1.count()
         sessionNotiCount = self.request.session['NumNotifications']
-
+        lastfive = Notifications.objects.all().order_by('-id')[:5]
+        lastfive1 = reversed(lastfive)
         #Session: User's total read noti
         #From db: Total noti
 
@@ -968,7 +972,8 @@ class notificationBellUpdate(ListView):
         context = {
             'sessionNotiCount': sessionNotiCount, #No. of User's Currently Read Notifications
             'outstandingCount': leftNotiCount,  #No. of new notifications shown on bell
-            'curNotification': curNotifications1,   #All current notifications
+            'curNotification': lastfive1,   #All current notifications
+            # 'curNotification': curNotifications1,   #All current notifications
             'curNotificationsJson': serializers.serialize('json', curNotifications1), #All current notifications in JSON
         }
         return context
