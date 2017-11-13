@@ -13,7 +13,6 @@ from rest_framework import permissions, viewsets, status, generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .serializer import *
-# from .serializer import PlanSerializer,EvalPlanSerializer,TestSerializer ,CMOSerializer
 from random import randint
 from django.conf import settings
 from django.core.mail import send_mail
@@ -22,28 +21,6 @@ import urllib
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 import warnings
-# from django.contrib.auth.decorators import login_required
-# import threading
-# from django.core.serializers import serialize
-# from django.core.serializers.json import DjangoJSONEncoder
-# from django.db.models import Max
-# #from django.test import Client
-# import operator
-#
-# class PlanViewSet(viewsets.ModelViewSet):
-#     lookup_field = 'plan_ID'
-#     queryset = Plan.objects.all()
-#     serializer_class = PlanSerializer
-#
-# class EvalPlanViewSet(viewsets.ModelViewSet):
-#     lookup_field = 'eval_planID'
-#     queryset = EvalPlan.objects.all()
-#     serializer_class = EvalPlanSerializer
-#
-# class TestViewSet(viewsets.ModelViewSet):
-#     lookup_field = 'PlanID'
-#     queryset = testmyfuckingapi.objects.all()
-#     serializer_class = TestSerializer
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
@@ -75,21 +52,6 @@ def initStorage():
 
 def initNotifications():
     Notifications.objects.all().delete()
-    # ongoingCrisis = Crisis.objects.exclude(crisis_status='Resolved')
-    # if(ongoingCrisis):
-    #     #For each non-Resolved crisis, get all corresponding plans
-    #     for crisis in ongoingCrisis:
-    #         plansInCrisis = Plan.objects.filter(plan_crisisID=crisis.crisis_ID)
-    #         if(plansInCrisis):
-    #             #For each plan in non-Resolved crisis, add into Notification
-    #             for plan in plansInCrisis:
-    #                 newNoti = Notifications(PlanNum=plan.plan_num, PlanID=plan.plan_ID, CrisisID=crisis.crisis_ID, CrisisTitle=crisis.crisis_name, DateTime=plan.plan_sendtime)
-    #                 newNoti.save()
-    #         else:
-    #             print("Crisis " + str(crisis.crisis_ID) + " has no Plans.")
-    # else:
-    #     print("No Notifications Loaded")
-
     #save all current plans in notification db
     plans = Plan.objects.all()
     if(plans):
@@ -112,37 +74,24 @@ def MyCMOListener():
     else:
         print("MyCMOListener not activated. No. of Plans (" + str(curPlans.count()) + "), No. of Notifications ("+str(curNotis.count())+")")
 
-# PlanNum = models.IntegerField()  # Autoincrement
-# PlanID = models.IntegerField()
-# CrisisID = models.IntegerField()
-# CrisisTitle = models.CharField(max_length=500, null=True, blank=True)
-# DateTime = models.DateTimeField(null=True, blank=True)
-
-
 def MyCMOApi():
     warnings.simplefilter("ignore", RuntimeWarning)
-    #Delete all preextings?
+    # Delete all preextings
     # Plan.objects.all().delete()
     # Crisis.objects.all().delete()
     # SubCrisis.objects.all().delete()
     CrisisUpdates.objects.all().delete()
 
-    #response = requests.get('http://172.21.148.168/api/pmo/')
-    #response_dict = response.json()
+    #MyCMOAPI is manually parsed to account for data integrity and manual translations of several parts of code.
+    #This is because the ORM structure of the DB is very strict and a buffer, or wrapper, is needed (i.e. Provisional)
 
-    # with urllib.request.urlopen('http://172.21.148.168/api/pmo/') as url:
     try:
         url = urllib.request.urlopen('http://172.21.148.168/api/pmo/', timeout=5)
         s = url.read()
-        #data = json.loads(s.decode('utf-8'))
         data = json.loads(s.decode('utf-8'))
 
         #Crisis Model
-        #Missing:
-        # - crisis_description: Concat SubCrisis Description
-        # - crisis_datetime: Earliest SubCrisis datetime
-        # if(len(response_dict)>0):
-        #     for i in range(0,len(response_dict)):
+        #Missing: None. All accounted
         if (len(data) > 0):
             for i in range(0, len(data)):
                 # print(data[i]['id']) #OK
@@ -166,56 +115,35 @@ def MyCMOApi():
                         sc_type = data[i]['crisisreport_set'][j]['crisisType']  # crisis_type
                         concatDescription += "SubCrisis " + str(data[i]['crisisreport_set'][j]['id']) + ": " + str(data[i]['crisisreport_set'][j]['description']) + " \n"
 
-                        #Add SubCrisis Here
                         newSubCrisis = SubCrisis(sc_ID=sc_id,crisis_ID=data[i]['id'], crisis_type=sc_type, latitude=sc_latitude, longitude=sc_longitude, radius=sc_radius,datetime=sc_datetime,description=sc_description)
-                        #newSubCrisis.save()
                         testSubCrisis = SubCrisis.objects.filter(crisis_ID=data[i]['id'], sc_ID=sc_id)
                         if not testSubCrisis:
-                            # print(testSubCrisis)
-                            #testSubCrisis.delete()
                             newSubCrisis.save()
                         else:
                             print("SubCrisis already exists.")
-                            #newSubCrisis.save()
                 else:
                     print("No SubCrisis for Crisis: " + str(crisis_id))
 
                 #Add Crisis Description Here
-                #crisis_datetime=data[i]['crisisreport_set'][0]['datetime'] << To FIX
                 newCrisis = Crisis(crisis_ID=crisis_id, crisis_name=crisis_name, crisis_description=concatDescription, crisis_datetime=data[i]['crisisreport_set'][0]['datetime'],crisis_status=crisis_status)
-                #newCrisis.save()
                 testCrisis = Crisis.objects.filter(crisis_ID=crisis_id)
                 if not testCrisis:
-                    # print(testCrisis)
-                    #testCrisis.delete()
                     newCrisis.save()
                 else:
                     print("Crisis already exists.")
-                    #newCrisis.save()
 
                 #Plan Model
-                #Missing:
-                # - plan_crisisID: data[i]['id']    Pseudo Foreign Key (Do a crisis.pk = crisis_ID)
-                # - plan_receipt: current time of update
-                # - plan_sendtime: ?? << sub with datetime.now() for now
-                # - plan_SAFRecommended
-                # - plan_SPFRecommended
-                # - plan_SCDFRecommended
-                # - plan_SAFMaximum
-                # - plan_SPFMaximum
-                # - plan_SCDFMaximum
+                #Missing: None. All accounted
                 if(data[i]['actionplan_set']):
                     for k in range(0, len(data[i]['actionplan_set'])):
                         plan_id = data[i]['actionplan_set'][k]['id']  # plan_num *IMPORTANT
                         plan_num = data[i]['actionplan_set'][k]['plan_number']  # plan_ID *PK IMPORTANT
                         plan_description = data[i]['actionplan_set'][k]['description']  # plan_description
-                        #plan_status = data[i]['actionplan_set'][k]['status']  # plan_status: ENUM
+                        #plan_status = data[i]['actionplan_set'][k]['status']  # plan_status: Needs Translation
                         plan_projtime = data[i]['actionplan_set'][k]['resolution_time']  # plan_projResolutionTime
                         plan_projcasualty = data[i]['actionplan_set'][k]['projected_casualties']  # plan_projCasualtyRate
                         plan_type = data[i]['actionplan_set'][k]['type']  # ??
                         plan_senttime = data[i]['actionplan_set'][k]['outgoing_time']
-                        #plan_author = data[i]['actionplan_set'][k]['author']
-                        #plan_comments = data[i]['actionplan_set'][k]['comment']
 
                         #buffer input
                         maxSAF = 0
@@ -252,6 +180,7 @@ def MyCMOApi():
                                 print("Plan saved: " + str(plan_id) + " " + str(plan_status))
                             else:
                                 print("Plan already exists")
+
                         elif(data[i]['actionplan_set'][k]['status'] == "PMORequest"):
                             plan_status = "Pending PMO"
                             if (data[i]['actionplan_set'][k]['comment']):
@@ -265,8 +194,9 @@ def MyCMOApi():
                                 print("Plan saved: " + str(plan_id) + " " + str(plan_status))
                             else:
                                 print("Plan already exists")
+
                         elif data[i]['actionplan_set'][k]['status'] == "Rejected":
-                            #Rejected validation done at CMO Side      and data[i]['actionplan_set'][k]['author'] == "PMO"
+                            #Rejected validation done at CMO Side and data[i]['actionplan_set'][k]['author'] == "PMO"
                             #I rejected
                             plan_status = "Pending CMO"
                             if (data[i]['actionplan_set'][k]['comment']):
@@ -288,11 +218,9 @@ def MyCMOApi():
                     print("No Plan for Crisis: " + str(crisis_id))
 
                 #CrisisUpdates Model
-                #Missing:
-                # - updates_crisisID:  data[i]['id']    Pseudo Foreign Key (Do a crisis.pk = crisis_ID)
-                # - updates_curSAF
-                # - updates_curSPF
-                # - updates_curSCDF
+                #Missing: None. All acounted
+                # - updates_crisisID:  data[i]['id'] --- Pseudo Foreign Key (Do a crisis.pk = crisis_ID)
+
                 if(data[i]['efupdate_set']):
                     for l in range(0, len(data[i]['efupdate_set'])):
                         stat_id = data[i]['efupdate_set'][l]['id']
@@ -320,16 +248,13 @@ def MyCMOApi():
                             newStat = CrisisUpdates(id=stat_id, updates_crisisID=crisis_id, updates_datetime=stat_datetime, updates_curInjuries=stat_injured, updates_curDeaths=stat_deaths, updates_curSAF=curSAF, updates_curSPF=curSPF, updates_curSCDF=curSCDF, updates_description=stat_description)
                         else:
                             newStat = CrisisUpdates(id=stat_id, updates_crisisID=crisis_id, updates_datetime=stat_datetime, updates_curInjuries = 0, updates_curDeaths = 0, updates_curSAF = 0, updates_curSPF = 0, updates_curSCDF = 0, updates_description=stat_description)
-                        #Fix: updates_datetime=stat_datetime
-                        #newStat.save()
-                        #print(newStat)
+
                         testStat = CrisisUpdates.objects.filter(id=stat_id)
                         if not (testStat):
-                        #     testStat.delete()
                             newStat.save()
                         else:
                             print("Stat already exists")
-                        #     newStat.save()
+
                 else:
                     newStat = CrisisUpdates(updates_crisisID=crisis_id, updates_datetime=datetime.now(),updates_curInjuries=0, updates_curDeaths=0, updates_curSAF=0,updates_curSPF=0, updates_curSCDF=0, updates_description="")
                     newStat.save()
@@ -344,14 +269,6 @@ def MyCMOApi():
     else:
     # do something
         print('CMO Crisis Package Updated successfully!')
-
-# def getJsonValueByAttributes():
-#     response = requests.get('http://127.0.0.1:8000/api/plan/plan_ID/')
-#     response_dict = response.json()
-#     #for result1 in range(0,len(response_dict)):
-#     #    print(response_dict[result1])
-#     threading.Timer(60.0, getJsonValueByAttributes).start()
-#     #set timer to call the api can change to value of 60 current set to 1 min
 
 def login(request):
     return render(request, 'pmoapp/LoginGUI/login.html', {})
@@ -408,7 +325,6 @@ def login_check(session):
         #print("Session not found")
         return False
 
-#@user_passes_test(otp_check(requests), login_url='/authotp/')
 def home(request):
     if not login_check(request.session):
         return redirect('/otplogout')
@@ -428,13 +344,8 @@ def home(request):
         salutation = "Ms."
 
     curUser = salutation + " " + request.user.last_name +" "+ request.user.first_name
-    #print(curUser)
 
-#NOTE: WHEN TO PULL FROM CMO: ON EVERY PAGE LOAD, BECAUSE NOTIFICATION COME, CLICKING IT WILL REFRESH A PAGE!
-
-    #Code to receive, process and insert into my database.
-
-#Process Crisis/Plans
+    #Process Crisis/Plans
     crisisList = Crisis.objects.exclude(crisis_status='Resolved').order_by('crisis_ID')
     for crisis in crisisList:
         print(crisis)
@@ -457,7 +368,6 @@ def home(request):
         'accountType': accountType,
         'curUser': curUser,
         'planIDs': planIDS,
-        # 'crisisID': json.dumps(crisisItem.crisis_ID),
         'curName': json.dumps(curUser),
         'profilePicture': profilePicture,
     }
@@ -469,7 +379,7 @@ def history(request):
 
     template = loader.get_template('pmoapp/HistoricalGUI/history.html')
 
-#Get user info
+    #Get user info
 
     updateTime = datetime.now()
     curUsername = request.user
@@ -484,7 +394,7 @@ def history(request):
 
     curUser = salutation + " " + request.user.last_name + " " + request.user.first_name
 
-#Sidebar display list
+    #Sidebar display list
     allPlans = Plan.objects.all()
     ongoingPlanList = []
     ongoingCrisisList = Crisis.objects.exclude(crisis_status='Resolved')
@@ -500,7 +410,7 @@ def history(request):
                     max = plan
                     ongoingPlanList.append(plansInCrisis[index2-1])
 
-# Get all plans where Crisis status = Resolved
+    # Get all plans where Crisis status = Resolved
     historicalCrisisList = Crisis.objects.filter(crisis_status='Resolved')
     historicalPlanList = []
     for crisis in historicalCrisisList:
@@ -508,18 +418,10 @@ def history(request):
             if (crisis.crisis_ID == plan.plan_crisisID):
                 historicalPlanList.append(plan)
 
-    # print("ongoing:")
-    # for a in ongoingPlanList:
-    #     print(a.id)
-    # print("historical:")
-    # for b in historicalPlanList:
-    #     print(b.id)
-
     toDisplay = ongoingPlanList + historicalPlanList
     allCrisis = Crisis.objects.all()
     context = {
         'toDisplay': toDisplay,
-        #'toDisplay2': toDisplay2,
         'ongoingCrisis': ongoingCrisisList,
         'updateTime': updateTime,
         'allCrisis': allCrisis,
@@ -550,7 +452,6 @@ def crisis(request, crisis_id):
     curUser = salutation + " " + request.user.last_name + " " + request.user.first_name
     print(curUser)
 
-    #planItem = Plan.objects.filter(plan_ID=plan_id).get()
     crisisItem = Crisis.objects.filter(crisis_ID=crisis_id).get()
     updateItem = []
     planList=Plan.objects.filter(plan_crisisID=crisis_id)
@@ -623,14 +524,6 @@ def crisis(request, crisis_id):
     else:
         curAgencies = []
 
-    # print(curAgencies)
-
-    # print("open")
-    # print(crisis_id)
-    # print(curUserType)
-    # print(curAgencies)
-    # print("close")
-
     context = {
         'planItem': planItem,
         'curAgencies': serializers.serialize('json', curAgencies),
@@ -647,7 +540,6 @@ def crisis(request, crisis_id):
         'crisis_ID': crisis_id,
         'curName': json.dumps(curUser),
         'jsonCrisis': serializers.serialize('json', graphUpdateList),
-        #'jsonCrisis1': JsonResponse(serializers.serialize(graphUpdateList)),
         'jsonComments': serializers.serialize('json', allComments),
         'allComments': allComments,
         'myComments': myComments,
@@ -692,8 +584,7 @@ def report(request, plan_id):
                                    updates_curInjuries=0, updates_curDeaths=0, updates_curSAF=0, updates_curSPF=0,
                                    updates_curSCDF=0)
         baseUpdate.save()
-    # newAccount = Account(username="benji", password="12345", emailAddress="benjamintanjb@gmail.com", user_type="PM")
-    # newAccount.save()
+
     #print(updateItem)
 
     crisisList = Crisis.objects.exclude(crisis_status='Resolved')
@@ -756,7 +647,6 @@ def report(request, plan_id):
         'crisisID': json.dumps(crisisItem.crisis_ID),
         'curName': json.dumps(curUser),
         'jsonCrisis': serializers.serialize('json', graphUpdateList),
-        # 'jsonCrisis1': JsonResponse(serializers.serialize(graphUpdateList)),
         'jsonComments': serializers.serialize('json', allComments),
         'allComments': allComments,
         'myComments': myComments,
@@ -791,11 +681,6 @@ def sendReport(request):
 
         reportStatus = True
 
-        # Status based on comment
-        # for n in allComments:
-        #     if(n.eval_hasComment):
-        #         reportStatus = False
-
         if(action == "Approve"):
             reportStatus = True
         elif(action == "Reject"):
@@ -822,11 +707,6 @@ def sendReport(request):
         else:
             # do something
             print('Plan sent to CMO successfully!')
-
-        # print(r.status_code)
-        # print(curPlanID)
-        # print(concatComments)
-        # print(reportStatus)
 
         #update plan_comments in comments box.
 
@@ -987,16 +867,11 @@ class notificationBellUpdate(ListView):
             'sessionNotiCount': sessionNotiCount, #No. of User's Currently Read Notifications
             'outstandingCount': leftNotiCount,  #No. of new notifications shown on bell
             'curNotification': lastfive1,   #All current notifications
-            # 'curNotification': curNotifications1,   #All current notifications
-            # 'curNotificationsJson': serializers.serialize('json', curNotifications1), #All current notifications in JSON
         }
         return context
 
 
 def updateNotiCount(request):
-    # if not request.is_ajax() or not request.method == 'POST':
-    #     return HttpResponseNotAllowed(['POST'])
-
     curNotifications = Notifications.objects.all()
     curNotiCount = curNotifications.count()
     request.session['NumNotifications'] = curNotiCount
@@ -1048,7 +923,6 @@ def newsfeed(request):
         'accountType': accountType,
         'curUser': curUser,
         'profilePicture': profilePicture,
-        # 'crisisID': json.dumps(crisisItem.crisis_ID),
         'curName': json.dumps(curUser)
     }
     return HttpResponse(template.render(context, request))

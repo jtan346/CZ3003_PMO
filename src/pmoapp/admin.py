@@ -71,19 +71,13 @@ class EvalPlanAdmin(admin.ModelAdmin):
 
     def get_userID(self, obj):
         return obj.eval_userID.user_type
-#
-# class TestAdmin(admin.ModelAdmin):
-#     Model = testmyfuckingapi
-#     list_display = ('PlanID', 'Comments', 'PlanStatus')
 
 class NotificationAdmin(admin.ModelAdmin):
     Model = Notifications
     list_display = ('PlanNum', 'PlanID', 'CrisisID', 'CrisisTitle', 'DateTime')
 
-# admin.site.register(testmyfuckingapi, TestAdmin)
 admin.site.register(Notifications, NotificationAdmin)
 admin.site.register(Account, AccountAdmin)
-#admin.site.register(CurrentReport)
 admin.site.register(Crisis, CrisisAdmin)
 admin.site.register(CrisisUpdates, UpdateAdmin)
 admin.site.register(Plan, PlanAdmin)
@@ -91,10 +85,3 @@ admin.site.register(SubCrisis, SubCrisisAdmin)
 admin.site.register(ExternalAgency, ExternalAgencyAdmin)
 admin.site.register(ApproveAgency, ApproveAgencyAdmin)
 admin.site.register(EvalPlan, EvalPlanAdmin)
-
-# try:
-#     for name,obj in inspect.getmembers(models,inspect.isclass):
-#         if(issubclass(obj, Model)):
-#             admin.site.register(obj)
-# except(TypeError):
-#     print("Obj Throwing error : %s " % obj)
