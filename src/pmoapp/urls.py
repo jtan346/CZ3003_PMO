@@ -8,7 +8,7 @@ from django.contrib.auth import views as auth_views
 from rest_framework import routers
 
 urlpatterns = [ #pylint: disable=invalid-name
-    url(r'^api/cmoapi/', CMOSerializer),
+    url(r'^api/cmoapi/', CMOApi), #doublucheck
     url(r'^$', auth_views.login, {'template_name': 'pmoapp/LoginGUI/login.html'}, name='login'),
     url(r'^login/$', auth_views.login, {'template_name': 'pmoapp/LoginGUI/login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, name='logout'),

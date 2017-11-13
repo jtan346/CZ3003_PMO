@@ -25,7 +25,7 @@ import datetime
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
-def CMOSerializer(Request):
+def CMOApi(Request):
     if(Request.method == "POST"):
         serializer = CMOSerializer(data=Request.data)
         print(serializers)
@@ -63,7 +63,7 @@ def initNotifications():
     noti = Notifications.objects.all()
     print("initNotifications: There are currently " + str(noti.count()) + " Notifications")
 
-def MyCMOListener():
+def CMOListener():
     #If numNotifications > numPlans (ongoing), means CMO post me something
     curPlans = Plan.objects.all()
     curNotis = Notifications.objects.all()
@@ -71,9 +71,9 @@ def MyCMOListener():
     if(curNotis.count() > curPlans.count()):
         #call mycmoapi to pull new plan into db
         MyCMOApi()
-        print("MyCMOListener activated")
+        print("CMOListener activated")
     else:
-        print("MyCMOListener not activated. No. of Plans (" + str(curPlans.count()) + "), No. of Notifications ("+str(curNotis.count())+")")
+        print("CMOListener not activated. No. of Plans (" + str(curPlans.count()) + "), No. of Notifications ("+str(curNotis.count())+")")
 
 def MyCMOApi():
     warnings.simplefilter("ignore", RuntimeWarning)
@@ -335,7 +335,7 @@ def home(request):
     if not login_check(request.session):
         return redirect('/otplogout')
     #MyCMOApi()
-    MyCMOListener()
+    CMOListener()
     template = loader.get_template('pmoapp/HomeGUI/home.html')
 #Process Account/Session
     updateTime = datetime.datetime.now()
