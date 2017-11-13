@@ -186,7 +186,7 @@ LOGIN_URL = '/login/'
 LOGIN_EXEMPT_URLS = (
     #'/api/test/PlanID/'
     r'^api/test/',
-    r'^/api/cmoapi/',
+    r'^api/cmoapi/',
 )
 
 EMAIL_HOST = 'smtp.gmail.com'
