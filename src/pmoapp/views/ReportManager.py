@@ -124,109 +124,6 @@ def report(request, plan_id):
         'crisis_ID': crisisItem.crisis_status,
     }
     return HttpResponse(template.render(context, request))
-#
-# def sendReport(request):
-#     if request.POST:
-#         curPlanID = request.POST['planID']
-#         action = request.POST['planAction']
-#         #1. Comments
-#
-#         allComments = EvalPlan.objects.filter(eval_planID=curPlanID) #Will return 5 objects
-#
-#         concatComments = ""
-#         if(allComments):
-#             for n in allComments:
-#                 concatComments += str(n.eval_userID.user_type) + ": " + str(n.eval_text) + " \r\n"
-#
-#         print(concatComments)
-#
-#         #2. Status
-#
-#         reportStatus = True
-#
-#         if(action == "Approve"):
-#             reportStatus = True
-#         elif(action == "Reject"):
-#             reportStatus = False
-#
-#         #Change http when we have
-#
-#         try:
-#             requests.post('http://172.21.148.168/api/auth/', data={
-#                 'PlanID': curPlanID,
-#                 'Comments': concatComments,
-#                 'PlanStatus': reportStatus
-#             })
-#             print("Report Sent")
-#             print(curPlanID)
-#             print(concatComments)
-#             print(reportStatus)
-#
-#         except HTTPError as e:
-#             print('Error code: ', e.code)
-#         except URLError as e:
-#             # do something
-#             print('Reason: ', e.reason)
-#         else:
-#             # do something
-#             print('Plan sent to CMO successfully!')
-#
-#         #update plan_comments in comments box.
-#
-#         # Change the status of report to pending cmo fortesting
-#         if (reportStatus == True):
-#             Plan.objects.filter(plan_ID=curPlanID).update(plan_status="Approved")
-#             Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.datetime.now())
-#         else:
-#             Plan.objects.filter(plan_ID=curPlanID).update(plan_status="Pending CMO")
-#             Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.datetime.now())
-#
-#     return HttpResponse('')
-#
-# def saveComment(request):
-#     print(request)
-#     if request.POST:
-#         getPlanID = request.POST['planID']
-#         getAccType = request.POST['accType']
-#         getCommentTxt = request.POST['commentTxt']
-#         getHasComment = request.POST['hasComment']
-#         getMyApprovals = request.POST.getlist('myApprovals[]')
-#
-#         curAccount = Account.objects.filter(user_type=getAccType).get()
-#         curPlan = Plan.objects.filter(plan_ID=getPlanID).get()
-#         eval_entry = EvalPlan(eval_planID=curPlan, eval_userID=curAccount, eval_text=getCommentTxt, eval_hasComment=getHasComment)
-#         testDuplicate = EvalPlan.objects.filter(eval_planID__plan_ID=getPlanID, eval_userID__user_type=getAccType)
-#
-#         crisis_id = curPlan.plan_crisisID
-#         curCrisis = Crisis.objects.filter(crisis_ID=crisis_id).get()
-#
-#         curAgencies = []
-#         if (ApproveAgency.objects.filter(approve_approver__user_type=getAccType, approve_crisis__crisis_ID=crisis_id)):
-#             curAgencies = ApproveAgency.objects.filter(approve_approver__user_type=getAccType, approve_crisis__crisis_ID=crisis_id)
-#             for item in curAgencies:
-#                 item.delete()
-#
-#         for agency in getMyApprovals:
-#             theagency = ExternalAgency.objects.filter(agency_abbrev=agency).get()
-#             newAgency = ApproveAgency(approve_approver=curAccount,approve_agency=theagency,approve_crisis=curCrisis)
-#             newAgency.save()
-#
-#         print("open")
-#         print(curAgencies)
-#
-#         testmyinserts = ApproveAgency.objects.filter(approve_approver__user_type=getAccType, approve_crisis__crisis_ID=crisis_id)
-#         for item in testmyinserts:
-#             print(item.approve_agency)
-#
-#         print("close")
-#
-#         if not testDuplicate:
-#             eval_entry.save()
-#         else:
-#             testDuplicate[0].delete()
-#             eval_entry.save()
-#
-#     return HttpResponse('')
 
 def sendReport(request):
     if request.POST:
@@ -271,6 +168,8 @@ def sendReport(request):
                 eachagency += "Point of Contact: " + str(thisAgency.agency_poc) + "(" + str(thisAgency.agency_pocContact) + ")\r\n"
                 eachagency += "Description: " + str(thisAgency.agency_description) + "\r\n"
                 print(eachagency)
+                agencyText += eachagency + "\r\n"
+
 
         #send plan
         try:
@@ -321,13 +220,14 @@ def sendReport(request):
             Plan.objects.filter(plan_ID=curPlanID).update(plan_status="Approved")
             Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.datetime.now())
             Plan.objects.filter(plan_ID=curPlanID).update(plan_comments=concatComments)
+            Plan.objects.filter(plan_ID=curPlanID).update(plan_agencies=agencyText)
             #remember update my comments
             #agencies already FK to comments
         else:
             Plan.objects.filter(plan_ID=curPlanID).update(plan_status="Pending CMO")
             Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.datetime.now())
             Plan.objects.filter(plan_ID=curPlanID).update(plan_comments=concatComments)
-
+            Plan.objects.filter(plan_ID=curPlanID).update(plan_agencies=agencyText)
 
     return HttpResponse('')
 

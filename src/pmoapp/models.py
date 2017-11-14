@@ -6,7 +6,7 @@ import datetime
 from django.contrib.auth.models import User
 
 class Account(models.Model):
-    username = models.CharField(max_length=15, primary_key=True)
+    username = models.CharField(max_length=200, primary_key=True)
     handphone_number = models.IntegerField(
         validators=[
             MaxValueValidator(99999999),
@@ -77,7 +77,7 @@ class Plan(models.Model):
     plan_num = models.IntegerField()
     plan_crisisID = models.IntegerField()
     plan_description = models.TextField(null=True, blank=True)
-    plan_status = models.CharField(max_length=25)  # Enum: PendingPMO, PendingCMO, Approved(only when approved=True)
+    plan_status = models.CharField(max_length=200)  # Enum: PendingPMO, PendingCMO, Approved(only when approved=True)
     plan_receipt = models.DateTimeField(null=True) #ReceiptTime
     plan_sendtime = models.DateTimeField(null=True, blank=True) #sendtime
     plan_projCasualtyRate = models.DecimalField(max_digits=5, decimal_places=2, null=True)  # Default: 0.0, min; 0.0, max: 100.0
@@ -89,6 +89,7 @@ class Plan(models.Model):
     plan_SPFMaximum = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
     plan_SCDFMaximum = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
     plan_comments = models.TextField(blank=True, null=True) #comments posted to CMO, updated internally
+    plan_agencies = models.TextField(blank=True, null=True) #comments posted to CMO, updated internally
     plan_type = models.TextField(blank=True, null=True)
 
     def __str__(self):

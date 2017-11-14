@@ -198,7 +198,7 @@
             </a>
           </li>
 		  <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Live News Feed">
-            <a class="nav-link" href="../../#">
+        <a class="nav-link" href="#" target="_blank" onclick='window.open("http://172.21.148.168/publicmap");return false;'>
               <i class="fa fa-fw fa-feed"></i>
               <span class="nav-link-text">
                 CMO Public Broadcast</span>
@@ -482,6 +482,8 @@
 				<h4 class="reportHeader"> Review of Crisis Report </h4>
 				<h5 class="reportHeader pb-2">PMO Comments (Crisis {{ crisisItem.crisis_ID }} - Plan {{ planItem.plan_num }})</h5>
 				<textarea disabled class="form-control mb-2" id="txt{{ curAccount.user_type }}" rows="10">{{ planItem.plan_comments }}</textarea>
+				<h5 class="reportHeader pb-2 mt-3">External Agency Approvals</h5>
+				<textarea disabled class="form-control mb-2" id="txt{{ planItem.plan_agencies }}" rows="10">{{ planItem.plan_agencies }}</textarea>
 			</form>
 			</section>
 
