@@ -62,11 +62,15 @@ class CrisisUpdates(models.Model): #EF Updates
     id = models.IntegerField(primary_key=True)
     updates_crisisID = models.IntegerField()
     updates_datetime = models.DateTimeField()
-    updates_curInjuries = models.IntegerField(null=True, default=0)
-    updates_curDeaths = models.IntegerField(null=True, default=0)
-    updates_curSAF = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
-    updates_curSPF = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
-    updates_curSCDF = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
+    updates_curInjuries = models.CharField(max_length=500, blank=True, null=True)
+    updates_curDeaths = models.CharField(max_length=500, blank=True, null=True)
+    updates_curSAF = models.CharField(max_length=500, blank=True, null=True)  # Default: 0.0, min; 0.0, max: 100.0
+    updates_curSPF = models.CharField(max_length=500, blank=True, null=True)  # Default: 0.0, min; 0.0, max: 100.0
+    updates_curSCDF = models.CharField(max_length=500, blank=True, null=True)  # Default: 0.0, min; 0.0, max: 100.0updates_curInjuries = models.IntegerField(null=True, default=0)
+    # updates_curDeaths = models.IntegerField(null=True, default=0)
+    # updates_curSAF = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
+    # updates_curSPF = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
+    # updates_curSCDF = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
     updates_description = models.TextField(null=True, blank=True)
 
     class Meta: #For naming convention in django/admin
@@ -80,14 +84,20 @@ class Plan(models.Model):
     plan_status = models.CharField(max_length=200)  # Enum: PendingPMO, PendingCMO, Approved(only when approved=True)
     plan_receipt = models.DateTimeField(null=True) #ReceiptTime
     plan_sendtime = models.DateTimeField(null=True, blank=True) #sendtime
-    plan_projCasualtyRate = models.DecimalField(max_digits=5, decimal_places=2, null=True)  # Default: 0.0, min; 0.0, max: 100.0
     plan_projResolutionTime = models.TextField(blank=True, null=True)
-    plan_SAFRecommended = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
-    plan_SPFRecommended = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
-    plan_SCDFRecommended = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
-    plan_SAFMaximum = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
-    plan_SPFMaximum = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
-    plan_SCDFMaximum = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
+    plan_projCasualtyRate = models.CharField(max_length=200, blank=True, null=True)  # Default: 0.0, min; 0.0, max: 100.0
+    plan_SAFRecommended = models.CharField(max_length=200, blank=True, null=True)  # Default: 0.0, min; 0.0, max: 100.0
+    plan_SPFRecommended = models.CharField(max_length=200, blank=True, null=True)  # Default: 0.0, min; 0.0, max: 100.0
+    plan_SCDFRecommended = models.CharField(max_length=200, blank=True, null=True)  # Default: 0.0, min; 0.0, max: 100.0
+    plan_SAFMaximum = models.CharField(max_length=200, blank=True, null=True)  # Default: 0.0, min; 0.0, max: 100.0
+    plan_SPFMaximum = models.CharField(max_length=200, blank=True, null=True)  # Default: 0.0, min; 0.0, max: 100.0
+    plan_SCDFMaximum = models.CharField(max_length=200, blank=True, null=True)  # Default: 0.0, min; 0.0, max: 100.0plan_projCasualtyRate = models.DecimalField(max_digits=5, decimal_places=2, null=True)  # Default: 0.0, min; 0.0, max: 100.0
+    # plan_SAFRecommended = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
+    # plan_SPFRecommended = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
+    # plan_SCDFRecommended = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
+    # plan_SAFMaximum = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
+    # plan_SPFMaximum = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
+    # plan_SCDFMaximum = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
     plan_comments = models.TextField(blank=True, null=True) #comments posted to CMO, updated internally
     plan_agencies = models.TextField(blank=True, null=True) #comments posted to CMO, updated internally
     plan_type = models.TextField(blank=True, null=True)
