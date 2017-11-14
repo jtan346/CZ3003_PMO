@@ -175,6 +175,19 @@ def MyCMOApi():
                                 print("Plan saved: " + str(plan_id) + " " + str(plan_status))
                             else:
                                 print("Plan already exists")
+                        # elif data[i]['actionplan_set'][k]['status'] == "Resolved":
+                        #     plan_status = "Resolved"
+                        #     if (data[i]['actionplan_set'][k]['comment']):
+                        #         newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id, plan_type=plan_type, plan_description=plan_description, plan_projResolutionTime=plan_projtime, plan_status=plan_status,plan_receipt=datetime.datetime.now(), plan_sendtime=plan_senttime,plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF, plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF,plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF,plan_comments=data[i]['actionplan_set'][k]['comment']['text'])
+                        #     else:
+                        #         fillercomment = "No comments for: Crisis " + str(crisis_id) + " - Plan " + str(plan_num)
+                        #         newPlan = Plan(plan_ID=plan_id, plan_num=plan_num, plan_crisisID=crisis_id,plan_type=plan_type, plan_description=plan_description,plan_projResolutionTime=plan_projtime, plan_status=plan_status,plan_receipt=datetime.datetime.now(), plan_sendtime=plan_senttime,plan_projCasualtyRate=plan_projcasualty, plan_SAFRecommended=recSAF,plan_SPFRecommended=recSPF, plan_SCDFRecommended=recSCDF,plan_SAFMaximum=maxSAF, plan_SPFMaximum=maxSPF, plan_SCDFMaximum=maxSCDF,plan_comments=fillercomment)
+                        #     testPlan = Plan.objects.filter(plan_ID=plan_id)
+                        #     if not testPlan:
+                        #         newPlan.save()
+                        #         print("Plan saved: " + str(plan_id) + " " + str(plan_status))
+                        #     else:
+                        #         print("Plan already exists")
                         else:
                             #disregard plan
                             #plan_status = "Throw"

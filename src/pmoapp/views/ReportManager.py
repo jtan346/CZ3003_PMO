@@ -183,6 +183,15 @@ def sendReport(request):
             print(concatComments)
             print(reportStatus)
 
+            if (reportStatus == True):
+                Plan.objects.filter(plan_ID=curPlanID).update(plan_status="Approved")
+                Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.datetime.now())
+                if (planItem.plan_status == "Resolved"):
+                    Crisis.objects.filter(crisis_ID=planItem.plan_crisisID).update(crisis_status="Resolved")
+            else:
+                Plan.objects.filter(plan_ID=curPlanID).update(plan_status="Pending CMO")
+                Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.datetime.now())
+
         except HTTPError as e:
             print('Error code: ', e.code)
         except URLError as e:
@@ -216,18 +225,19 @@ def sendReport(request):
         #update plan_comments in comments box.
 
         # Change the status of report to pending cmo fortesting
-        if (reportStatus == True):
-            Plan.objects.filter(plan_ID=curPlanID).update(plan_status="Approved")
-            Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.datetime.now())
-            Plan.objects.filter(plan_ID=curPlanID).update(plan_comments=concatComments)
-            Plan.objects.filter(plan_ID=curPlanID).update(plan_agencies=agencyText)
-            #remember update my comments
-            #agencies already FK to comments
-        else:
-            Plan.objects.filter(plan_ID=curPlanID).update(plan_status="Pending CMO")
-            Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.datetime.now())
-            Plan.objects.filter(plan_ID=curPlanID).update(plan_comments=concatComments)
-            Plan.objects.filter(plan_ID=curPlanID).update(plan_agencies=agencyText)
+        # if (reportStatus == True):
+        #     Plan.objects.filter(plan_ID=curPlanID).update(plan_status="Approved")
+        #     Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.datetime.now())
+        #     Plan.objects.filter(plan_ID=curPlanID).update(plan_comments=concatComments)
+        #     Plan.objects.filter(plan_ID=curPlanID).update(plan_agencies=agencyText)
+        #     #remember update my comments
+        #     #agencies already FK to comments
+        # else:
+        #     Plan.objects.filter(plan_ID=curPlanID).update(plan_status="Pending CMO")
+        #     Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.datetime.now())
+
+        Plan.objects.filter(plan_ID=curPlanID).update(plan_comments=concatComments)
+        Plan.objects.filter(plan_ID=curPlanID).update(plan_agencies=agencyText)
 
     return HttpResponse('')
 
