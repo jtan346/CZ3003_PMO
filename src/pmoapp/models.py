@@ -22,10 +22,10 @@ class Account(models.Model):
         return self.user_type
 
 class ExternalAgency(models.Model): #many-to-many
-    agency_name = models.CharField(max_length=70)
-    agency_abbrev = models.CharField(max_length=10, primary_key=True)
-    agency_poc = models.CharField(max_length=50)
-    agency_pocContact = models.CharField(max_length=50)
+    agency_name = models.CharField(max_length=200)
+    agency_abbrev = models.CharField(max_length=200, primary_key=True)
+    agency_poc = models.CharField(max_length=200)
+    agency_pocContact = models.CharField(max_length=200)
     agency_description = models.CharField(max_length=500, null=True)
     agency_approver = models.ForeignKey(Account)
     class Meta: #For naming convention in django/admin
@@ -62,8 +62,8 @@ class CrisisUpdates(models.Model): #EF Updates
     id = models.IntegerField(primary_key=True)
     updates_crisisID = models.IntegerField()
     updates_datetime = models.DateTimeField()
-    updates_curInjuries = models.IntegerField(null=True, default=0.0)
-    updates_curDeaths = models.IntegerField(null=True, default=0.0)
+    updates_curInjuries = models.IntegerField(null=True, default=0)
+    updates_curDeaths = models.IntegerField(null=True, default=0)
     updates_curSAF = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
     updates_curSPF = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0
     updates_curSCDF = models.DecimalField(max_digits=5, decimal_places=2, null=True, default=0.0)  # Default: 0.0, min; 0.0, max: 100.0

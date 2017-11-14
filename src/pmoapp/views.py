@@ -39,9 +39,9 @@ def CMOApi(Request):
     return Response(status.HTTP_400_BAD_REQUEST)
 
 def startupInitializer():
-    initStorage()
-    MyCMOApi()
-    initNotifications()
+    #initStorage()
+    #MyCMOApi()
+    #initNotifications()
     print("startupInits")
 
 def initStorage():
@@ -49,6 +49,7 @@ def initStorage():
     Crisis.objects.all().delete()
     SubCrisis.objects.all().delete()
     CrisisUpdates.objects.all().delete()
+    ApproveAgency.objects.all().delete()
     print("Storage Reset and ready to receive CMO Data.")
 
 def initNotifications():
@@ -277,7 +278,7 @@ def MyCMOApi():
         print('CMO Crisis Package Updated successfully!')
 
 def login(request):
-    return render(request, 'pmoapp/LoginGUI/login.html', {})
+    return render(request, 'LoginGUI/login.html', {})
 
 def logout(request):
     return render(request, 'pmoapp/LoginGUI/logout.html', {})
@@ -296,7 +297,6 @@ def otp(request):
     request.session['NumNotifications'] = curnumNotifications
     email_text = str(request.user) + ": " +str(OTP)
     send_mail(subject, email_text, from_email, to_email, fail_silently=False)
-    # send_mail(subject, str(OTP), from_email, to_email, fail_silently=False)
     print(str(OTP))
     return render(request, 'pmoapp/LoginGUI/authotp.html', {})
 
@@ -682,6 +682,10 @@ def sendReport(request):
     if request.POST:
         curPlanID = request.POST['planID']
         action = request.POST['planAction']
+
+        planItem = Plan.objects.filter(plan_ID=curPlanID).get()
+        crisisItem = Crisis.objects.filter(crisis_ID=planItem.plan_crisisID).get()
+
         #1. Comments
 
         allComments = EvalPlan.objects.filter(eval_planID=curPlanID) #Will return 5 objects
@@ -704,6 +708,42 @@ def sendReport(request):
 
         #Change http when we have
 
+        #3. Agencies
+
+        agencyText = ""
+        if(ApproveAgency.objects.filter(approve_crisis__crisis_ID=crisisItem.crisis_ID)):
+            for item in ApproveAgency.objects.filter(approve_crisis__crisis_ID=crisisItem.crisis_ID):
+                thisAgency = item.approve_agency
+                thisApprover = item.approve_approver
+                eachagency = ""
+                eachagency += "Approver: " + str(thisApprover.user_type) + "(" + str(thisApprover.appointment) + ")\r\n"
+                eachagency += "Agency: " + str(thisAgency.agency_abbrev) + "(" + str(thisAgency.agency_name) + ")\r\n"
+                eachagency += "Point of Contact: " + str(thisAgency.agency_poc) + "(" + str(thisAgency.agency_pocContact) + ")\r\n"
+                eachagency += "Description: " + str(thisAgency.agency_description) + "\r\n"
+                print(eachagency)
+
+        #send plan
+        try:
+            requests.post('http://172.21.148.168/api/auth/', data={
+                'PlanID': curPlanID,
+                'Comments': concatComments,
+                'PlanStatus': reportStatus
+            })
+            print("Report Sent")
+            print(curPlanID)
+            print(concatComments)
+            print(reportStatus)
+
+        except HTTPError as e:
+            print('Error code: ', e.code)
+        except URLError as e:
+            # do something
+            print('Reason: ', e.reason)
+        else:
+            # do something
+            print('Plan sent to CMO successfully!')
+
+        #send agencies
         try:
             requests.post('http://172.21.148.168/api/auth/', data={
                 'PlanID': curPlanID,
@@ -730,9 +770,14 @@ def sendReport(request):
         if (reportStatus == True):
             Plan.objects.filter(plan_ID=curPlanID).update(plan_status="Approved")
             Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.datetime.now())
+            Plan.objects.filter(plan_ID=curPlanID).update(plan_comments=concatComments)
+            #remember update my comments
+            #agencies already FK to comments
         else:
             Plan.objects.filter(plan_ID=curPlanID).update(plan_status="Pending CMO")
             Plan.objects.filter(plan_ID=curPlanID).update(plan_sendtime=datetime.datetime.now())
+            Plan.objects.filter(plan_ID=curPlanID).update(plan_comments=concatComments)
+
 
     return HttpResponse('')
 
@@ -810,6 +855,7 @@ class commentUpdates(ListView):
         return updateItem
     def get_context_data(self, **kwargs):
         dataRec = self.kwargs['slug']
+        print(dataRec)
         data2 = dataRec.replace('-', ' ').split(' ')
         curUser = Account.objects.filter(user_type=data2[0]).get()
         curPlan = Plan.objects.filter(plan_ID=data2[1]).get()
