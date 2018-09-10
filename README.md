@@ -2,6 +2,11 @@
 
 Project for CZ3003 Software System Analysis and Design, group SSP3.
 
+## Disclaimer
+
+This project and all source codes and resources are created for the sole purpose of CZ3003 project work. This repository is no longer
+maintained by its developers. Please feel free to contact me for any information regarding this repository. Thank you and all the best!
+
 ## Getting Started Guide
 
 ### Getting Started for macOS and Unix-like
@@ -117,9 +122,3 @@ To format our codes:
 $ pip install yapf
 $ find src -iname "*.py" | xargs yapf -i
 ```
-
-
-## Disclaimer
-
-This project and all source codes and resources are created for the sole purpose of CZ3003 project work. This repository is no longer
-maintained by its developers. Please feel free to contact me for any information regarding this repository. Thank you and all the best!
