@@ -117,3 +117,9 @@ To format our codes:
 $ pip install yapf
 $ find src -iname "*.py" | xargs yapf -i
 ```
+
+
+## Disclaimer
+
+This project and all source codes and resources are created for the sole purpose of CZ3003 project work. This repository is no longer
+maintained by its developers. Please feel free to contact me for any information regarding this repository. Thank you and all the best!
